@@ -1,0 +1,8 @@
+﻿# Redirect www to non-www
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.driverssaathi\.com [NC]
+RewriteRule ^(.*)$ https://driverssaathi.com/ [L,R=301]
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
