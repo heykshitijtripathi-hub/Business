@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Driver Saathi — Verified Drivers for Fleets, Delhi NCR</title>
-<meta name="description" content="Driver Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and logistics operators across Delhi NCR.">
-<link rel="icon" type="image/png" href="images/driver-saathi-logo.png">
+<title>Drivers Saathi — Verified Drivers for Fleets &amp; Private Cars | Delhi NCR</title>
+<meta name="description" content="Drivers Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and private car owners across Delhi NCR.">
+<link rel="icon" type="image/png" href="images/driver-saathi-logo.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -54,52 +54,121 @@
 
   .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
 
+  /* ---------- Top Utility Announcement Bar ---------- */
+  .top-bar{
+    background:#0F172A;
+    color:#94A3B8;
+    font-size:12.5px;
+    padding:8px 0;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .top-bar-inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .dispatch-live{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    color:#F1F5F9;
+    font-weight:500;
+  }
+  .pulse-dot{
+    display:inline-block;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#10B981;
+    box-shadow:0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(16, 185, 129, 0.7);}
+    70%{box-shadow:0 0 0 7px rgba(16, 185, 129, 0);}
+    100%{box-shadow:0 0 0 0 rgba(16, 185, 129, 0);}
+  }
+  .top-contact-links{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .top-contact-links a{
+    color:#CBD5E1;
+    text-decoration:none;
+    transition:color .18s;
+  }
+  .top-contact-links a:hover{
+    color:#FB8500;
+  }
+  @media(max-width:700px){
+    .top-bar{display:none;}
+  }
+
   /* ---------- Header ---------- */
   header.site{
     position:sticky; top:0; z-index:100;
-    background:rgba(255,255,255,0.95);
-    backdrop-filter:blur(12px);
+    background:rgba(255,255,255,0.96);
+    backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line-soft);
     box-shadow:0 4px 20px -5px rgba(15,23,42,0.06);
   }
-  .nav-row{display:flex; align-items:center; justify-content:space-between; padding:14px 24px;}
+  .nav-row{display:flex; align-items:center; justify-content:space-between; padding:12px 24px;}
   .brandmark{
     text-decoration:none; display:inline-flex; align-items:center; gap:12px;
     overflow:visible; flex-shrink:0;
   }
   .brand-logo-img{
     height:50px; width:auto; max-width:280px; display:block;
-    transition:transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
-    filter:drop-shadow(0 2px 6px rgba(251,133,0,0.22));
+    transition:transform 0.3s ease, filter 0.3s ease;
   }
   .brandmark:hover .brand-logo-img{
-    transform:translateY(-2px) scale(1.03);
-    filter:drop-shadow(0 6px 18px rgba(251,133,0,0.4));
+    transform:translateY(-1px) scale(1.02);
   }
-  nav.primary{display:flex; align-items:center; gap:32px;}
-  nav.primary ul{list-style:none; display:flex; gap:28px; margin:0; padding:0;}
-  nav.primary a.navlink{
-    font-size:15px; font-weight:500; text-decoration:none; color:var(--ink-soft);
-    padding-bottom:4px; border-bottom:2px solid transparent; transition:border-color .18s, color .18s;
+  .nav-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
-  nav.primary a.navlink:hover{color:var(--ink); border-bottom-color:var(--marigold);}
   .btn{
     display:inline-flex; align-items:center; gap:8px; font-family:var(--font-body);
-    font-weight:600; font-size:15px; padding:11px 22px; border-radius:6px;
-    border:1.5px solid transparent; cursor:pointer; text-decoration:none; transition:transform .15s, background .15s, border-color .15s;
+    font-weight:600; font-size:14.5px; padding:10px 20px; border-radius:8px;
+    border:1.5px solid transparent; cursor:pointer; text-decoration:none; transition:all .2s ease;
   }
   .btn:active{transform:translateY(1px);}
   .btn-primary{background:var(--marigold); color:#fff; font-weight:700; box-shadow:0 4px 14px rgba(251,133,0,0.3);}
-  .btn-primary:hover{background:var(--marigold-deep); color:#fff;}
+  .btn-primary:hover{background:var(--marigold-deep); color:#fff; transform:translateY(-1px); box-shadow:0 6px 20px rgba(251,133,0,0.4);}
   .btn-ghost{background:transparent; color:var(--route-navy); border-color:var(--line);}
-  .btn-ghost:hover{border-color:var(--route-navy);}
+  .btn-ghost:hover{border-color:var(--route-navy); background:#F8FAFC;}
   .btn-dark{background:var(--route-navy); color:#fff;}
-  .btn-dark:hover{background:var(--ink);}
+  .btn-dark:hover{background:#000; transform:translateY(-1px);}
+  .btn-driver-pill{
+    background:#F8FAFC;
+    color:#0F172A;
+    border:1px solid #CBD5E1;
+    font-size:13.5px;
+    padding:8px 14px;
+    border-radius:20px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    text-decoration:none;
+    font-weight:600;
+    transition:all .2s;
+  }
+  .btn-driver-pill:hover{
+    background:#0F172A;
+    color:#fff;
+    border-color:#0F172A;
+  }
   .menu-toggle{
     display:none; background:none; border:1px solid var(--line); border-radius:6px;
     padding:8px 10px; cursor:pointer;
   }
   .menu-toggle span{display:block; width:20px; height:2px; background:var(--ink); margin:4px 0;}
+
 
   /* ---------- Tab Bar Navigation ---------- */
   .tab-bar {
@@ -637,13 +706,26 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
+<!-- TOP UTILITY ANNOUNCEMENT BAR -->
+<div class="top-bar">
+  <div class="wrap top-bar-inner">
+    <div class="dispatch-live"><span class="pulse-dot"></span> Delhi NCR Dispatch Desk: Active &amp; Taking Bookings (Mon–Sat: 8 AM – 9 PM)</div>
+    <div class="top-contact-links">
+      <span>Helpline: <a href="mailto:support@driverssaathi.com">support@driverssaathi.com</a></span>
+      <span style="opacity:0.4;">|</span>
+      <span>Base Hub: Gurugram &amp; Noida</span>
+    </div>
+  </div>
+</div>
+
 <header class="site">
   <div class="nav-row wrap">
-    <a href="index.html" class="brandmark" aria-label="Driver Saathi Home">
-      <img src="images/driver-saathi-logo.png" alt="Driver Saathi Logo" class="brand-logo-img">
+    <a href="index.html" class="brandmark" aria-label="Drivers Saathi Home">
+      <img src="images/driver-saathi-logo.png?v=3" alt="Drivers Saathi Logo" class="brand-logo-img">
     </a>
-    <div style="display:flex; align-items:center; gap:16px;">
-      <a class="btn btn-primary" href="#request">Request drivers</a>
+    <div class="nav-actions">
+      <a class="btn-driver-pill" href="driver-apply.html">🚗 Drive with Us</a>
+      <a class="btn btn-primary" href="#request">Hire a Driver &rarr;</a>
       <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
         <span></span><span></span><span></span>
       </button>
@@ -693,16 +775,21 @@
     <div class="hero-overlay-gradient"></div>
     <div class="wrap">
       <div>
-        <h1 style="color:#ffffff;">Verified drivers for your fleet, across Delhi&nbsp;NCR</h1>
-        <p class="lede">Driver Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and logistics operators — with a replacement ready if one drops out.</p>
+        <div class="badge" style="background:rgba(251,133,0,0.22); color:#FB8500; border:1px solid rgba(251,133,0,0.45); padding:6px 14px; border-radius:20px; font-size:13px; font-weight:700; margin-bottom:18px; display:inline-flex; align-items:center; gap:6px;">
+          <span>🛡️</span> #1 Verified Driver Placement Desk in Delhi NCR
+        </div>
+        <h1 style="color:#ffffff;">Verified drivers for fleets &amp; private cars, across Delhi&nbsp;NCR</h1>
+        <p class="lede">Drivers Saathi authenticates licenses, clears police records, and deploys trained professional drivers for commercial fleets, corporate transport, and personal car owners — backed by an unconditional 24-hr replacement guarantee.</p>
         <div class="cta-row">
-          <a href="#request" class="btn btn-primary">Request drivers</a>
-          <a href="#how" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.08); backdrop-filter:blur(6px);">See how it works</a>
+          <a href="#request" class="btn btn-primary" onclick="switchFormTab('fleet')">Request Fleet Drivers &rarr;</a>
+          <a href="#request" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); backdrop-filter:blur(6px);" onclick="switchFormTab('individual')">Hire Personally 👤</a>
+          <a href="driver-apply.html" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.3); background:transparent;">Drive with Us 🚗</a>
         </div>
         <div class="trust-chips">
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Police verified</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>License authenticated</span>
-          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Background checked</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>100% Police verified</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>License &amp; Badge authenticated</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>24-hr Replacement SLA</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>500+ Verified Network</span>
         </div>
       </div>
 
@@ -1649,10 +1736,10 @@
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="#top" class="brandmark" aria-label="Driver Saathi Home">
-          <img src="images/driver-saathi-logo-light.png" alt="Driver Saathi Logo" class="brand-logo-img" style="height:52px;">
+        <a href="#top" class="brandmark" aria-label="Drivers Saathi Home">
+          <img src="images/driver-saathi-logo-light.png?v=3" alt="Drivers Saathi Logo" class="brand-logo-img" style="height:52px;">
         </a>
-        <p style="margin-top:16px;">Professionalizing driver hiring for fleets and cab companies across Delhi NCR.</p>
+        <p style="margin-top:16px;">Professionalizing verified driver hiring for fleets, companies and personal car owners across Delhi NCR.</p>
       </div>
       <div>
         <h4>Company</h4>
