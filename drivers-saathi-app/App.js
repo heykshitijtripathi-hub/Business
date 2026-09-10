@@ -39,7 +39,92 @@ const THEME = {
   sosSoft: '#FEF2F2',
   blue: '#2563EB',
   blueSoft: '#EFF6FF',
+  purple: '#7C3AED',
+  purpleSoft: '#F5F3FF',
 };
+
+// Common Outstation Routes with Toll, Taxes, and Driver DA (Night Allowance)
+const ROUTES_DB = [
+  {
+    id: 'agra',
+    name: 'Delhi ⇄ Agra (Taj Expressway)',
+    distance: '210 km (One-way)',
+    toll: '₹415 (One-way) / ₹665 (Return)',
+    stateTax: 'Nil for Private Cars / ₹120 Commercial',
+    driverDA: '₹400 / Night Halt',
+    speedLimit: '100 km/h (Strict Speed Cameras)',
+  },
+  {
+    id: 'jaipur',
+    name: 'Delhi ⇄ Jaipur (Delhi-Mumbai Expy)',
+    distance: '270 km (One-way)',
+    toll: '₹590 (Sohna-Dausa Expy)',
+    stateTax: 'Rajasthan Entry Tax for Cabs',
+    driverDA: '₹500 / Night Halt',
+    speedLimit: '120 km/h (Expressway)',
+  },
+  {
+    id: 'chandigarh',
+    name: 'Delhi ⇄ Chandigarh (NH-44)',
+    distance: '250 km (One-way)',
+    toll: '₹390 (Panipat, Gharaunda, Shambhu)',
+    stateTax: 'Haryana / Punjab Border Permit',
+    driverDA: '₹400 / Night Halt',
+    speedLimit: '90 km/h Highway',
+  },
+  {
+    id: 'airport',
+    name: 'Noida / Greater Noida ⇄ Airport (T3)',
+    distance: '48 km (One-way)',
+    toll: '₹140 (DND / Barapullah Route: Free)',
+    stateTax: 'None for Delhi/NCR Private Cars',
+    driverDA: 'Day Duty (Regular Shift)',
+    speedLimit: '70 km/h Ring Road',
+  },
+  {
+    id: 'dehradun',
+    name: 'Delhi ⇄ Dehradun / Rishikesh',
+    distance: '260 km (One-way)',
+    toll: '₹310 (Meerut Expressway)',
+    stateTax: 'Uttarakhand Green Cess for Cabs',
+    driverDA: '₹500 / Night Halt',
+    speedLimit: '80 km/h Hill Section',
+  },
+];
+
+// Chauffeur Etiquette & Safety Academy Rules
+const ACADEMY_TIPS = [
+  {
+    id: '1',
+    category: 'VIP ETIQUETTE',
+    title: 'Opening Passenger Doors & Greeting',
+    tip: 'Always open the rear left door for VIP passengers. Greet with "Namaste / Good Morning Sir/Ma\'am" and maintain neutral eye contact.',
+  },
+  {
+    id: '2',
+    category: 'CABIN COMFORT',
+    title: 'AC & Music Preference Protocol',
+    tip: 'Set AC to 23°C before passenger boards. Never play music, radio or speak on phone on loudspeaker unless requested by owner.',
+  },
+  {
+    id: '3',
+    category: 'DELHI NCR DRIVING',
+    title: 'Strict Expressway Speed Cameras',
+    tip: 'Observe speed limits (70 km/h on Ring Road, 100 km/h on Taj Expressway). Avoid sudden acceleration or jerky braking.',
+  },
+  {
+    id: '4',
+    category: 'EMERGENCY & BREAKDOWN',
+    title: 'Puncture & Breakdown Procedure',
+    tip: 'Safely pull over to extreme left shoulder, turn on hazard hazard indicators immediately, and place emergency triangle 50m behind car.',
+  },
+  {
+    id: '5',
+    category: 'PRIVACY & SECURITY',
+    title: 'Zero Gossip & Discretion Policy',
+    tip: 'Never discuss passenger conversations, destinations, or family matters with outside guards or peer drivers.',
+  },
+];
 
 const STRINGS = {
   en: {
@@ -55,9 +140,9 @@ const STRINGS = {
     // Bottom Navigation
     tabHome: 'Home',
     tabHire: 'Hire',
-    tabLogbook: 'Duty Log',
-    tabJobs: 'Job Board',
-    tabTools: 'Tools & Rates',
+    tabVehicle: 'Car Care',
+    tabToll: 'Toll & DA',
+    tabAcademy: 'Academy',
 
     // Forms
     fleetFormTitle: 'Request Fleet & Commercial Drivers',
@@ -85,7 +170,7 @@ const STRINGS = {
 
     successTitle: 'Requirement Received!',
     successSub:
-      'Thank you for contacting Drivers Saathi. Our central dispatch desk is reviewing your requirement and will connect with you via Call / WhatsApp shortly.\n\nA confirmation copy has been sent to support@driverssaathi.com and your email.',
+      'Thank you for reaching out to Drivers Saathi. Our central dispatch desk is reviewing your requirement and will connect with you via Call / WhatsApp shortly.\n\nA confirmation copy has been sent to support@driverssaathi.com and your email.',
     closeBtn: 'Done',
   },
   hi: {
@@ -100,9 +185,9 @@ const STRINGS = {
 
     tabHome: 'होम',
     tabHire: 'ड्राइवर लें',
-    tabLogbook: 'हाजिरी डायरी',
-    tabJobs: 'नौकरियां',
-    tabTools: 'टूल्स व रेट्स',
+    tabVehicle: 'कार डायरी',
+    tabToll: 'टोल व भत्ता',
+    tabAcademy: 'ट्रेनिंग',
 
     fleetFormTitle: 'फ्लीट व कमर्शियल ड्राइवर रिक्वायरमेंट',
     fleetFormSub: 'कैब फ्लीट, टूर ऑपरेटर्स और कॉर्पोरेट स्टाफ पिकअप के लिए।',
@@ -129,27 +214,35 @@ const STRINGS = {
 
     successTitle: 'आवेदन प्राप्त हुआ!',
     successSub:
-      'ड्राइवर्स साथी से संपर्क करने के लिए धन्यवाद। हमारी टीम जल्द आपसे फोन/व्हाट्सएप पर संपर्क करेगी और ड्राइवर्स की सूची उपलब्ध कराएगी।\n\nएक कन्फर्मेशन ईमेल भी आपको भेजा गया है।',
+      'ड्राइवर्स साथी से संपर्क करने के लिए धन्यवाद। हमारी टीम जल्द आपसे फोन/व्हाट्सएप पर संपर्क करेगी।\n\nएक कन्फर्मेशन ईमेल भी आपको भेजा गया है।',
     closeBtn: 'ठीक है',
   },
 };
 
 export default function App() {
   const [lang, setLang] = useState('en');
-  const [currentTab, setCurrentTab] = useState('home'); // home | hire | logbook | jobs | tools
+  const [currentTab, setCurrentTab] = useState('home'); // home | hire | vehicle | toll | academy
   const [hireCategory, setHireCategory] = useState('personal'); // personal | fleet | temporary
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // Interactive Salary Calculator State
-  const [calcCarType, setCalcCarType] = useState('sedan');
-  const [calcHours, setCalcHours] = useState('10');
-  const [calcZone, setCalcZone] = useState('delhi');
+  // Selected Toll Route
+  const [selectedRoute, setSelectedRoute] = useState(ROUTES_DB[0]);
 
-  // Document Uploads State for Driver KYC
-  const [licenseImg, setLicenseImg] = useState(null);
-  const [aadhaarImg, setAadhaarImg] = useState(null);
+  // Car Care State (Insurance & PUC Expiry)
+  const [insuranceDate, setInsuranceDate] = useState('2027-03-15');
+  const [pucDate, setPucDate] = useState('2026-11-20');
+  const [serviceKm, setServiceKm] = useState('45,000 km');
+
+  // Fuel Log State
+  const [fuelLitres, setFuelLitres] = useState('35');
+  const [fuelCost, setFuelCost] = useState('3200');
+  const [fuelOdo, setFuelOdo] = useState('41250');
+  const [fuelEntries, setFuelEntries] = useState([
+    { id: '1', date: '2026-09-08', litres: '35 L', cost: '₹3,200', odo: '41,250 km', mileage: '16.4 km/L' },
+    { id: '2', date: '2026-08-25', litres: '40 L', cost: '₹3,750', odo: '40,680 km', mileage: '15.8 km/L' },
+  ]);
 
   // Digital Duty Logbook State
   const [logEntries, setLogEntries] = useState([]);
@@ -174,20 +267,15 @@ export default function App() {
     experience: '',
   });
 
-  // Parivahan DL Search State
-  const [verifyDLNumber, setVerifyDLNumber] = useState('');
-  const [verifyDOB, setVerifyDOB] = useState('');
-
   const t = STRINGS[lang];
 
-  // Load saved duty logs from phone memory on start
+  // Persistent storage init
   useEffect(() => {
     (async () => {
       try {
-        const saved = await AsyncStorage.getItem('@driver_duty_logs');
+        const saved = await AsyncStorage.getItem('@driver_duty_logs_v2');
         if (saved) setLogEntries(JSON.parse(saved));
         else {
-          // Default demo log entries
           setLogEntries([
             { id: '1', date: '2026-09-08', in: '09:00 AM', out: '07:30 PM', km: '62 km', ot: '1.5 hrs' },
             { id: '2', date: '2026-09-09', in: '08:45 AM', out: '08:00 PM', km: '84 km', ot: '2.0 hrs' },
@@ -212,13 +300,25 @@ export default function App() {
     };
     const updated = [newEntry, ...logEntries];
     setLogEntries(updated);
-    await AsyncStorage.setItem('@driver_duty_logs', JSON.stringify(updated));
+    await AsyncStorage.setItem('@driver_duty_logs_v2', JSON.stringify(updated));
     Alert.alert('Entry Saved', `Driver duty recorded for ${logDate} with ${logOT || 0} hrs Overtime.`);
   };
 
-  const clearDutyLogs = async () => {
-    setLogEntries([]);
-    await AsyncStorage.removeItem('@driver_duty_logs');
+  const addFuelEntry = () => {
+    if (!fuelLitres || !fuelCost) {
+      Alert.alert('Incomplete Entry', 'Please enter Liters filled and Total Cost.');
+      return;
+    }
+    const newFuel = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      litres: `${fuelLitres} L`,
+      cost: `₹${Number(fuelCost).toLocaleString('en-IN')}`,
+      odo: `${fuelOdo} km`,
+      mileage: '16.2 km/L',
+    };
+    setFuelEntries([newFuel, ...fuelEntries]);
+    Alert.alert('Fuel Record Saved', 'Expense added to your vehicle ledger.');
   };
 
   // WhatsApp & Communication Actions
@@ -250,60 +350,6 @@ export default function App() {
     );
   };
 
-  const handleParivahanVerify = () => {
-    if (!verifyDLNumber.trim()) {
-      Alert.alert('License Number Required', 'Please enter a valid Driving License number (e.g. DL-0420110012345).');
-      return;
-    }
-    // Launch official mParivahan verification portal
-    Linking.openURL('https://parivahan.gov.in/rcdlstatus/?pur_cd=101');
-  };
-
-  // Image Picker for KYC
-  const pickDocument = async (docType) => {
-    try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        Alert.alert('Permission Denied', 'Gallery access is needed to attach your documents.');
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        quality: 0.7,
-      });
-      if (!result.canceled && result.assets && result.assets[0]) {
-        if (docType === 'license') setLicenseImg(result.assets[0].uri);
-        else setAadhaarImg(result.assets[0].uri);
-        Alert.alert('Document Attached', `${docType === 'license' ? 'Driving License' : 'Aadhaar Card'} attached successfully.`);
-      }
-    } catch (e) {}
-  };
-
-  // Salary Calculator
-  const calculateEstimate = () => {
-    let base = 18000;
-    if (calcCarType === 'hatchback') base = 16000;
-    if (calcCarType === 'sedan') base = 18000;
-    if (calcCarType === 'suv') base = 21000;
-    if (calcCarType === 'luxury') base = 26000;
-
-    let hourMultiplier = 1.0;
-    if (calcHours === '8') hourMultiplier = 0.9;
-    if (calcHours === '10') hourMultiplier = 1.0;
-    if (calcHours === '12') hourMultiplier = 1.15;
-
-    let zoneAdd = 0;
-    if (calcZone === 'gurugram') zoneAdd = 1000;
-    if (calcZone === 'noida') zoneAdd = 500;
-
-    const driverSalary = Math.round(base * hourMultiplier + zoneAdd);
-    const agencyFee = 4500;
-    return { driverSalary, agencyFee };
-  };
-
-  const estimate = calculateEstimate();
-
   // Form Submission
   const handleFormSubmit = async (type) => {
     if (!formData.name.trim() || !formData.phone.trim()) {
@@ -331,8 +377,6 @@ export default function App() {
       Destination: formData.destination || 'Local NCR',
       'License Type': formData.license || 'LMV',
       Experience: formData.experience || 'Not specified',
-      'License Attached': licenseImg ? 'Yes' : 'Pending',
-      'Aadhaar Attached': aadhaarImg ? 'Yes' : 'Pending',
       _subject: `[Lead Alert] ${type} - ${formData.name} (${formData.phone})`,
       _autoresponse: autoResponderCopy,
       _template: 'table',
@@ -363,8 +407,6 @@ export default function App() {
         license: '',
         experience: '',
       });
-      setLicenseImg(null);
-      setAadhaarImg(null);
     } catch (err) {
       setModalMessage(t.successSub);
       setModalVisible(true);
@@ -377,7 +419,7 @@ export default function App() {
     <SafeAreaView style={styles.safeContainer}>
       <StatusBar style="light" backgroundColor={THEME.ink} />
 
-      {/* Top Header */}
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.logoRow}>
           <Image
@@ -402,7 +444,7 @@ export default function App() {
         </View>
       </View>
 
-      {/* Live Dispatch Ticker */}
+      {/* Live Ticker */}
       <View style={styles.liveTicker}>
         <View style={styles.livePulse} />
         <Text style={styles.liveTickerText}>{t.liveStatus}</Text>
@@ -414,11 +456,11 @@ export default function App() {
       >
         <ScrollView contentContainerStyle={styles.mainScroll} showsVerticalScrollIndicator={false}>
           {/* ======================================================== */}
-          {/* TAB 1: OVERVIEW / HOME SCREEN                            */}
+          {/* TAB 1: HOME SCREEN                                       */}
           {/* ======================================================== */}
           {currentTab === 'home' && (
             <View>
-              {/* Executive Hero Banner */}
+              {/* Hero Banner */}
               <View style={styles.heroWrapper}>
                 <Image
                   source={require('./assets/driver_passenger_service.jpg')}
@@ -461,12 +503,12 @@ export default function App() {
                     onPress={() => openWhatsApp()}
                     activeOpacity={0.85}
                   >
-                    <Text style={styles.btnWhatsAppHeroText}>💬 Instant WhatsApp Consultation</Text>
+                    <Text style={styles.btnWhatsAppHeroText}>💬 Instant WhatsApp Booking</Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
-              {/* Fast Feature Quick Cards */}
+              {/* Super-App Feature Quick Grid */}
               <View style={styles.quickActionGrid}>
                 <TouchableOpacity
                   style={styles.quickCard}
@@ -476,35 +518,35 @@ export default function App() {
                   }}
                 >
                   <Text style={styles.quickIcon}>🛣️</Text>
-                  <Text style={styles.quickTitle}>Outstation / Highway</Text>
-                  <Text style={styles.quickSub}>Book 1-Day Driver for Jaipur / Agra / Airport</Text>
+                  <Text style={styles.quickTitle}>Outstation & Highway</Text>
+                  <Text style={styles.quickSub}>1-Day Driver for Agra / Jaipur / Hills</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.quickCard}
-                  onPress={() => setCurrentTab('logbook')}
+                  onPress={() => setCurrentTab('toll')}
                 >
-                  <Text style={styles.quickIcon}>⏱️</Text>
-                  <Text style={styles.quickTitle}>Driver Duty Log</Text>
-                  <Text style={styles.quickSub}>Daily Check-in, Overtime (OT) & Km tracker</Text>
+                  <Text style={styles.quickIcon}>💳</Text>
+                  <Text style={styles.quickTitle}>Toll & Night DA Calc</Text>
+                  <Text style={styles.quickSub}>FASTag, MCD border tax & driver allowance</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.quickCard}
-                  onPress={() => setCurrentTab('jobs')}
+                  onPress={() => setCurrentTab('vehicle')}
                 >
-                  <Text style={styles.quickIcon}>💼</Text>
-                  <Text style={styles.quickTitle}>Active Job Board</Text>
-                  <Text style={styles.quickSub}>View ₹18k-₹26k Chauffeur Openings in NCR</Text>
+                  <Text style={styles.quickIcon}>📋</Text>
+                  <Text style={styles.quickTitle}>Car Care & Fuel Log</Text>
+                  <Text style={styles.quickSub}>Insurance, PUC reminders & Km/L tracker</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.quickCard}
-                  onPress={() => setCurrentTab('tools')}
+                  onPress={() => setCurrentTab('academy')}
                 >
-                  <Text style={styles.quickIcon}>🔍</Text>
-                  <Text style={styles.quickTitle}>Verify DL & Challan</Text>
-                  <Text style={styles.quickSub}>Official Parivahan license & rate tools</Text>
+                  <Text style={styles.quickIcon}>🎓</Text>
+                  <Text style={styles.quickTitle}>Chauffeur Academy</Text>
+                  <Text style={styles.quickSub}>VIP etiquette, speed rules & safety guide</Text>
                 </TouchableOpacity>
               </View>
 
@@ -533,7 +575,7 @@ export default function App() {
                 </View>
               </View>
 
-              {/* Dispatch Help Card */}
+              {/* Central Dispatch Desk */}
               <View style={styles.contactDeskCard}>
                 <Text style={styles.contactDeskTitle}>Need a Driver Urgently?</Text>
                 <Text style={styles.contactDeskSub}>
@@ -552,11 +594,10 @@ export default function App() {
           )}
 
           {/* ======================================================== */}
-          {/* TAB 2: HIRE DRIVER (PERSONAL, FLEET, TEMPORARY / OUTSTATION) */}
+          {/* TAB 2: HIRE DRIVER                                       */}
           {/* ======================================================== */}
           {currentTab === 'hire' && (
             <View>
-              {/* 3-Way Booking Segment Selector */}
               <View style={styles.segmentContainer}>
                 <TouchableOpacity
                   style={[styles.segmentBtn, hireCategory === 'personal' && styles.segmentBtnActive]}
@@ -640,7 +681,7 @@ export default function App() {
                     <Text style={styles.fieldLabel}>{t.tripDate} *</Text>
                     <TextInput
                       style={styles.textInput}
-                      placeholder="e.g. Saturday 12th Sept, 6:00 AM Departure"
+                      placeholder="e.g. Saturday 6:00 AM Departure"
                       placeholderTextColor={THEME.inkMuted}
                       value={formData.tripDate}
                       onChangeText={(v) => setFormData({ ...formData, tripDate: v })}
@@ -736,89 +777,147 @@ export default function App() {
           )}
 
           {/* ======================================================== */}
-          {/* TAB 3: DIGITAL DRIVER DUTY LOGBOOK & OVERTIME CALCULATOR */}
+          {/* TAB 3: CAR CARE, DOCUMENT EXPIRY & FUEL LOG              */}
           {/* ======================================================== */}
-          {currentTab === 'logbook' && (
+          {currentTab === 'vehicle' && (
             <View>
+              {/* Document Expiry Tracker */}
               <View style={styles.sectionHeadingBox}>
-                <Text style={styles.sectionCategory}>DAILY MANAGEMENT</Text>
-                <Text style={styles.sectionTitle}>Digital Driver Duty Logbook</Text>
+                <Text style={styles.sectionCategory}>VEHICLE COMPLIANCE</Text>
+                <Text style={styles.sectionTitle}>Document Expiry & Maintenance</Text>
                 <Text style={styles.sectionSubtitle}>
-                  Track your chauffeur’s daily check-in, check-out, running kilometers, and overtime (OT)
-                  hours directly on your phone with zero confusion.
+                  Keep your vehicle road-legal across Delhi NCR. Track PUC, Insurance & Service schedule.
                 </Text>
               </View>
 
-              {/* New Duty Entry Card */}
-              <View style={styles.logCard}>
-                <Text style={styles.logCardTitle}>+ Record Today's Duty Entry</Text>
-
-                <View style={styles.logInputRow}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.miniLabel}>Duty Date</Text>
-                    <TextInput
-                      style={styles.miniInput}
-                      value={logDate}
-                      onChangeText={setLogDate}
-                      placeholder="YYYY-MM-DD"
-                    />
+              <View style={styles.carDocCard}>
+                <View style={styles.docRow}>
+                  <View>
+                    <Text style={styles.docName}>🛡️ Vehicle Insurance</Text>
+                    <Text style={styles.docSub}>Valid until: {insuranceDate}</Text>
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.miniLabel}>Check-in</Text>
-                    <TextInput
-                      style={styles.miniInput}
-                      value={logInTime}
-                      onChangeText={setLogInTime}
-                      placeholder="09:00 AM"
-                    />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.miniLabel}>Check-out</Text>
-                    <TextInput
-                      style={styles.miniInput}
-                      value={logOutTime}
-                      onChangeText={setLogOutTime}
-                      placeholder="07:30 PM"
-                    />
+                  <View style={[styles.statusBadge, { backgroundColor: THEME.verifiedSoft }]}>
+                    <Text style={[styles.statusBadgeText, { color: THEME.verified }]}>ACTIVE</Text>
                   </View>
                 </View>
 
+                <View style={styles.docRow}>
+                  <View>
+                    <Text style={styles.docName}>💨 PUC (Pollution Certificate)</Text>
+                    <Text style={styles.docSub}>Valid until: {pucDate}</Text>
+                  </View>
+                  <View style={[styles.statusBadge, { backgroundColor: THEME.marigoldLight }]}>
+                    <Text style={[styles.statusBadgeText, { color: THEME.marigoldDeep }]}>RENEW IN 70D</Text>
+                  </View>
+                </View>
+
+                <View style={styles.docRow}>
+                  <View>
+                    <Text style={styles.docName}>🔧 Periodic Engine Service</Text>
+                    <Text style={styles.docSub}>Next due at: {serviceKm}</Text>
+                  </View>
+                  <View style={[styles.statusBadge, { backgroundColor: THEME.blueSoft }]}>
+                    <Text style={[styles.statusBadgeText, { color: THEME.blue }]}>SCHEDULED</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Fuel Mileage Diary */}
+              <View style={styles.sectionHeadingBox}>
+                <Text style={styles.sectionCategory}>FUEL DIARY</Text>
+                <Text style={styles.sectionTitle}>Fuel Expense & Mileage Log</Text>
+              </View>
+
+              <View style={styles.fuelInputCard}>
+                <Text style={styles.logCardTitle}>+ Add Fuel Fill-up Entry</Text>
                 <View style={styles.logInputRow}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.miniLabel}>Running Distance (Km)</Text>
+                    <Text style={styles.miniLabel}>Litres</Text>
                     <TextInput
                       style={styles.miniInput}
-                      value={logKm}
-                      onChangeText={setLogKm}
-                      placeholder="e.g. 55"
+                      value={fuelLitres}
+                      onChangeText={setFuelLitres}
+                      placeholder="e.g. 35"
                       keyboardType="numeric"
                     />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.miniLabel}>Overtime Hours (OT)</Text>
+                    <Text style={styles.miniLabel}>Total (₹)</Text>
                     <TextInput
                       style={styles.miniInput}
-                      value={logOT}
-                      onChangeText={setLogOT}
-                      placeholder="e.g. 1.5"
+                      value={fuelCost}
+                      onChangeText={setFuelCost}
+                      placeholder="e.g. 3200"
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Odometer (Km)</Text>
+                    <TextInput
+                      style={styles.miniInput}
+                      value={fuelOdo}
+                      onChangeText={setFuelOdo}
+                      placeholder="41250"
                       keyboardType="numeric"
                     />
                   </View>
                 </View>
 
-                <TouchableOpacity style={styles.btnLogSave} onPress={saveDutyLog} activeOpacity={0.85}>
-                  <Text style={styles.btnLogSaveText}>💾 Save Duty Record</Text>
+                <TouchableOpacity style={styles.btnFuelSave} onPress={addFuelEntry} activeOpacity={0.85}>
+                  <Text style={styles.btnFuelSaveText}>💾 Save Fuel Record</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Duty Log History Table */}
-              <View style={styles.logHistoryHeader}>
-                <Text style={styles.logHistoryTitle}>Recent Duty Records ({logEntries.length})</Text>
-                {logEntries.length > 0 && (
-                  <TouchableOpacity onPress={clearDutyLogs}>
-                    <Text style={{ color: THEME.sosRed, fontSize: 12, fontWeight: '700' }}>Clear All</Text>
-                  </TouchableOpacity>
-                )}
+              {fuelEntries.map((item) => (
+                <View key={item.id} style={styles.fuelEntryCard}>
+                  <View style={styles.fuelEntryTop}>
+                    <Text style={styles.fuelEntryDate}>⛽ {item.date}</Text>
+                    <Text style={styles.fuelEntryCost}>{item.cost}</Text>
+                  </View>
+                  <View style={styles.fuelEntryDetails}>
+                    <Text style={styles.fuelEntryMeta}>{item.litres} • Odo: {item.odo}</Text>
+                    <Text style={styles.fuelEntryMileage}>Avg: {item.mileage}</Text>
+                  </View>
+                </View>
+              ))}
+
+              {/* Digital Driver Duty Logbook */}
+              <View style={[styles.sectionHeadingBox, { marginTop: 24 }]}>
+                <Text style={styles.sectionCategory}>DRIVER ATTENDANCE</Text>
+                <Text style={styles.sectionTitle}>Digital Duty & Overtime Log</Text>
+              </View>
+
+              <View style={styles.logCard}>
+                <Text style={styles.logCardTitle}>+ Record Today's Duty Entry</Text>
+                <View style={styles.logInputRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Date</Text>
+                    <TextInput style={styles.miniInput} value={logDate} onChangeText={setLogDate} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Check-in</Text>
+                    <TextInput style={styles.miniInput} value={logInTime} onChangeText={setLogInTime} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Check-out</Text>
+                    <TextInput style={styles.miniInput} value={logOutTime} onChangeText={setLogOutTime} />
+                  </View>
+                </View>
+
+                <View style={styles.logInputRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Distance (Km)</Text>
+                    <TextInput style={styles.miniInput} value={logKm} onChangeText={setLogKm} keyboardType="numeric" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Overtime (OT hrs)</Text>
+                    <TextInput style={styles.miniInput} value={logOT} onChangeText={setLogOT} keyboardType="numeric" />
+                  </View>
+                </View>
+
+                <TouchableOpacity style={styles.btnLogSave} onPress={saveDutyLog}>
+                  <Text style={styles.btnLogSaveText}>💾 Save Driver Duty</Text>
+                </TouchableOpacity>
               </View>
 
               {logEntries.map((entry) => (
@@ -833,282 +932,123 @@ export default function App() {
                   </View>
                 </View>
               ))}
+            </View>
+          )}
+
+          {/* ======================================================== */}
+          {/* TAB 4: TOLL, FASTAG & DRIVER ALLOWANCE (DA) CALCULATOR   */}
+          {/* ======================================================== */}
+          {currentTab === 'toll' && (
+            <View>
+              <View style={styles.sectionHeadingBox}>
+                <Text style={styles.sectionCategory}>OUTSTATION ESTIMATOR</Text>
+                <Text style={styles.sectionTitle}>Delhi NCR Toll, Tax & DA Guide</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Accurate FASTag toll charges, border entry permits, and driver daily allowances (DA).
+                </Text>
+              </View>
+
+              {/* Route Selector Tabs */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.routeScroll}>
+                {ROUTES_DB.map((r) => (
+                  <TouchableOpacity
+                    key={r.id}
+                    style={[styles.routePill, selectedRoute.id === r.id && styles.routePillActive]}
+                    onPress={() => setSelectedRoute(r)}
+                  >
+                    <Text style={[styles.routePillText, selectedRoute.id === r.id && styles.routePillTextActive]}>
+                      {r.name.split('⇄')[1] || r.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              {/* Route Breakdown Card */}
+              <View style={styles.routeDetailsCard}>
+                <Text style={styles.routeCardName}>{selectedRoute.name}</Text>
+                <Text style={styles.routeCardDistance}>📍 Approx Distance: {selectedRoute.distance}</Text>
+
+                <View style={styles.routeDetailBox}>
+                  <View style={styles.routeItemRow}>
+                    <Text style={styles.routeItemLabel}>💳 Estimated FASTag Toll:</Text>
+                    <Text style={styles.routeItemValue}>{selectedRoute.toll}</Text>
+                  </View>
+
+                  <View style={styles.routeItemRow}>
+                    <Text style={styles.routeItemLabel}>🛂 State Border Taxes:</Text>
+                    <Text style={styles.routeItemValue}>{selectedRoute.stateTax}</Text>
+                  </View>
+
+                  <View style={styles.routeItemRow}>
+                    <Text style={styles.routeItemLabel}>🍽️ Driver Daily DA / Halt:</Text>
+                    <Text style={[styles.routeItemValue, { color: THEME.marigoldDeep }]}>
+                      {selectedRoute.driverDA}
+                    </Text>
+                  </View>
+
+                  <View style={styles.routeItemRow}>
+                    <Text style={styles.routeItemLabel}>📷 Max Speed Camera Limit:</Text>
+                    <Text style={styles.routeItemValue}>{selectedRoute.speedLimit}</Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.btnPrimary}
+                  onPress={() => {
+                    setFormData({ ...formData, destination: selectedRoute.name });
+                    setCurrentTab('hire');
+                    setHireCategory('temporary');
+                  }}
+                >
+                  <Text style={styles.btnPrimaryText}>Book Outstation Driver for this Route &rarr;</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Fast Tag Tips */}
+              <View style={styles.tipCard}>
+                <Text style={styles.tipTitle}>💡 Drivers Saathi Outstation Guidelines</Text>
+                <Text style={styles.tipBody}>
+                  • Driver Night Allowance (DA) of ₹400-₹500 applies if duty extends beyond 10:00 PM on outstation routes.
+                  {'\n'}• Vehicle fuel, fast-tag tolls, and parking fees are borne by the vehicle owner.
+                  {'\n'}• All our outstation chauffeurs hold commercial hill & expressway driving clearance.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* ======================================================== */}
+          {/* TAB 5: CHAUFFEUR ACADEMY & ETIQUETTE GUIDE               */}
+          {/* ======================================================== */}
+          {currentTab === 'academy' && (
+            <View>
+              <View style={styles.sectionHeadingBox}>
+                <Text style={styles.sectionCategory}>CHAUFFEUR ACADEMY</Text>
+                <Text style={styles.sectionTitle}>VIP Etiquette & Safety Protocol</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Every driver placed by Drivers Saathi is trained in corporate decorum, privacy, and defensive driving.
+                </Text>
+              </View>
+
+              {ACADEMY_TIPS.map((item) => (
+                <View key={item.id} style={styles.academyCard}>
+                  <View style={styles.academyHeader}>
+                    <Text style={styles.academyCategory}>{item.category}</Text>
+                  </View>
+                  <Text style={styles.academyTitle}>{item.title}</Text>
+                  <Text style={styles.academyTip}>{item.tip}</Text>
+                </View>
+              ))}
 
               <TouchableOpacity
                 style={styles.btnWhatsAppOutline}
                 onPress={() =>
                   openWhatsApp(
-                    `Hello Drivers Saathi, here is my driver's monthly duty sheet with ${logEntries.length} entries. Please calculate monthly salary.`
+                    'Hello Drivers Saathi Academy, I want to learn more about your chauffeur training program in Delhi NCR.'
                   )
                 }
               >
-                <Text style={styles.btnWhatsAppOutlineText}>📤 Share Monthly Sheet with Drivers Saathi</Text>
+                <Text style={styles.btnWhatsAppOutlineText}>🎓 Inquire About Driver Training Program</Text>
               </TouchableOpacity>
-            </View>
-          )}
-
-          {/* ======================================================== */}
-          {/* TAB 4: ACTIVE JOB BOARD FOR DRIVERS                     */}
-          {/* ======================================================== */}
-          {currentTab === 'jobs' && (
-            <View>
-              <View style={styles.sectionHeadingBox}>
-                <Text style={styles.sectionCategory}>DELHI NCR OPENINGS</Text>
-                <Text style={styles.sectionTitle}>Active Driver Job Board</Text>
-                <Text style={styles.sectionSubtitle}>
-                  Verified driving jobs for private car chauffeurs, company executives & cab fleets with
-                  fixed monthly salaries.
-                </Text>
-              </View>
-
-              {/* Job Card 1 */}
-              <View style={styles.jobCard}>
-                <View style={styles.jobBadgeRow}>
-                  <Text style={styles.jobTypeBadge}>PRIVATE CAR</Text>
-                  <Text style={styles.jobSalary}>₹22,000 - ₹24,000 / mo</Text>
-                </View>
-                <Text style={styles.jobTitle}>Chauffeur for Hyundai Creta (Automatic)</Text>
-                <Text style={styles.jobLocation}>📍 Vasant Vihar & South Extension, Delhi</Text>
-                <Text style={styles.jobDesc}>
-                  Daily office commute + family duty. 10 hours/day, 6 days a week. Non-smoker, clean record,
-                  minimum 4 years experience required.
-                </Text>
-                <TouchableOpacity
-                  style={styles.jobApplyBtn}
-                  onPress={() => {
-                    setFormData({ ...formData, location: 'Vasant Vihar', experience: '4' });
-                    setCurrentTab('tools');
-                  }}
-                >
-                  <Text style={styles.jobApplyBtnText}>Apply for this Duty &rarr;</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Job Card 2 */}
-              <View style={styles.jobCard}>
-                <View style={styles.jobBadgeRow}>
-                  <Text style={[styles.jobTypeBadge, { backgroundColor: '#E0E7FF', color: '#4338CA' }]}>
-                    EXECUTIVE LUXURY
-                  </Text>
-                  <Text style={styles.jobSalary}>₹26,000 - ₹28,000 / mo</Text>
-                </View>
-                <Text style={styles.jobTitle}>Chauffeur for Mercedes E-Class / BMW</Text>
-                <Text style={styles.jobLocation}>📍 DLF Golf Course Road, Gurugram</Text>
-                <Text style={styles.jobDesc}>
-                  Corporate MD travel. Fluent Hindi and basic English route navigation. Highway driving
-                  experience on Yamuna / Delhi-Mumbai Expressway.
-                </Text>
-                <TouchableOpacity
-                  style={styles.jobApplyBtn}
-                  onPress={() => {
-                    setFormData({ ...formData, location: 'DLF Gurugram', experience: '6' });
-                    setCurrentTab('tools');
-                  }}
-                >
-                  <Text style={styles.jobApplyBtnText}>Apply for this Duty &rarr;</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Job Card 3 */}
-              <View style={styles.jobCard}>
-                <View style={styles.jobBadgeRow}>
-                  <Text style={[styles.jobTypeBadge, { backgroundColor: THEME.verifiedSoft, color: '#065F46' }]}>
-                    COMMERCIAL FLEET
-                  </Text>
-                  <Text style={styles.jobSalary}>₹20,000 + Fuel Bonus</Text>
-                </View>
-                <Text style={styles.jobTitle}>Cab Fleet Driver (Dzire / WagonR)</Text>
-                <Text style={styles.jobLocation}>📍 Sector 62 & Greater Noida</Text>
-                <Text style={styles.jobDesc}>
-                  Corporate IT staff shuttle pick-and-drop. Fixed timings, on-time weekly payments. Commercial
-                  badge required.
-                </Text>
-                <TouchableOpacity
-                  style={styles.jobApplyBtn}
-                  onPress={() => {
-                    setFormData({ ...formData, location: 'Noida', experience: '3' });
-                    setCurrentTab('tools');
-                  }}
-                >
-                  <Text style={styles.jobApplyBtnText}>Apply for this Duty &rarr;</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-
-          {/* ======================================================== */}
-          {/* TAB 5: TOOLS, DL PARIVAHAN VERIFICATION & CALCULATOR    */}
-          {/* ======================================================== */}
-          {currentTab === 'tools' && (
-            <View>
-              {/* Tool 1: Parivahan DL Verification Portal Link */}
-              <View style={styles.toolCard}>
-                <Text style={styles.toolBadge}>OFFICIAL GOVERNMENT INTEGRATION</Text>
-                <Text style={styles.toolTitle}>Verify Any Driver’s License (mParivahan)</Text>
-                <Text style={styles.toolSub}>
-                  Enter the driving license number to instantly verify authenticity, commercial endorsement,
-                  and traffic violation history via the Ministry of Road Transport portal.
-                </Text>
-
-                <Text style={styles.fieldLabel}>Enter DL Number (e.g. DL-0420110012345)</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="DL-XXXXXXXXXXXXXX"
-                  placeholderTextColor={THEME.inkMuted}
-                  value={verifyDLNumber}
-                  onChangeText={setVerifyDLNumber}
-                  autoCapitalize="characters"
-                />
-
-                <TouchableOpacity style={styles.btnParivahan} onPress={handleParivahanVerify} activeOpacity={0.85}>
-                  <Text style={styles.btnParivahanText}>🔍 Verify on Official Parivahan Portal</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Tool 2: Salary & Cost Calculator */}
-              <View style={styles.calcCard}>
-                <Text style={styles.calcSectionLabel}>1. Vehicle Category</Text>
-                <View style={styles.calcButtonGroup}>
-                  <TouchableOpacity
-                    style={[styles.calcOption, calcCarType === 'hatchback' && styles.calcOptionActive]}
-                    onPress={() => setCalcCarType('hatchback')}
-                  >
-                    <Text style={[styles.calcOptionText, calcCarType === 'hatchback' && styles.calcOptionTextActive]}>
-                      Hatchback (Manual)
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.calcOption, calcCarType === 'sedan' && styles.calcOptionActive]}
-                    onPress={() => setCalcCarType('sedan')}
-                  >
-                    <Text style={[styles.calcOptionText, calcCarType === 'sedan' && styles.calcOptionTextActive]}>
-                      Sedan / Compact SUV
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.calcOption, calcCarType === 'suv' && styles.calcOptionActive]}
-                    onPress={() => setCalcCarType('suv')}
-                  >
-                    <Text style={[styles.calcOptionText, calcCarType === 'suv' && styles.calcOptionTextActive]}>
-                      Full SUV (Innova / Fortuner)
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.calcOption, calcCarType === 'luxury' && styles.calcOptionActive]}
-                    onPress={() => setCalcCarType('luxury')}
-                  >
-                    <Text style={[styles.calcOptionText, calcCarType === 'luxury' && styles.calcOptionTextActive]}>
-                      Luxury (Mercedes / BMW / Audi)
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <Text style={styles.calcSectionLabel}>2. Duty Hours (6 Days / Week)</Text>
-                <View style={styles.calcRowGroup}>
-                  {['8', '10', '12'].map((hr) => (
-                    <TouchableOpacity
-                      key={hr}
-                      style={[styles.calcPill, calcHours === hr && styles.calcPillActive]}
-                      onPress={() => setCalcHours(hr)}
-                    >
-                      <Text style={[styles.calcPillText, calcHours === hr && styles.calcPillTextActive]}>
-                        {hr} Hours
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                <Text style={styles.calcSectionLabel}>3. Primary Operating NCR Zone</Text>
-                <View style={styles.calcRowGroup}>
-                  {[
-                    { id: 'delhi', label: 'Delhi' },
-                    { id: 'gurugram', label: 'Gurugram' },
-                    { id: 'noida', label: 'Noida' },
-                  ].map((z) => (
-                    <TouchableOpacity
-                      key={z.id}
-                      style={[styles.calcPill, calcZone === z.id && styles.calcPillActive]}
-                      onPress={() => setCalcZone(z.id)}
-                    >
-                      <Text style={[styles.calcPillText, calcZone === z.id && styles.calcPillTextActive]}>
-                        {z.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                <View style={styles.estimateResultBox}>
-                  <Text style={styles.estimateTitle}>Estimated Monthly Salary</Text>
-                  <Text style={styles.estimateFigure}>₹{estimate.driverSalary.toLocaleString('en-IN')}</Text>
-                  <Text style={styles.estimateNote}>in-hand per month (6 days a week)</Text>
-
-                  <TouchableOpacity
-                    style={styles.btnPrimary}
-                    onPress={() => {
-                      setFormData({ ...formData, vehicle: calcCarType, location: calcZone });
-                      setCurrentTab('hire');
-                      setHireCategory('personal');
-                    }}
-                  >
-                    <Text style={styles.btnPrimaryText}>Book Driver at this Rate &rarr;</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              {/* Tool 3: Driver KYC Upload Form */}
-              <View style={[styles.formContainerCard, { marginTop: 20 }]}>
-                <Text style={styles.formTitle}>{t.driverFormTitle}</Text>
-                <Text style={styles.formSubtitle}>{t.driverFormSub}</Text>
-
-                <Text style={styles.fieldLabel}>{t.name} *</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Driver Full Name"
-                  placeholderTextColor={THEME.inkMuted}
-                  value={formData.name}
-                  onChangeText={(v) => setFormData({ ...formData, name: v })}
-                />
-
-                <Text style={styles.fieldLabel}>{t.phone} *</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="+91 98765 43210"
-                  placeholderTextColor={THEME.inkMuted}
-                  keyboardType="phone-pad"
-                  value={formData.phone}
-                  onChangeText={(v) => setFormData({ ...formData, phone: v })}
-                />
-
-                <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Attach Verification Documents</Text>
-                <View style={styles.kycRow}>
-                  <TouchableOpacity
-                    style={[styles.kycUploadBtn, licenseImg && styles.kycUploadBtnSuccess]}
-                    onPress={() => pickDocument('license')}
-                  >
-                    <Text style={styles.kycUploadIcon}>{licenseImg ? '✅' : '🪪'}</Text>
-                    <Text style={styles.kycUploadLabel}>{licenseImg ? 'License Attached' : 'Attach DL'}</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.kycUploadBtn, aadhaarImg && styles.kycUploadBtnSuccess]}
-                    onPress={() => pickDocument('aadhaar')}
-                  >
-                    <Text style={styles.kycUploadIcon}>{aadhaarImg ? '✅' : '📄'}</Text>
-                    <Text style={styles.kycUploadLabel}>{aadhaarImg ? 'Aadhaar Attached' : 'Attach Aadhaar'}</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity
-                  style={styles.submitActionButton}
-                  onPress={() => handleFormSubmit('Driver Partner KYC & Application')}
-                  disabled={loading}
-                >
-                  {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.submitActionButtonText}>{t.applyBtn}</Text>}
-                </TouchableOpacity>
-              </View>
             </View>
           )}
         </ScrollView>
@@ -1131,23 +1071,23 @@ export default function App() {
           <Text style={[styles.tabLabel, currentTab === 'hire' && styles.tabLabelActive]}>{t.tabHire}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('logbook')} activeOpacity={0.7}>
-          <Text style={[styles.tabIconText, currentTab === 'logbook' && styles.tabIconActive]}>⏱️</Text>
-          <Text style={[styles.tabLabel, currentTab === 'logbook' && styles.tabLabelActive]}>{t.tabLogbook}</Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('vehicle')} activeOpacity={0.7}>
+          <Text style={[styles.tabIconText, currentTab === 'vehicle' && styles.tabIconActive]}>📋</Text>
+          <Text style={[styles.tabLabel, currentTab === 'vehicle' && styles.tabLabelActive]}>{t.tabVehicle}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('jobs')} activeOpacity={0.7}>
-          <Text style={[styles.tabIconText, currentTab === 'jobs' && styles.tabIconActive]}>💼</Text>
-          <Text style={[styles.tabLabel, currentTab === 'jobs' && styles.tabLabelActive]}>{t.tabJobs}</Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('toll')} activeOpacity={0.7}>
+          <Text style={[styles.tabIconText, currentTab === 'toll' && styles.tabIconActive]}>💳</Text>
+          <Text style={[styles.tabLabel, currentTab === 'toll' && styles.tabLabelActive]}>{t.tabToll}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('tools')} activeOpacity={0.7}>
-          <Text style={[styles.tabIconText, currentTab === 'tools' && styles.tabIconActive]}>🛠️</Text>
-          <Text style={[styles.tabLabel, currentTab === 'tools' && styles.tabLabelActive]}>{t.tabTools}</Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('academy')} activeOpacity={0.7}>
+          <Text style={[styles.tabIconText, currentTab === 'academy' && styles.tabIconActive]}>🎓</Text>
+          <Text style={[styles.tabLabel, currentTab === 'academy' && styles.tabLabelActive]}>{t.tabAcademy}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Success Confirmation Modal */}
+      {/* Confirmation Modal */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
@@ -1365,7 +1305,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   quickTitle: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '800',
     color: THEME.ink,
     marginBottom: 2,
@@ -1570,108 +1510,46 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
   },
 
-  // Duty Logbook Tab
-  logCard: {
+  // Car Care & Expiry
+  carDocCard: {
     backgroundColor: THEME.paper,
     borderRadius: 16,
     padding: 16,
-    borderWidth: 1.5,
-    borderColor: THEME.blue,
+    borderWidth: 1,
+    borderColor: THEME.line,
     marginBottom: 20,
+    gap: 12,
   },
-  logCardTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: THEME.ink,
-    marginBottom: 12,
-  },
-  logInputRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 10,
-  },
-  miniLabel: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: THEME.inkSoft,
-    marginBottom: 4,
-  },
-  miniInput: {
-    backgroundColor: THEME.paperAlt,
-    borderWidth: 1,
-    borderColor: THEME.line,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    fontSize: 12.5,
-    color: THEME.ink,
-  },
-  btnLogSave: {
-    backgroundColor: THEME.blue,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  btnLogSaveText: {
-    color: '#FFF',
-    fontWeight: '700',
-    fontSize: 13.5,
-  },
-  logHistoryHeader: {
+  docRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.lineSoft,
   },
-  logHistoryTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: THEME.ink,
-  },
-  logEntryCard: {
-    backgroundColor: THEME.paper,
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: THEME.line,
-    marginBottom: 10,
-  },
-  logEntryTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  logEntryDate: {
+  docName: {
     fontSize: 14,
     fontWeight: '800',
     color: THEME.ink,
   },
-  logEntryOT: {
+  docSub: {
     fontSize: 12,
-    fontWeight: '800',
-    color: THEME.marigoldDeep,
-    backgroundColor: THEME.marigoldLight,
+    color: THEME.inkSoft,
+    marginTop: 2,
+  },
+  statusBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 6,
   },
-  logEntryDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  logEntryMeta: {
-    fontSize: 12.5,
-    color: THEME.inkSoft,
-  },
-  logEntryKm: {
-    fontSize: 12.5,
-    fontWeight: '600',
-    color: THEME.ink,
+  statusBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '800',
   },
 
-  // Job Board Tab
-  jobCard: {
+  // Fuel Input & History
+  fuelInputCard: {
     backgroundColor: THEME.paper,
     borderRadius: 14,
     padding: 16,
@@ -1679,98 +1557,172 @@ const styles = StyleSheet.create({
     borderColor: THEME.line,
     marginBottom: 14,
   },
-  jobBadgeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  jobTypeBadge: {
-    backgroundColor: THEME.marigoldLight,
-    color: THEME.marigoldDeep,
-    fontSize: 10.5,
-    fontWeight: '800',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  jobSalary: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: THEME.verified,
-  },
-  jobTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: THEME.ink,
-    marginBottom: 4,
-  },
-  jobLocation: {
-    fontSize: 12.5,
-    color: THEME.inkSoft,
-    marginBottom: 8,
-  },
-  jobDesc: {
-    fontSize: 12.5,
-    color: THEME.inkSoft,
-    lineHeight: 18,
-    marginBottom: 12,
-  },
-  jobApplyBtn: {
-    backgroundColor: THEME.ink,
-    paddingVertical: 10,
+  btnFuelSave: {
+    backgroundColor: THEME.verified,
+    paddingVertical: 11,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 6,
   },
-  jobApplyBtnText: {
+  btnFuelSaveText: {
     color: '#FFF',
-    fontSize: 13,
     fontWeight: '700',
+    fontSize: 13,
   },
-
-  // Tools Tab
-  toolCard: {
+  fuelEntryCard: {
     backgroundColor: THEME.paper,
-    borderRadius: 16,
-    padding: 18,
-    borderWidth: 1.5,
-    borderColor: '#93C5FD',
-    marginBottom: 20,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginBottom: 8,
   },
-  toolBadge: {
-    color: THEME.blue,
-    fontSize: 10.5,
-    fontWeight: '800',
-    letterSpacing: 0.6,
+  fuelEntryTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
-  toolTitle: {
-    fontSize: 17,
+  fuelEntryDate: {
+    fontSize: 13.5,
     fontWeight: '800',
     color: THEME.ink,
-    marginBottom: 4,
   },
-  toolSub: {
-    fontSize: 12.5,
-    color: THEME.inkSoft,
-    lineHeight: 17,
-    marginBottom: 12,
-  },
-  btnParivahan: {
-    backgroundColor: THEME.blue,
-    borderRadius: 10,
-    paddingVertical: 13,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  btnParivahanText: {
-    color: '#FFF',
+  fuelEntryCost: {
+    fontSize: 14,
     fontWeight: '800',
-    fontSize: 13.5,
+    color: THEME.marigoldDeep,
+  },
+  fuelEntryDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  fuelEntryMeta: {
+    fontSize: 12,
+    color: THEME.inkSoft,
+  },
+  fuelEntryMileage: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: THEME.verified,
   },
 
-  // Calculator Card in Tools Tab
-  calcCard: {
+  // Duty Logbook
+  logCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1.5,
+    borderColor: THEME.blue,
+    marginBottom: 16,
+  },
+  logCardTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: THEME.ink,
+    marginBottom: 10,
+  },
+  logInputRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  miniLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: THEME.inkSoft,
+    marginBottom: 3,
+  },
+  miniInput: {
+    backgroundColor: THEME.paperAlt,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 7,
+    fontSize: 12,
+    color: THEME.ink,
+  },
+  btnLogSave: {
+    backgroundColor: THEME.blue,
+    paddingVertical: 11,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  btnLogSaveText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  logEntryCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginBottom: 8,
+  },
+  logEntryTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  logEntryDate: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: THEME.ink,
+  },
+  logEntryOT: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: THEME.marigoldDeep,
+    backgroundColor: THEME.marigoldLight,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  logEntryDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  logEntryMeta: {
+    fontSize: 12,
+    color: THEME.inkSoft,
+  },
+  logEntryKm: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.ink,
+  },
+
+  // Toll Tab
+  routeScroll: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  routePill: {
+    backgroundColor: THEME.paper,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginRight: 8,
+  },
+  routePillActive: {
+    backgroundColor: THEME.marigold,
+    borderColor: THEME.marigoldDeep,
+  },
+  routePillText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: THEME.inkSoft,
+  },
+  routePillTextActive: {
+    color: THEME.paper,
+    fontWeight: '800',
+  },
+  routeDetailsCard: {
     backgroundColor: THEME.paper,
     borderRadius: 16,
     padding: 18,
@@ -1778,119 +1730,86 @@ const styles = StyleSheet.create({
     borderColor: THEME.line,
     marginBottom: 16,
   },
-  calcSectionLabel: {
-    fontSize: 13,
-    fontWeight: '700',
+  routeCardName: {
+    fontSize: 18,
+    fontWeight: '800',
     color: THEME.ink,
-    marginTop: 10,
-    marginBottom: 6,
-  },
-  calcButtonGroup: {
-    gap: 6,
-  },
-  calcOption: {
-    backgroundColor: THEME.paperAlt,
-    paddingVertical: 9,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: THEME.line,
-  },
-  calcOptionActive: {
-    backgroundColor: THEME.marigoldLight,
-    borderColor: THEME.marigold,
-  },
-  calcOptionText: {
-    fontSize: 12.5,
-    color: THEME.inkSoft,
-    fontWeight: '600',
-  },
-  calcOptionTextActive: {
-    color: THEME.marigoldDeep,
-    fontWeight: '800',
-  },
-  calcRowGroup: {
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  calcPill: {
-    backgroundColor: THEME.paperAlt,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: THEME.line,
-  },
-  calcPillActive: {
-    backgroundColor: THEME.marigold,
-    borderColor: THEME.marigoldDeep,
-  },
-  calcPillText: {
-    fontSize: 12,
-    color: THEME.inkSoft,
-    fontWeight: '600',
-  },
-  calcPillTextActive: {
-    color: THEME.paper,
-    fontWeight: '800',
-  },
-  estimateResultBox: {
-    backgroundColor: THEME.ink,
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  estimateTitle: {
-    color: '#94A3B8',
-    fontSize: 11.5,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: 2,
-  },
-  estimateFigure: {
-    color: THEME.marigold,
-    fontSize: 32,
-    fontWeight: '800',
-  },
-  estimateNote: {
-    color: '#CBD5E1',
-    fontSize: 11.5,
-    marginBottom: 12,
-  },
-
-  // KYC
-  kycRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 6,
-  },
-  kycUploadBtn: {
-    flex: 1,
-    backgroundColor: THEME.paperAlt,
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  kycUploadBtnSuccess: {
-    backgroundColor: THEME.verifiedSoft,
-    borderColor: THEME.verified,
-    borderStyle: 'solid',
-  },
-  kycUploadIcon: {
-    fontSize: 22,
     marginBottom: 4,
   },
-  kycUploadLabel: {
-    fontSize: 12,
+  routeCardDistance: {
+    fontSize: 13,
+    color: THEME.inkSoft,
+    marginBottom: 14,
+  },
+  routeDetailBox: {
+    backgroundColor: THEME.paperAlt,
+    borderRadius: 12,
+    padding: 14,
+    gap: 10,
+    marginBottom: 16,
+  },
+  routeItemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  routeItemLabel: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+  },
+  routeItemValue: {
+    fontSize: 12.5,
     fontWeight: '700',
     color: THEME.ink,
+  },
+  tipCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginBottom: 20,
+  },
+  tipTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: THEME.ink,
+    marginBottom: 6,
+  },
+  tipBody: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+    lineHeight: 18,
+  },
+
+  // Academy Tab
+  academyCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginBottom: 12,
+  },
+  academyHeader: {
+    marginBottom: 4,
+  },
+  academyCategory: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    color: THEME.marigoldDeep,
+    letterSpacing: 0.6,
+  },
+  academyTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: THEME.ink,
+    marginBottom: 6,
+  },
+  academyTip: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+    lineHeight: 18,
   },
 
   // Floating WhatsApp
@@ -1939,7 +1858,7 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   tabLabel: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '600',
     color: THEME.inkSoft,
   },
