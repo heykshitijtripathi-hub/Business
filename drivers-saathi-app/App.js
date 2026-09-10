@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -17,8 +17,9 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Brand Color Palette
+// Theme & Palette
 const THEME = {
   ink: '#0F172A',
   inkSoft: '#475569',
@@ -29,12 +30,15 @@ const THEME = {
   paper: '#FFFFFF',
   paperAlt: '#F8FAFC',
   line: '#E2E8F0',
+  lineSoft: '#F1F5F9',
   verified: '#10B981',
   verifiedSoft: '#ECFDF5',
   cardNavy: '#1E293B',
   whatsapp: '#25D366',
   sosRed: '#EF4444',
   sosSoft: '#FEF2F2',
+  blue: '#2563EB',
+  blueSoft: '#EFF6FF',
 };
 
 const STRINGS = {
@@ -48,37 +52,40 @@ const STRINGS = {
     ctaDrive: 'Drive with Us',
     liveStatus: 'Delhi NCR Dispatch: Active (Mon-Sat: 8 AM - 9 PM)',
 
-    // Tabs
-    tabHome: 'Overview',
-    tabHire: 'Hire Driver',
-    tabCalc: 'Calculator',
-    tabDrivers: 'Roster & Reviews',
-    tabApply: 'Driver KYC',
+    // Bottom Navigation
+    tabHome: 'Home',
+    tabHire: 'Hire',
+    tabLogbook: 'Duty Log',
+    tabJobs: 'Job Board',
+    tabTools: 'Tools & Rates',
 
     // Forms
     fleetFormTitle: 'Request Fleet & Commercial Drivers',
     fleetFormSub: 'For cab fleets, tour operators, corporate staff shuttles, and logistics.',
-    personalFormTitle: 'Hire a Personal Chauffeur',
+    personalFormTitle: 'Hire a Permanent Chauffeur',
     personalFormSub: 'For private car owners, families, daily office commute, and VIP luxury cars.',
+    tempFormTitle: 'Book Temporary / Outstation Driver',
+    tempFormSub: 'Short notice driver for 1-day highway trips, weekend outstation, or backup driver.',
     driverFormTitle: 'Driver KYC & Application Form',
     driverFormSub: 'Upload your documents to get fast-track police verified & start earning.',
 
-    name: 'Contact Person / Full Name',
-    phone: 'Phone Number (Calling & WhatsApp)',
+    name: 'Full Name / Contact Person',
+    phone: 'Phone Number (WhatsApp)',
     email: 'Email Address (For auto-confirmation)',
     company: 'Company / Fleet Name (Optional)',
     vehicle: 'Vehicle Type / Model (e.g. Creta / Innova / EV)',
     location: 'Location / Preferred Area in Delhi NCR',
     driverCount: 'Number of Drivers Required',
+    tripDate: 'Trip Date & Required Time',
+    destination: 'Outstation Destination (e.g. Delhi to Jaipur / Agra)',
     licenseType: 'License Category (LMV / Commercial / Heavy)',
     experience: 'Total Driving Experience (in Years)',
     submitBtn: 'Submit Requirement Now',
     applyBtn: 'Submit KYC & Application',
 
-    // Success Modal
     successTitle: 'Requirement Received!',
     successSub:
-      'Thank you for reaching out to Drivers Saathi. Our dispatch desk is reviewing your requirement and will connect with you via call/WhatsApp shortly.\n\nA confirmation copy has been sent to support@driverssaathi.com and your email.',
+      'Thank you for contacting Drivers Saathi. Our central dispatch desk is reviewing your requirement and will connect with you via Call / WhatsApp shortly.\n\nA confirmation copy has been sent to support@driverssaathi.com and your email.',
     closeBtn: 'Done',
   },
   hi: {
@@ -91,28 +98,30 @@ const STRINGS = {
     ctaDrive: 'ड्राइवर बनें',
     liveStatus: 'दिल्ली एनसीआर डेस्क: चालू है (सोम-शनि: 8 AM - 9 PM)',
 
-    // Tabs
     tabHome: 'होम',
-    tabHire: 'ड्राइवर चाहिए',
-    tabCalc: 'रेट कैलकुलेटर',
-    tabDrivers: 'ड्राइवर्स व रिव्यू',
-    tabApply: 'ड्राइवर KYC',
+    tabHire: 'ड्राइवर लें',
+    tabLogbook: 'हाजिरी डायरी',
+    tabJobs: 'नौकरियां',
+    tabTools: 'टूल्स व रेट्स',
 
-    // Forms
     fleetFormTitle: 'फ्लीट व कमर्शियल ड्राइवर रिक्वायरमेंट',
     fleetFormSub: 'कैब फ्लीट, टूर ऑपरेटर्स और कॉर्पोरेट स्टाफ पिकअप के लिए।',
     personalFormTitle: 'पर्सनल गाड़ी के लिए ड्राइवर बुक करें',
     personalFormSub: 'परिवार, रोज़ाना ऑफिस आवागमन और लग्जरी कारों के लिए।',
+    tempFormTitle: 'अस्थाई / आउटस्टेशन ड्राइवर बुक करें',
+    tempFormSub: '1 दिन के ट्रिप, वीकेंड हाईवे सफर या छुट्टी पर गए ड्राइवर की जगह बैकअप ड्राइवर।',
     driverFormTitle: 'ड्राइवर KYC और आवेदन फॉर्म',
-    driverFormSub: 'अपने दस्तावेज अपलोड करें और तुरंत वेरिफाइड होकर काम शुरू करें।',
+    driverFormSub: 'दस्तावेज अपलोड करें और तुरंत वेरिफाइड होकर काम शुरू करें।',
 
     name: 'पूरा नाम / संपर्क व्यक्ति',
     phone: 'फ़ोन नंबर (कॉलिंग और व्हाट्सएप)',
-    email: 'ईमेल आईडी (कन्फर्मेशन प्राप्त करने के लिए)',
+    email: 'ईमेल आईडी (कन्फर्मेशन के लिए)',
     company: 'कंपनी / फ्लीट नाम (वैकल्पिक)',
     vehicle: 'गाड़ी का प्रकार / मॉडल (जैसे Innova / Creta / Dzire)',
     location: 'दिल्ली एनसीआर में इलाका',
     driverCount: 'कितने ड्राइवर्स की ज़रूरत है?',
+    tripDate: 'ट्रिप की तारीख और समय',
+    destination: 'कहाँ जाना है? (जैसे दिल्ली से आगरा / जयपुर)',
     licenseType: 'लाइसेंस का प्रकार (LMV / कमर्शियल बैच)',
     experience: 'ड्राइविंग का अनुभव (वर्षों में)',
     submitBtn: 'रिक्वेस्ट सबमिट करें',
@@ -127,20 +136,28 @@ const STRINGS = {
 
 export default function App() {
   const [lang, setLang] = useState('en');
-  const [currentTab, setCurrentTab] = useState('home'); // home | hire | calc | drivers | apply
-  const [hireCategory, setHireCategory] = useState('fleet'); // fleet | personal
+  const [currentTab, setCurrentTab] = useState('home'); // home | hire | logbook | jobs | tools
+  const [hireCategory, setHireCategory] = useState('personal'); // personal | fleet | temporary
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // Interactive Salary / Cost Calculator State
-  const [calcCarType, setCalcCarType] = useState('sedan'); // hatchback | sedan | suv | luxury
-  const [calcHours, setCalcHours] = useState('10'); // 8 | 10 | 12
-  const [calcZone, setCalcZone] = useState('delhi'); // delhi | gurugram | noida
+  // Interactive Salary Calculator State
+  const [calcCarType, setCalcCarType] = useState('sedan');
+  const [calcHours, setCalcHours] = useState('10');
+  const [calcZone, setCalcZone] = useState('delhi');
 
   // Document Uploads State for Driver KYC
   const [licenseImg, setLicenseImg] = useState(null);
   const [aadhaarImg, setAadhaarImg] = useState(null);
+
+  // Digital Duty Logbook State
+  const [logEntries, setLogEntries] = useState([]);
+  const [logDate, setLogDate] = useState(new Date().toISOString().split('T')[0]);
+  const [logInTime, setLogInTime] = useState('09:00 AM');
+  const [logOutTime, setLogOutTime] = useState('07:30 PM');
+  const [logKm, setLogKm] = useState('45');
+  const [logOT, setLogOT] = useState('1.5');
 
   // Form Fields State
   const [formData, setFormData] = useState({
@@ -151,13 +168,60 @@ export default function App() {
     vehicle: '',
     location: '',
     count: '1',
+    tripDate: '',
+    destination: '',
     license: '',
     experience: '',
   });
 
+  // Parivahan DL Search State
+  const [verifyDLNumber, setVerifyDLNumber] = useState('');
+  const [verifyDOB, setVerifyDOB] = useState('');
+
   const t = STRINGS[lang];
 
-  // Actions
+  // Load saved duty logs from phone memory on start
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem('@driver_duty_logs');
+        if (saved) setLogEntries(JSON.parse(saved));
+        else {
+          // Default demo log entries
+          setLogEntries([
+            { id: '1', date: '2026-09-08', in: '09:00 AM', out: '07:30 PM', km: '62 km', ot: '1.5 hrs' },
+            { id: '2', date: '2026-09-09', in: '08:45 AM', out: '08:00 PM', km: '84 km', ot: '2.0 hrs' },
+          ]);
+        }
+      } catch (e) {}
+    })();
+  }, []);
+
+  const saveDutyLog = async () => {
+    if (!logInTime || !logOutTime) {
+      Alert.alert('Incomplete Entry', 'Please specify Check-in and Check-out times.');
+      return;
+    }
+    const newEntry = {
+      id: Date.now().toString(),
+      date: logDate,
+      in: logInTime,
+      out: logOutTime,
+      km: `${logKm || 0} km`,
+      ot: `${logOT || 0} hrs`,
+    };
+    const updated = [newEntry, ...logEntries];
+    setLogEntries(updated);
+    await AsyncStorage.setItem('@driver_duty_logs', JSON.stringify(updated));
+    Alert.alert('Entry Saved', `Driver duty recorded for ${logDate} with ${logOT || 0} hrs Overtime.`);
+  };
+
+  const clearDutyLogs = async () => {
+    setLogEntries([]);
+    await AsyncStorage.removeItem('@driver_duty_logs');
+  };
+
+  // WhatsApp & Communication Actions
   const openWhatsApp = (prefilledText = '') => {
     const text =
       prefilledText ||
@@ -186,35 +250,37 @@ export default function App() {
     );
   };
 
+  const handleParivahanVerify = () => {
+    if (!verifyDLNumber.trim()) {
+      Alert.alert('License Number Required', 'Please enter a valid Driving License number (e.g. DL-0420110012345).');
+      return;
+    }
+    // Launch official mParivahan verification portal
+    Linking.openURL('https://parivahan.gov.in/rcdlstatus/?pur_cd=101');
+  };
+
   // Image Picker for KYC
   const pickDocument = async (docType) => {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permissionResult.granted) {
-        Alert.alert('Permission Denied', 'Camera roll access is needed to upload your KYC documents.');
+        Alert.alert('Permission Denied', 'Gallery access is needed to attach your documents.');
         return;
       }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
         quality: 0.7,
       });
-
       if (!result.canceled && result.assets && result.assets[0]) {
-        if (docType === 'license') {
-          setLicenseImg(result.assets[0].uri);
-        } else {
-          setAadhaarImg(result.assets[0].uri);
-        }
-        Alert.alert('Document Selected', `${docType === 'license' ? 'Driving License' : 'Aadhaar Card'} photo attached successfully.`);
+        if (docType === 'license') setLicenseImg(result.assets[0].uri);
+        else setAadhaarImg(result.assets[0].uri);
+        Alert.alert('Document Attached', `${docType === 'license' ? 'Driving License' : 'Aadhaar Card'} attached successfully.`);
       }
-    } catch (e) {
-      Alert.alert('Document Note', 'File picker accessed.');
-    }
+    } catch (e) {}
   };
 
-  // Cost / Salary Calculation Engine
+  // Salary Calculator
   const calculateEstimate = () => {
     let base = 18000;
     if (calcCarType === 'hatchback') base = 16000;
@@ -232,15 +298,16 @@ export default function App() {
     if (calcZone === 'noida') zoneAdd = 500;
 
     const driverSalary = Math.round(base * hourMultiplier + zoneAdd);
-    const agencyFee = 4500; // One-time placement fee
-    return { driverSalary, agencyFee, totalFirstMonth: driverSalary + agencyFee };
+    const agencyFee = 4500;
+    return { driverSalary, agencyFee };
   };
 
   const estimate = calculateEstimate();
 
+  // Form Submission
   const handleFormSubmit = async (type) => {
     if (!formData.name.trim() || !formData.phone.trim()) {
-      Alert.alert('Required Information', 'Please enter your Full Name and Mobile Number.');
+      Alert.alert('Required Information', 'Please enter your Full Name and Phone Number.');
       return;
     }
 
@@ -256,14 +323,16 @@ export default function App() {
       Name: formData.name,
       'Phone Number': formData.phone,
       Email: formData.email || 'Not Provided',
-      Company: formData.company || 'Individual / Personal',
+      Company: formData.company || 'Individual',
       'Vehicle Model': formData.vehicle || 'Not specified',
       'Location / NCR Zone': formData.location || 'Delhi NCR',
       'Drivers Needed': formData.count || '1',
+      'Trip Date & Time': formData.tripDate || 'N/A',
+      Destination: formData.destination || 'Local NCR',
       'License Type': formData.license || 'LMV',
       Experience: formData.experience || 'Not specified',
-      'License Attached': licenseImg ? 'Yes (Mobile Picker)' : 'Pending',
-      'Aadhaar Attached': aadhaarImg ? 'Yes (Mobile Picker)' : 'Pending',
+      'License Attached': licenseImg ? 'Yes' : 'Pending',
+      'Aadhaar Attached': aadhaarImg ? 'Yes' : 'Pending',
       _subject: `[Lead Alert] ${type} - ${formData.name} (${formData.phone})`,
       _autoresponse: autoResponderCopy,
       _template: 'table',
@@ -279,10 +348,8 @@ export default function App() {
         },
         body: JSON.stringify(payload),
       });
-
       setModalMessage(t.successSub);
       setModalVisible(true);
-
       setFormData({
         name: '',
         phone: '',
@@ -291,6 +358,8 @@ export default function App() {
         vehicle: '',
         location: '',
         count: '1',
+        tripDate: '',
+        destination: '',
         license: '',
         experience: '',
       });
@@ -319,12 +388,10 @@ export default function App() {
         </View>
 
         <View style={styles.headerRightButtons}>
-          {/* Roadside Emergency SOS */}
           <TouchableOpacity style={styles.sosButton} onPress={handleSOS} activeOpacity={0.8}>
             <Text style={styles.sosButtonText}>🚨 SOS</Text>
           </TouchableOpacity>
 
-          {/* Bilingual Language Toggle */}
           <TouchableOpacity
             style={styles.languageToggle}
             onPress={() => setLang(lang === 'en' ? 'hi' : 'en')}
@@ -335,7 +402,7 @@ export default function App() {
         </View>
       </View>
 
-      {/* Dispatch Desk Live Strip */}
+      {/* Live Dispatch Ticker */}
       <View style={styles.liveTicker}>
         <View style={styles.livePulse} />
         <Text style={styles.liveTickerText}>{t.liveStatus}</Text>
@@ -370,22 +437,22 @@ export default function App() {
                       style={styles.btnPrimary}
                       onPress={() => {
                         setCurrentTab('hire');
-                        setHireCategory('fleet');
+                        setHireCategory('personal');
                       }}
                       activeOpacity={0.85}
                     >
-                      <Text style={styles.btnPrimaryText}>{t.ctaFleet} &rarr;</Text>
+                      <Text style={styles.btnPrimaryText}>{t.ctaPersonal} &rarr;</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       style={styles.btnGlass}
                       onPress={() => {
                         setCurrentTab('hire');
-                        setHireCategory('personal');
+                        setHireCategory('fleet');
                       }}
                       activeOpacity={0.85}
                     >
-                      <Text style={styles.btnGlassText}>{t.ctaPersonal}</Text>
+                      <Text style={styles.btnGlassText}>{t.ctaFleet}</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -399,21 +466,47 @@ export default function App() {
                 </View>
               </View>
 
-              {/* Calculator Teaser Banner */}
-              <TouchableOpacity
-                style={styles.calcTeaserCard}
-                onPress={() => setCurrentTab('calc')}
-                activeOpacity={0.85}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.calcTeaserBadge}>NEW FEATURE</Text>
-                  <Text style={styles.calcTeaserTitle}>Driver Salary & Cost Estimator</Text>
-                  <Text style={styles.calcTeaserSub}>
-                    Calculate monthly chauffeur pay according to car model, shift hours & Delhi NCR zone.
-                  </Text>
-                </View>
-                <Text style={styles.calcTeaserArrow}>&rarr;</Text>
-              </TouchableOpacity>
+              {/* Fast Feature Quick Cards */}
+              <View style={styles.quickActionGrid}>
+                <TouchableOpacity
+                  style={styles.quickCard}
+                  onPress={() => {
+                    setCurrentTab('hire');
+                    setHireCategory('temporary');
+                  }}
+                >
+                  <Text style={styles.quickIcon}>🛣️</Text>
+                  <Text style={styles.quickTitle}>Outstation / Highway</Text>
+                  <Text style={styles.quickSub}>Book 1-Day Driver for Jaipur / Agra / Airport</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.quickCard}
+                  onPress={() => setCurrentTab('logbook')}
+                >
+                  <Text style={styles.quickIcon}>⏱️</Text>
+                  <Text style={styles.quickTitle}>Driver Duty Log</Text>
+                  <Text style={styles.quickSub}>Daily Check-in, Overtime (OT) & Km tracker</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.quickCard}
+                  onPress={() => setCurrentTab('jobs')}
+                >
+                  <Text style={styles.quickIcon}>💼</Text>
+                  <Text style={styles.quickTitle}>Active Job Board</Text>
+                  <Text style={styles.quickSub}>View ₹18k-₹26k Chauffeur Openings in NCR</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.quickCard}
+                  onPress={() => setCurrentTab('tools')}
+                >
+                  <Text style={styles.quickIcon}>🔍</Text>
+                  <Text style={styles.quickTitle}>Verify DL & Challan</Text>
+                  <Text style={styles.quickSub}>Official Parivahan license & rate tools</Text>
+                </TouchableOpacity>
+              </View>
 
               {/* Strict Verification Trust Stats */}
               <View style={styles.sectionHeadingBox}>
@@ -440,29 +533,7 @@ export default function App() {
                 </View>
               </View>
 
-              {/* Ground Inspection Photography */}
-              <View style={styles.photoBannerCard}>
-                <Image
-                  source={require('./assets/driver_team_standing.jpg')}
-                  style={styles.photoBannerImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.photoBannerContent}>
-                  <Text style={styles.photoBannerTitle}>Ground Inspected Chauffeurs</Text>
-                  <Text style={styles.photoBannerSub}>
-                    Every candidate undergoes physical road driving tests, background address check,
-                    and badge verification before dispatch.
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.linkButton}
-                    onPress={() => setCurrentTab('drivers')}
-                  >
-                    <Text style={styles.linkButtonText}>View Verified Drivers & Reviews &rarr;</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              {/* Central Dispatch Contact Card */}
+              {/* Dispatch Help Card */}
               <View style={styles.contactDeskCard}>
                 <Text style={styles.contactDeskTitle}>Need a Driver Urgently?</Text>
                 <Text style={styles.contactDeskSub}>
@@ -481,48 +552,57 @@ export default function App() {
           )}
 
           {/* ======================================================== */}
-          {/* TAB 2: HIRE DRIVER (FLEET & CHAUFFEUR FORMS)             */}
+          {/* TAB 2: HIRE DRIVER (PERSONAL, FLEET, TEMPORARY / OUTSTATION) */}
           {/* ======================================================== */}
           {currentTab === 'hire' && (
             <View>
+              {/* 3-Way Booking Segment Selector */}
               <View style={styles.segmentContainer}>
-                <TouchableOpacity
-                  style={[styles.segmentBtn, hireCategory === 'fleet' && styles.segmentBtnActive]}
-                  onPress={() => setHireCategory('fleet')}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      styles.segmentBtnText,
-                      hireCategory === 'fleet' && styles.segmentBtnTextActive,
-                    ]}
-                  >
-                    Cab Fleet / Corporate
-                  </Text>
-                </TouchableOpacity>
-
                 <TouchableOpacity
                   style={[styles.segmentBtn, hireCategory === 'personal' && styles.segmentBtnActive]}
                   onPress={() => setHireCategory('personal')}
                   activeOpacity={0.8}
                 >
-                  <Text
-                    style={[
-                      styles.segmentBtnText,
-                      hireCategory === 'personal' && styles.segmentBtnTextActive,
-                    ]}
-                  >
-                    Personal Car Chauffeur
+                  <Text style={[styles.segmentBtnText, hireCategory === 'personal' && styles.segmentBtnTextActive]}>
+                    Personal Chauffeur
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.segmentBtn, hireCategory === 'fleet' && styles.segmentBtnActive]}
+                  onPress={() => setHireCategory('fleet')}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.segmentBtnText, hireCategory === 'fleet' && styles.segmentBtnTextActive]}>
+                    Cab Fleet / B2B
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.segmentBtn, hireCategory === 'temporary' && styles.segmentBtnActive]}
+                  onPress={() => setHireCategory('temporary')}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.segmentBtnText, hireCategory === 'temporary' && styles.segmentBtnTextActive]}>
+                    Outstation / 1-Day
                   </Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.formContainerCard}>
                 <Text style={styles.formTitle}>
-                  {hireCategory === 'fleet' ? t.fleetFormTitle : t.personalFormTitle}
+                  {hireCategory === 'personal'
+                    ? t.personalFormTitle
+                    : hireCategory === 'fleet'
+                    ? t.fleetFormTitle
+                    : t.tempFormTitle}
                 </Text>
                 <Text style={styles.formSubtitle}>
-                  {hireCategory === 'fleet' ? t.fleetFormSub : t.personalFormSub}
+                  {hireCategory === 'personal'
+                    ? t.personalFormSub
+                    : hireCategory === 'fleet'
+                    ? t.fleetFormSub
+                    : t.tempFormSub}
                 </Text>
 
                 <Text style={styles.fieldLabel}>{t.name} *</Text>
@@ -555,7 +635,29 @@ export default function App() {
                   onChangeText={(v) => setFormData({ ...formData, email: v })}
                 />
 
-                {hireCategory === 'fleet' ? (
+                {hireCategory === 'temporary' && (
+                  <>
+                    <Text style={styles.fieldLabel}>{t.tripDate} *</Text>
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="e.g. Saturday 12th Sept, 6:00 AM Departure"
+                      placeholderTextColor={THEME.inkMuted}
+                      value={formData.tripDate}
+                      onChangeText={(v) => setFormData({ ...formData, tripDate: v })}
+                    />
+
+                    <Text style={styles.fieldLabel}>{t.destination} *</Text>
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="e.g. Delhi to Jaipur Return (2 Days)"
+                      placeholderTextColor={THEME.inkMuted}
+                      value={formData.destination}
+                      onChangeText={(v) => setFormData({ ...formData, destination: v })}
+                    />
+                  </>
+                )}
+
+                {hireCategory === 'fleet' && (
                   <>
                     <Text style={styles.fieldLabel}>{t.company}</Text>
                     <TextInput
@@ -576,23 +678,21 @@ export default function App() {
                       onChangeText={(v) => setFormData({ ...formData, count: v })}
                     />
                   </>
-                ) : (
-                  <>
-                    <Text style={styles.fieldLabel}>{t.vehicle}</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      placeholder="e.g. Honda City / Hyundai Creta / BMW (Automatic)"
-                      placeholderTextColor={THEME.inkMuted}
-                      value={formData.vehicle}
-                      onChangeText={(v) => setFormData({ ...formData, vehicle: v })}
-                    />
-                  </>
                 )}
+
+                <Text style={styles.fieldLabel}>{t.vehicle}</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g. Honda City / Innova / Fortuner / EV"
+                  placeholderTextColor={THEME.inkMuted}
+                  value={formData.vehicle}
+                  onChangeText={(v) => setFormData({ ...formData, vehicle: v })}
+                />
 
                 <Text style={styles.fieldLabel}>{t.location}</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="e.g. South Delhi / DLF Phase 5 Gurugram / Sector 62 Noida"
+                  placeholder="e.g. South Delhi / DLF Gurugram / Sector 62 Noida"
                   placeholderTextColor={THEME.inkMuted}
                   value={formData.location}
                   onChangeText={(v) => setFormData({ ...formData, location: v })}
@@ -602,9 +702,11 @@ export default function App() {
                   style={styles.submitActionButton}
                   onPress={() =>
                     handleFormSubmit(
-                      hireCategory === 'fleet'
-                        ? 'Fleet / Corporate Driver Request'
-                        : 'Personal Car Chauffeur Request'
+                      hireCategory === 'personal'
+                        ? 'Personal Permanent Chauffeur'
+                        : hireCategory === 'fleet'
+                        ? 'Fleet / Corporate Request'
+                        : 'Temporary / Outstation Driver Request'
                     )
                   }
                   disabled={loading}
@@ -621,37 +723,250 @@ export default function App() {
                   style={styles.btnWhatsAppOutline}
                   onPress={() =>
                     openWhatsApp(
-                      `Hello Drivers Saathi, I want to inquire about ${
-                        hireCategory === 'fleet' ? 'fleet drivers' : 'a personal driver'
-                      }. My name is ${formData.name || ''}.`
+                      `Hello Drivers Saathi! I want to hire a ${hireCategory} driver for my car in ${
+                        formData.location || 'Delhi NCR'
+                      }. Name: ${formData.name || ''}`
                     )
                   }
                 >
-                  <Text style={styles.btnWhatsAppOutlineText}>💬 Or Chat Directly on WhatsApp</Text>
+                  <Text style={styles.btnWhatsAppOutlineText}>💬 Book Instantly via WhatsApp</Text>
                 </TouchableOpacity>
-
-                <Text style={styles.securityNote}>
-                  🔒 We guarantee 100% data privacy. Profiles dispatched within 24 hours.
-                </Text>
               </View>
             </View>
           )}
 
           {/* ======================================================== */}
-          {/* TAB 3: SALARY & COST CALCULATOR (NEW FEATURE)             */}
+          {/* TAB 3: DIGITAL DRIVER DUTY LOGBOOK & OVERTIME CALCULATOR */}
           {/* ======================================================== */}
-          {currentTab === 'calc' && (
+          {currentTab === 'logbook' && (
             <View>
               <View style={styles.sectionHeadingBox}>
-                <Text style={styles.sectionCategory}>COST ESTIMATOR</Text>
-                <Text style={styles.sectionTitle}>Driver Salary & Placement Calculator</Text>
+                <Text style={styles.sectionCategory}>DAILY MANAGEMENT</Text>
+                <Text style={styles.sectionTitle}>Digital Driver Duty Logbook</Text>
                 <Text style={styles.sectionSubtitle}>
-                  Get an instant real-market salary estimate for verified full-time drivers in Delhi NCR.
+                  Track your chauffeur’s daily check-in, check-out, running kilometers, and overtime (OT)
+                  hours directly on your phone with zero confusion.
                 </Text>
               </View>
 
+              {/* New Duty Entry Card */}
+              <View style={styles.logCard}>
+                <Text style={styles.logCardTitle}>+ Record Today's Duty Entry</Text>
+
+                <View style={styles.logInputRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Duty Date</Text>
+                    <TextInput
+                      style={styles.miniInput}
+                      value={logDate}
+                      onChangeText={setLogDate}
+                      placeholder="YYYY-MM-DD"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Check-in</Text>
+                    <TextInput
+                      style={styles.miniInput}
+                      value={logInTime}
+                      onChangeText={setLogInTime}
+                      placeholder="09:00 AM"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Check-out</Text>
+                    <TextInput
+                      style={styles.miniInput}
+                      value={logOutTime}
+                      onChangeText={setLogOutTime}
+                      placeholder="07:30 PM"
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.logInputRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Running Distance (Km)</Text>
+                    <TextInput
+                      style={styles.miniInput}
+                      value={logKm}
+                      onChangeText={setLogKm}
+                      placeholder="e.g. 55"
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.miniLabel}>Overtime Hours (OT)</Text>
+                    <TextInput
+                      style={styles.miniInput}
+                      value={logOT}
+                      onChangeText={setLogOT}
+                      placeholder="e.g. 1.5"
+                      keyboardType="numeric"
+                    />
+                  </View>
+                </View>
+
+                <TouchableOpacity style={styles.btnLogSave} onPress={saveDutyLog} activeOpacity={0.85}>
+                  <Text style={styles.btnLogSaveText}>💾 Save Duty Record</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Duty Log History Table */}
+              <View style={styles.logHistoryHeader}>
+                <Text style={styles.logHistoryTitle}>Recent Duty Records ({logEntries.length})</Text>
+                {logEntries.length > 0 && (
+                  <TouchableOpacity onPress={clearDutyLogs}>
+                    <Text style={{ color: THEME.sosRed, fontSize: 12, fontWeight: '700' }}>Clear All</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {logEntries.map((entry) => (
+                <View key={entry.id} style={styles.logEntryCard}>
+                  <View style={styles.logEntryTop}>
+                    <Text style={styles.logEntryDate}>📅 {entry.date}</Text>
+                    <Text style={styles.logEntryOT}>+{entry.ot} Overtime</Text>
+                  </View>
+                  <View style={styles.logEntryDetails}>
+                    <Text style={styles.logEntryMeta}>In: {entry.in} • Out: {entry.out}</Text>
+                    <Text style={styles.logEntryKm}>Distance: {entry.km}</Text>
+                  </View>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={styles.btnWhatsAppOutline}
+                onPress={() =>
+                  openWhatsApp(
+                    `Hello Drivers Saathi, here is my driver's monthly duty sheet with ${logEntries.length} entries. Please calculate monthly salary.`
+                  )
+                }
+              >
+                <Text style={styles.btnWhatsAppOutlineText}>📤 Share Monthly Sheet with Drivers Saathi</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* ======================================================== */}
+          {/* TAB 4: ACTIVE JOB BOARD FOR DRIVERS                     */}
+          {/* ======================================================== */}
+          {currentTab === 'jobs' && (
+            <View>
+              <View style={styles.sectionHeadingBox}>
+                <Text style={styles.sectionCategory}>DELHI NCR OPENINGS</Text>
+                <Text style={styles.sectionTitle}>Active Driver Job Board</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Verified driving jobs for private car chauffeurs, company executives & cab fleets with
+                  fixed monthly salaries.
+                </Text>
+              </View>
+
+              {/* Job Card 1 */}
+              <View style={styles.jobCard}>
+                <View style={styles.jobBadgeRow}>
+                  <Text style={styles.jobTypeBadge}>PRIVATE CAR</Text>
+                  <Text style={styles.jobSalary}>₹22,000 - ₹24,000 / mo</Text>
+                </View>
+                <Text style={styles.jobTitle}>Chauffeur for Hyundai Creta (Automatic)</Text>
+                <Text style={styles.jobLocation}>📍 Vasant Vihar & South Extension, Delhi</Text>
+                <Text style={styles.jobDesc}>
+                  Daily office commute + family duty. 10 hours/day, 6 days a week. Non-smoker, clean record,
+                  minimum 4 years experience required.
+                </Text>
+                <TouchableOpacity
+                  style={styles.jobApplyBtn}
+                  onPress={() => {
+                    setFormData({ ...formData, location: 'Vasant Vihar', experience: '4' });
+                    setCurrentTab('tools');
+                  }}
+                >
+                  <Text style={styles.jobApplyBtnText}>Apply for this Duty &rarr;</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Job Card 2 */}
+              <View style={styles.jobCard}>
+                <View style={styles.jobBadgeRow}>
+                  <Text style={[styles.jobTypeBadge, { backgroundColor: '#E0E7FF', color: '#4338CA' }]}>
+                    EXECUTIVE LUXURY
+                  </Text>
+                  <Text style={styles.jobSalary}>₹26,000 - ₹28,000 / mo</Text>
+                </View>
+                <Text style={styles.jobTitle}>Chauffeur for Mercedes E-Class / BMW</Text>
+                <Text style={styles.jobLocation}>📍 DLF Golf Course Road, Gurugram</Text>
+                <Text style={styles.jobDesc}>
+                  Corporate MD travel. Fluent Hindi and basic English route navigation. Highway driving
+                  experience on Yamuna / Delhi-Mumbai Expressway.
+                </Text>
+                <TouchableOpacity
+                  style={styles.jobApplyBtn}
+                  onPress={() => {
+                    setFormData({ ...formData, location: 'DLF Gurugram', experience: '6' });
+                    setCurrentTab('tools');
+                  }}
+                >
+                  <Text style={styles.jobApplyBtnText}>Apply for this Duty &rarr;</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Job Card 3 */}
+              <View style={styles.jobCard}>
+                <View style={styles.jobBadgeRow}>
+                  <Text style={[styles.jobTypeBadge, { backgroundColor: THEME.verifiedSoft, color: '#065F46' }]}>
+                    COMMERCIAL FLEET
+                  </Text>
+                  <Text style={styles.jobSalary}>₹20,000 + Fuel Bonus</Text>
+                </View>
+                <Text style={styles.jobTitle}>Cab Fleet Driver (Dzire / WagonR)</Text>
+                <Text style={styles.jobLocation}>📍 Sector 62 & Greater Noida</Text>
+                <Text style={styles.jobDesc}>
+                  Corporate IT staff shuttle pick-and-drop. Fixed timings, on-time weekly payments. Commercial
+                  badge required.
+                </Text>
+                <TouchableOpacity
+                  style={styles.jobApplyBtn}
+                  onPress={() => {
+                    setFormData({ ...formData, location: 'Noida', experience: '3' });
+                    setCurrentTab('tools');
+                  }}
+                >
+                  <Text style={styles.jobApplyBtnText}>Apply for this Duty &rarr;</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* ======================================================== */}
+          {/* TAB 5: TOOLS, DL PARIVAHAN VERIFICATION & CALCULATOR    */}
+          {/* ======================================================== */}
+          {currentTab === 'tools' && (
+            <View>
+              {/* Tool 1: Parivahan DL Verification Portal Link */}
+              <View style={styles.toolCard}>
+                <Text style={styles.toolBadge}>OFFICIAL GOVERNMENT INTEGRATION</Text>
+                <Text style={styles.toolTitle}>Verify Any Driver’s License (mParivahan)</Text>
+                <Text style={styles.toolSub}>
+                  Enter the driving license number to instantly verify authenticity, commercial endorsement,
+                  and traffic violation history via the Ministry of Road Transport portal.
+                </Text>
+
+                <Text style={styles.fieldLabel}>Enter DL Number (e.g. DL-0420110012345)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="DL-XXXXXXXXXXXXXX"
+                  placeholderTextColor={THEME.inkMuted}
+                  value={verifyDLNumber}
+                  onChangeText={setVerifyDLNumber}
+                  autoCapitalize="characters"
+                />
+
+                <TouchableOpacity style={styles.btnParivahan} onPress={handleParivahanVerify} activeOpacity={0.85}>
+                  <Text style={styles.btnParivahanText}>🔍 Verify on Official Parivahan Portal</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Tool 2: Salary & Cost Calculator */}
               <View style={styles.calcCard}>
-                {/* 1. Car Type Selector */}
                 <Text style={styles.calcSectionLabel}>1. Vehicle Category</Text>
                 <View style={styles.calcButtonGroup}>
                   <TouchableOpacity
@@ -691,8 +1006,7 @@ export default function App() {
                   </TouchableOpacity>
                 </View>
 
-                {/* 2. Duty Hours */}
-                <Text style={styles.calcSectionLabel}>2. Daily Duty Hours (6 Days / Week)</Text>
+                <Text style={styles.calcSectionLabel}>2. Duty Hours (6 Days / Week)</Text>
                 <View style={styles.calcRowGroup}>
                   {['8', '10', '12'].map((hr) => (
                     <TouchableOpacity
@@ -707,13 +1021,12 @@ export default function App() {
                   ))}
                 </View>
 
-                {/* 3. Location Zone */}
                 <Text style={styles.calcSectionLabel}>3. Primary Operating NCR Zone</Text>
                 <View style={styles.calcRowGroup}>
                   {[
-                    { id: 'delhi', label: 'Delhi (South/West)' },
+                    { id: 'delhi', label: 'Delhi' },
                     { id: 'gurugram', label: 'Gurugram' },
-                    { id: 'noida', label: 'Noida / Gr. Noida' },
+                    { id: 'noida', label: 'Noida' },
                   ].map((z) => (
                     <TouchableOpacity
                       key={z.id}
@@ -727,152 +1040,39 @@ export default function App() {
                   ))}
                 </View>
 
-                {/* Estimation Results Card */}
                 <View style={styles.estimateResultBox}>
-                  <Text style={styles.estimateTitle}>Estimated Market Salary</Text>
+                  <Text style={styles.estimateTitle}>Estimated Monthly Salary</Text>
                   <Text style={styles.estimateFigure}>₹{estimate.driverSalary.toLocaleString('en-IN')}</Text>
-                  <Text style={styles.estimateNote}>per month in-hand (excluding overtime)</Text>
-
-                  <View style={styles.estimateBreakdown}>
-                    <View style={styles.breakdownRow}>
-                      <Text style={styles.breakdownLabel}>Driver Monthly Salary</Text>
-                      <Text style={styles.breakdownVal}>₹{estimate.driverSalary.toLocaleString('en-IN')}/mo</Text>
-                    </View>
-                    <View style={styles.breakdownRow}>
-                      <Text style={styles.breakdownLabel}>One-time Placement Fee</Text>
-                      <Text style={styles.breakdownVal}>₹{estimate.agencyFee.toLocaleString('en-IN')}</Text>
-                    </View>
-                    <View style={styles.breakdownRow}>
-                      <Text style={styles.breakdownLabel}>Warranty</Text>
-                      <Text style={[styles.breakdownVal, { color: THEME.verified, fontWeight: '700' }]}>
-                        30-Day Free Replacement
-                      </Text>
-                    </View>
-                  </View>
+                  <Text style={styles.estimateNote}>in-hand per month (6 days a week)</Text>
 
                   <TouchableOpacity
                     style={styles.btnPrimary}
                     onPress={() => {
-                      setFormData({
-                        ...formData,
-                        location: calcZone.toUpperCase(),
-                        vehicle: calcCarType.toUpperCase(),
-                      });
+                      setFormData({ ...formData, vehicle: calcCarType, location: calcZone });
                       setCurrentTab('hire');
                       setHireCategory('personal');
                     }}
                   >
-                    <Text style={styles.btnPrimaryText}>Book Driver at This Rate &rarr;</Text>
+                    <Text style={styles.btnPrimaryText}>Book Driver at this Rate &rarr;</Text>
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
-          )}
 
-          {/* ======================================================== */}
-          {/* TAB 4: REAL DRIVERS ROSTER & CLIENT TESTIMONIALS         */}
-          {/* ======================================================== */}
-          {currentTab === 'drivers' && (
-            <View>
-              <View style={styles.sectionHeadingBox}>
-                <Text style={styles.sectionCategory}>GROUND AUDITED</Text>
-                <Text style={styles.sectionTitle}>Real Drivers & Fleet Roster</Text>
-                <Text style={styles.sectionSubtitle}>
-                  View actual profiles and ground inspection records of our verified community.
-                </Text>
-              </View>
-
-              {/* Driver Card 1 */}
-              <View style={styles.driverProfileCard}>
-                <Image
-                  source={require('./assets/indian_driver_portrait.jpg')}
-                  style={styles.driverProfileImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.driverProfileDetails}>
-                  <View style={styles.verifiedTagRow}>
-                    <Text style={styles.verifiedTag}>✓ Police Verified</Text>
-                    <Text style={styles.badgePillSmall}>LMV Commercial Badge</Text>
-                  </View>
-                  <Text style={styles.driverName}>Rajesh Kumar</Text>
-                  <Text style={styles.driverMeta}>Exp: 8 Years • Delhi & Highway Routes</Text>
-                  <Text style={styles.driverSkill}>Sedan / SUV / Commercial Cab Specialist</Text>
-                  <Text style={styles.driverRating}>⭐️⭐️⭐️⭐️⭐️ 4.9 Rating (42 Trips / Placements)</Text>
-                </View>
-              </View>
-
-              {/* Driver Card 2 */}
-              <View style={styles.driverProfileCard}>
-                <Image
-                  source={require('./assets/indian_driver_wheel.jpg')}
-                  style={styles.driverProfileImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.driverProfileDetails}>
-                  <View style={styles.verifiedTagRow}>
-                    <Text style={styles.verifiedTag}>✓ Road Tested</Text>
-                    <Text style={styles.badgePillSmall}>Clean Record</Text>
-                  </View>
-                  <Text style={styles.driverName}>Vikram Singh</Text>
-                  <Text style={styles.driverMeta}>Exp: 11 Years • Expressway & VIP Chauffeur</Text>
-                  <Text style={styles.driverSkill}>Automatic Transmission & Luxury Car Specialist</Text>
-                  <Text style={styles.driverRating}>⭐️⭐️⭐️⭐️⭐️ 5.0 Rating (Executive Transport)</Text>
-                </View>
-              </View>
-
-              {/* Client Testimonials Section */}
-              <View style={styles.sectionHeadingBox}>
-                <Text style={styles.sectionCategory}>CLIENT REVIEWS</Text>
-                <Text style={styles.sectionTitle}>What Fleet Managers & Car Owners Say</Text>
-              </View>
-
-              <View style={styles.testimonialCard}>
-                <Text style={styles.testimonialRating}>⭐️⭐️⭐️⭐️⭐️</Text>
-                <Text style={styles.testimonialQuote}>
-                  "We needed 6 commercial drivers on short notice for our Gurugram IT park staff route.
-                  Drivers Saathi provided background-checked drivers in 36 hours. Not a single day of absenteeism."
-                </Text>
-                <Text style={styles.testimonialAuthor}>Sunil Mehra</Text>
-                <Text style={styles.testimonialRole}>Fleet Operations Head, DLF CyberCity</Text>
-              </View>
-
-              <View style={styles.testimonialCard}>
-                <Text style={styles.testimonialRating}>⭐️⭐️⭐️⭐️⭐️</Text>
-                <Text style={styles.testimonialQuote}>
-                  "Found a dependable chauffeur for my mother’s daily hospital and market visits in Greater Kailash.
-                  Polite, punctual, and non-smoker. The police verification certificate gave us complete peace of mind."
-                </Text>
-                <Text style={styles.testimonialAuthor}>Dr. Ananya Sen</Text>
-                <Text style={styles.testimonialRole}>Resident, South Delhi</Text>
-              </View>
-            </View>
-          )}
-
-          {/* ======================================================== */}
-          {/* TAB 5: DRIVER PARTNER KYC & APPLICATION                  */}
-          {/* ======================================================== */}
-          {currentTab === 'apply' && (
-            <View>
-              <View style={styles.formContainerCard}>
+              {/* Tool 3: Driver KYC Upload Form */}
+              <View style={[styles.formContainerCard, { marginTop: 20 }]}>
                 <Text style={styles.formTitle}>{t.driverFormTitle}</Text>
                 <Text style={styles.formSubtitle}>{t.driverFormSub}</Text>
-
-                <View style={styles.driverPerksBox}>
-                  <Text style={styles.driverPerkItem}>✓ Timely salary & weekly fuel bonuses</Text>
-                  <Text style={styles.driverPerkItem}>✓ Verified vehicle owners & corporate clients</Text>
-                  <Text style={styles.driverPerkItem}>✓ 24x7 Roadside & helpline support</Text>
-                </View>
 
                 <Text style={styles.fieldLabel}>{t.name} *</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="Driver Full Name (as on Aadhaar)"
+                  placeholder="Driver Full Name"
                   placeholderTextColor={THEME.inkMuted}
                   value={formData.name}
                   onChangeText={(v) => setFormData({ ...formData, name: v })}
                 />
 
-                <Text style={styles.fieldLabel}>{t.phone} (WhatsApp) *</Text>
+                <Text style={styles.fieldLabel}>{t.phone} *</Text>
                 <TextInput
                   style={styles.textInput}
                   placeholder="+91 98765 43210"
@@ -882,45 +1082,14 @@ export default function App() {
                   onChangeText={(v) => setFormData({ ...formData, phone: v })}
                 />
 
-                <Text style={styles.fieldLabel}>{t.licenseType}</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="e.g. LMV Commercial Badge / Transport / Heavy"
-                  placeholderTextColor={THEME.inkMuted}
-                  value={formData.license}
-                  onChangeText={(v) => setFormData({ ...formData, license: v })}
-                />
-
-                <Text style={styles.fieldLabel}>{t.experience}</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="e.g. 5 Years"
-                  placeholderTextColor={THEME.inkMuted}
-                  keyboardType="numeric"
-                  value={formData.experience}
-                  onChangeText={(v) => setFormData({ ...formData, experience: v })}
-                />
-
-                <Text style={styles.fieldLabel}>{t.location}</Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="e.g. Uttam Nagar / Badarpur / Sector 14 Gurugram"
-                  placeholderTextColor={THEME.inkMuted}
-                  value={formData.location}
-                  onChangeText={(v) => setFormData({ ...formData, location: v })}
-                />
-
-                {/* KYC Document Upload Section */}
-                <Text style={[styles.fieldLabel, { marginTop: 16 }]}>KYC Document Attachments (Camera / Gallery)</Text>
+                <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Attach Verification Documents</Text>
                 <View style={styles.kycRow}>
                   <TouchableOpacity
                     style={[styles.kycUploadBtn, licenseImg && styles.kycUploadBtnSuccess]}
                     onPress={() => pickDocument('license')}
                   >
                     <Text style={styles.kycUploadIcon}>{licenseImg ? '✅' : '🪪'}</Text>
-                    <Text style={styles.kycUploadLabel}>
-                      {licenseImg ? 'License Attached' : 'Attach License'}
-                    </Text>
+                    <Text style={styles.kycUploadLabel}>{licenseImg ? 'License Attached' : 'Attach DL'}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -928,41 +1097,17 @@ export default function App() {
                     onPress={() => pickDocument('aadhaar')}
                   >
                     <Text style={styles.kycUploadIcon}>{aadhaarImg ? '✅' : '📄'}</Text>
-                    <Text style={styles.kycUploadLabel}>
-                      {aadhaarImg ? 'Aadhaar Attached' : 'Attach Aadhaar'}
-                    </Text>
+                    <Text style={styles.kycUploadLabel}>{aadhaarImg ? 'Aadhaar Attached' : 'Attach Aadhaar'}</Text>
                   </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
                   style={styles.submitActionButton}
-                  onPress={() => handleFormSubmit('Driver Partner KYC Application')}
+                  onPress={() => handleFormSubmit('Driver Partner KYC & Application')}
                   disabled={loading}
-                  activeOpacity={0.85}
                 >
-                  {loading ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    <Text style={styles.submitActionButtonText}>{t.applyBtn}</Text>
-                  )}
+                  {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.submitActionButtonText}>{t.applyBtn}</Text>}
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.btnWhatsAppOutline}
-                  onPress={() =>
-                    openWhatsApp(
-                      `Hello Drivers Saathi, I want to join as a driver partner. My name is ${
-                        formData.name || ''
-                      }. Please let me know the joining process.`
-                    )
-                  }
-                >
-                  <Text style={styles.btnWhatsAppOutlineText}>💬 Send KYC via WhatsApp</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.securityNote}>
-                  📞 Our recruitment team will verify your license and call you within 2 business days.
-                </Text>
               </View>
             </View>
           )}
@@ -970,69 +1115,35 @@ export default function App() {
       </KeyboardAvoidingView>
 
       {/* Floating WhatsApp Action Button */}
-      <TouchableOpacity
-        style={styles.floatingWhatsApp}
-        onPress={() => openWhatsApp()}
-        activeOpacity={0.85}
-      >
+      <TouchableOpacity style={styles.floatingWhatsApp} onPress={() => openWhatsApp()} activeOpacity={0.85}>
         <Text style={styles.floatingWhatsAppIcon}>💬</Text>
       </TouchableOpacity>
 
       {/* Bottom Navigation Bar */}
       <View style={styles.bottomTabBar}>
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => setCurrentTab('home')}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('home')} activeOpacity={0.7}>
           <Text style={[styles.tabIconText, currentTab === 'home' && styles.tabIconActive]}>🏠</Text>
-          <Text style={[styles.tabLabel, currentTab === 'home' && styles.tabLabelActive]}>
-            {t.tabHome}
-          </Text>
+          <Text style={[styles.tabLabel, currentTab === 'home' && styles.tabLabelActive]}>{t.tabHome}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => setCurrentTab('hire')}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('hire')} activeOpacity={0.7}>
           <Text style={[styles.tabIconText, currentTab === 'hire' && styles.tabIconActive]}>🚗</Text>
-          <Text style={[styles.tabLabel, currentTab === 'hire' && styles.tabLabelActive]}>
-            {t.tabHire}
-          </Text>
+          <Text style={[styles.tabLabel, currentTab === 'hire' && styles.tabLabelActive]}>{t.tabHire}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => setCurrentTab('calc')}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.tabIconText, currentTab === 'calc' && styles.tabIconActive]}>🧮</Text>
-          <Text style={[styles.tabLabel, currentTab === 'calc' && styles.tabLabelActive]}>
-            {t.tabCalc}
-          </Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('logbook')} activeOpacity={0.7}>
+          <Text style={[styles.tabIconText, currentTab === 'logbook' && styles.tabIconActive]}>⏱️</Text>
+          <Text style={[styles.tabLabel, currentTab === 'logbook' && styles.tabLabelActive]}>{t.tabLogbook}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => setCurrentTab('drivers')}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.tabIconText, currentTab === 'drivers' && styles.tabIconActive]}>👥</Text>
-          <Text style={[styles.tabLabel, currentTab === 'drivers' && styles.tabLabelActive]}>
-            {t.tabDrivers}
-          </Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('jobs')} activeOpacity={0.7}>
+          <Text style={[styles.tabIconText, currentTab === 'jobs' && styles.tabIconActive]}>💼</Text>
+          <Text style={[styles.tabLabel, currentTab === 'jobs' && styles.tabLabelActive]}>{t.tabJobs}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => setCurrentTab('apply')}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.tabIconText, currentTab === 'apply' && styles.tabIconActive]}>🪪</Text>
-          <Text style={[styles.tabLabel, currentTab === 'apply' && styles.tabLabelActive]}>
-            {t.tabApply}
-          </Text>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setCurrentTab('tools')} activeOpacity={0.7}>
+          <Text style={[styles.tabIconText, currentTab === 'tools' && styles.tabIconActive]}>🛠️</Text>
+          <Text style={[styles.tabLabel, currentTab === 'tools' && styles.tabLabelActive]}>{t.tabTools}</Text>
         </TouchableOpacity>
       </View>
 
@@ -1045,11 +1156,7 @@ export default function App() {
             </View>
             <Text style={styles.modalTitle}>{t.successTitle}</Text>
             <Text style={styles.modalBody}>{modalMessage}</Text>
-            <TouchableOpacity
-              style={styles.modalCloseBtn}
-              onPress={() => setModalVisible(false)}
-              activeOpacity={0.85}
-            >
+            <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setModalVisible(false)} activeOpacity={0.85}>
               <Text style={styles.modalCloseBtnText}>{t.closeBtn}</Text>
             </TouchableOpacity>
           </View>
@@ -1139,7 +1246,7 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
 
-  // Hero Section
+  // Hero section
   heroWrapper: {
     borderRadius: 18,
     overflow: 'hidden',
@@ -1238,50 +1345,41 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // Calculator Teaser Card
-  calcTeaserCard: {
+  // Quick Action Grid
+  quickActionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  quickCard: {
+    width: '48%',
     backgroundColor: THEME.paper,
     borderRadius: 14,
-    padding: 16,
-    borderWidth: 1.5,
-    borderColor: THEME.marigold,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: THEME.marigold,
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: THEME.line,
   },
-  calcTeaserBadge: {
-    color: THEME.marigoldDeep,
-    fontSize: 10.5,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 2,
+  quickIcon: {
+    fontSize: 24,
+    marginBottom: 6,
   },
-  calcTeaserTitle: {
-    fontSize: 16,
+  quickTitle: {
+    fontSize: 14,
     fontWeight: '800',
     color: THEME.ink,
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  calcTeaserSub: {
-    fontSize: 12.5,
+  quickSub: {
+    fontSize: 11,
     color: THEME.inkSoft,
-    lineHeight: 17,
-  },
-  calcTeaserArrow: {
-    fontSize: 24,
-    color: THEME.marigoldDeep,
-    fontWeight: '800',
-    marginLeft: 12,
+    lineHeight: 15,
   },
 
-  // Stats Grid
+  // Section Headers
   sectionHeadingBox: {
     marginBottom: 14,
-    marginTop: 8,
+    marginTop: 6,
   },
   sectionCategory: {
     color: THEME.marigoldDeep,
@@ -1301,6 +1399,8 @@ const styles = StyleSheet.create({
     color: THEME.inkSoft,
     lineHeight: 18,
   },
+
+  // Stats Grid
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1325,43 +1425,6 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
     color: THEME.inkSoft,
     fontWeight: '500',
-  },
-
-  // Photo Banner
-  photoBannerCard: {
-    backgroundColor: THEME.paper,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: THEME.line,
-    marginBottom: 20,
-  },
-  photoBannerImage: {
-    width: '100%',
-    height: 180,
-  },
-  photoBannerContent: {
-    padding: 16,
-  },
-  photoBannerTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: THEME.ink,
-    marginBottom: 4,
-  },
-  photoBannerSub: {
-    fontSize: 13,
-    color: THEME.inkSoft,
-    lineHeight: 18,
-    marginBottom: 10,
-  },
-  linkButton: {
-    alignSelf: 'flex-start',
-  },
-  linkButtonText: {
-    color: THEME.marigoldDeep,
-    fontWeight: '700',
-    fontSize: 13.5,
   },
 
   // Contact Desk Card
@@ -1409,7 +1472,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  // Form Screen
+  // Forms
   segmentContainer: {
     flexDirection: 'row',
     backgroundColor: '#E2E8F0',
@@ -1431,9 +1494,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   segmentBtnText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: THEME.inkSoft,
+    textAlign: 'center',
   },
   segmentBtnTextActive: {
     color: THEME.marigoldDeep,
@@ -1457,20 +1521,6 @@ const styles = StyleSheet.create({
     color: THEME.inkSoft,
     lineHeight: 18,
     marginBottom: 16,
-  },
-  driverPerksBox: {
-    backgroundColor: THEME.verifiedSoft,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#A7F3D0',
-  },
-  driverPerkItem: {
-    color: '#065F46',
-    fontSize: 12.5,
-    fontWeight: '600',
-    marginBottom: 4,
   },
   fieldLabel: {
     fontSize: 13,
@@ -1512,42 +1562,236 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 13,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   btnWhatsAppOutlineText: {
     color: '#065F46',
     fontWeight: '800',
     fontSize: 13.5,
   },
-  securityNote: {
+
+  // Duty Logbook Tab
+  logCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1.5,
+    borderColor: THEME.blue,
+    marginBottom: 20,
+  },
+  logCardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.ink,
+    marginBottom: 12,
+  },
+  logInputRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  miniLabel: {
     fontSize: 11.5,
+    fontWeight: '700',
     color: THEME.inkSoft,
-    textAlign: 'center',
-    marginTop: 12,
+    marginBottom: 4,
+  },
+  miniInput: {
+    backgroundColor: THEME.paperAlt,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    fontSize: 12.5,
+    color: THEME.ink,
+  },
+  btnLogSave: {
+    backgroundColor: THEME.blue,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  btnLogSaveText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 13.5,
+  },
+  logHistoryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  logHistoryTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.ink,
+  },
+  logEntryCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginBottom: 10,
+  },
+  logEntryTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  logEntryDate: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: THEME.ink,
+  },
+  logEntryOT: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: THEME.marigoldDeep,
+    backgroundColor: THEME.marigoldLight,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  logEntryDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  logEntryMeta: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+  },
+  logEntryKm: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: THEME.ink,
   },
 
-  // Calculator Screen
+  // Job Board Tab
+  jobCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: THEME.line,
+    marginBottom: 14,
+  },
+  jobBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  jobTypeBadge: {
+    backgroundColor: THEME.marigoldLight,
+    color: THEME.marigoldDeep,
+    fontSize: 10.5,
+    fontWeight: '800',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  jobSalary: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: THEME.verified,
+  },
+  jobTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.ink,
+    marginBottom: 4,
+  },
+  jobLocation: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+    marginBottom: 8,
+  },
+  jobDesc: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  jobApplyBtn: {
+    backgroundColor: THEME.ink,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  jobApplyBtnText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+
+  // Tools Tab
+  toolCard: {
+    backgroundColor: THEME.paper,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1.5,
+    borderColor: '#93C5FD',
+    marginBottom: 20,
+  },
+  toolBadge: {
+    color: THEME.blue,
+    fontSize: 10.5,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    marginBottom: 4,
+  },
+  toolTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: THEME.ink,
+    marginBottom: 4,
+  },
+  toolSub: {
+    fontSize: 12.5,
+    color: THEME.inkSoft,
+    lineHeight: 17,
+    marginBottom: 12,
+  },
+  btnParivahan: {
+    backgroundColor: THEME.blue,
+    borderRadius: 10,
+    paddingVertical: 13,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  btnParivahanText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 13.5,
+  },
+
+  // Calculator Card in Tools Tab
   calcCard: {
     backgroundColor: THEME.paper,
     borderRadius: 16,
-    padding: 20,
+    padding: 18,
     borderWidth: 1,
     borderColor: THEME.line,
+    marginBottom: 16,
   },
   calcSectionLabel: {
-    fontSize: 13.5,
+    fontSize: 13,
     fontWeight: '700',
     color: THEME.ink,
-    marginTop: 12,
-    marginBottom: 8,
+    marginTop: 10,
+    marginBottom: 6,
   },
   calcButtonGroup: {
-    gap: 8,
+    gap: 6,
   },
   calcOption: {
     backgroundColor: THEME.paperAlt,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: THEME.line,
@@ -1557,7 +1801,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.marigold,
   },
   calcOptionText: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: THEME.inkSoft,
     fontWeight: '600',
   },
@@ -1572,9 +1816,9 @@ const styles = StyleSheet.create({
   },
   calcPill: {
     backgroundColor: THEME.paperAlt,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: THEME.line,
   },
@@ -1583,7 +1827,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.marigoldDeep,
   },
   calcPillText: {
-    fontSize: 12.5,
+    fontSize: 12,
     color: THEME.inkSoft,
     fontWeight: '600',
   },
@@ -1593,142 +1837,31 @@ const styles = StyleSheet.create({
   },
   estimateResultBox: {
     backgroundColor: THEME.ink,
-    borderRadius: 14,
-    padding: 18,
-    marginTop: 20,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
     alignItems: 'center',
   },
   estimateTitle: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   estimateFigure: {
     color: THEME.marigold,
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '800',
   },
   estimateNote: {
     color: '#CBD5E1',
-    fontSize: 12,
-    marginBottom: 16,
-  },
-  estimateBreakdown: {
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 10,
-    padding: 12,
-    gap: 8,
-    marginBottom: 16,
-  },
-  breakdownRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  breakdownLabel: {
-    color: '#E2E8F0',
-    fontSize: 12.5,
-  },
-  breakdownVal: {
-    color: THEME.paper,
-    fontWeight: '700',
-    fontSize: 12.5,
-  },
-
-  // Driver Profile & Reviews
-  driverProfileCard: {
-    backgroundColor: THEME.paper,
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: THEME.line,
-    marginBottom: 14,
-  },
-  driverProfileImage: {
-    width: '100%',
-    height: 180,
-  },
-  driverProfileDetails: {
-    padding: 14,
-  },
-  verifiedTagRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 6,
-  },
-  verifiedTag: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: THEME.verified,
-    backgroundColor: THEME.verifiedSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  badgePillSmall: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: THEME.marigoldDeep,
-    backgroundColor: THEME.marigoldLight,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  driverName: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: THEME.ink,
-    marginBottom: 2,
-  },
-  driverMeta: {
-    fontSize: 13,
-    color: THEME.inkSoft,
-    marginBottom: 2,
-  },
-  driverSkill: {
-    fontSize: 12.5,
-    color: THEME.marigoldDeep,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  driverRating: {
-    fontSize: 12,
-    color: '#D97706',
-    fontWeight: '700',
-  },
-  testimonialCard: {
-    backgroundColor: THEME.paper,
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: THEME.line,
+    fontSize: 11.5,
     marginBottom: 12,
   },
-  testimonialRating: {
-    fontSize: 13,
-    marginBottom: 6,
-  },
-  testimonialQuote: {
-    fontSize: 13,
-    color: THEME.ink,
-    lineHeight: 19,
-    fontStyle: 'italic',
-    marginBottom: 10,
-  },
-  testimonialAuthor: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: THEME.ink,
-  },
-  testimonialRole: {
-    fontSize: 12,
-    color: THEME.inkSoft,
-  },
 
-  // KYC Upload Buttons
+  // KYC
   kycRow: {
     flexDirection: 'row',
     gap: 10,
@@ -1760,7 +1893,7 @@ const styles = StyleSheet.create({
     color: THEME.ink,
   },
 
-  // Floating WhatsApp Button
+  // Floating WhatsApp
   floatingWhatsApp: {
     position: 'absolute',
     bottom: 75,
@@ -1815,7 +1948,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // Confirmation Modal
+  // Modal
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.75)',
