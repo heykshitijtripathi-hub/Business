@@ -103,8 +103,73 @@
   .top-contact-links a:hover{
     color:#FB8500;
   }
+
+  /* Language Switcher Styling */
+  .lang-switch-box{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,0.08);
+    padding:3px 6px 3px 10px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.14);
+  }
+  .lang-globe-icon{
+    stroke:#FB8500;
+    flex-shrink:0;
+  }
+  .lang-btn-group{
+    display:inline-flex;
+    gap:2px;
+    background:rgba(15,23,42,0.6);
+    padding:2px;
+    border-radius:16px;
+  }
+  .lang-btn{
+    border:none;
+    background:transparent;
+    color:#94A3B8;
+    font-size:11.5px;
+    font-weight:600;
+    padding:3px 10px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:all .2s;
+  }
+  .lang-btn:hover{
+    color:#FFFFFF;
+  }
+  .lang-btn.active{
+    background:#FB8500;
+    color:#FFFFFF;
+    box-shadow:0 1px 6px rgba(251,133,0,0.4);
+  }
+  /* Google Translate hidden elements styling */
+  .goog-te-banner-frame.skiptranslate,
+  .goog-te-banner-frame,
+  .goog-te-gadget,
+  #goog-gt-tt,
+  .goog-te-balloon-frame {
+    display:none !important;
+  }
+  body{
+    top:0px !important;
+  }
+  .skiptranslate iframe{
+    display:none !important;
+  }
+  #google_translate_element{
+    display:none;
+  }
+
   @media(max-width:700px){
-    .top-bar{display:none;}
+    .top-bar-inner{
+      justify-content:center;
+      gap:8px;
+    }
+    .dispatch-live{
+      display:none;
+    }
   }
 
   /* ---------- Header ---------- */
@@ -706,14 +771,23 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
-<!-- TOP UTILITY ANNOUNCEMENT BAR -->
+<!<!-- TOP UTILITY ANNOUNCEMENT BAR WITH LANGUAGE CONVERTER -->
 <div class="top-bar">
   <div class="wrap top-bar-inner">
     <div class="dispatch-live"><span class="pulse-dot"></span> Delhi NCR Dispatch Desk: Active &amp; Taking Bookings (Mon–Sat: 8 AM – 9 PM)</div>
     <div class="top-contact-links">
       <span>Helpline: <a href="mailto:support@driverssaathi.com">support@driverssaathi.com</a></span>
       <span style="opacity:0.4;">|</span>
-      <span>Base Hub: Gurugram &amp; Noida</span>
+      <!-- Language Converter Toggle -->
+      <div class="lang-switch-box">
+        <svg class="lang-globe-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        <span style="color:#94A3B8; font-size:11.5px; font-weight:500;">Language:</span>
+        <div class="lang-btn-group">
+          <button type="button" class="lang-btn active" id="btnLangEn" onclick="setLanguage('en')">English</button>
+          <button type="button" class="lang-btn" id="btnLangHi" onclick="setLanguage('hi')">हिन्दी</button>
+        </div>
+      </div>
+      <div id="google_translate_element"></div>
     </div>
   </div>
 </div>
@@ -724,7 +798,7 @@
       <img src="images/driver-saathi-logo.png?v=3" alt="Drivers Saathi Logo" class="brand-logo-img">
     </a>
     <div class="nav-actions">
-      <a class="btn-driver-pill" href="driver-apply.html">🚗 Drive with Us</a>
+      <a class="btn-driver-pill" href="driver-apply.html">Drive with Us</a>
       <a class="btn btn-primary" href="#request">Hire a Driver &rarr;</a>
       <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -743,7 +817,7 @@
     <a href="monthly-retainer.html" class="tab-item" role="tab">Monthly Retainer</a>
     <a href="enterprise-custom.html" class="tab-item" role="tab">Enterprise Custom</a>
     <a href="#request" class="tab-item" role="tab" data-target="request" onclick="switchFormTab('individual')">Hire Personally</a>
-    <a href="driver-apply.html" class="tab-item" role="tab">Drive with Us 🚗</a>
+    <a href="driver-apply.html" class="tab-item" role="tab">Drive with Us</a>
   </nav>
   <div id="mobileMenu" style="display:none; border-top:1px solid var(--line-soft); padding:10px 24px 18px; background:var(--paper);">
     <ul style="list-style:none; margin:0; padding:0; display:grid; gap:4px;">
@@ -757,8 +831,8 @@
       <li><a class="navlink" style="display:block; padding:10px 0;" href="pay-per-hire.html">Pay‑Per‑Hire</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="monthly-retainer.html">Monthly Retainer</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="enterprise-custom.html">Enterprise Custom</a></li>
-      <li><a class="navlink" style="display:block; padding:10px 0;" href="#request" onclick="switchFormTab('individual')">Hire Personally 👤</a></li>
-      <li><a class="navlink" style="display:block; padding:10px 0;" href="driver-apply.html">Drive with Us 🚗</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#request" onclick="switchFormTab('individual')">Hire Personally</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="driver-apply.html">Drive with Us</a></li>
       <li style="margin-top:8px;"><a class="btn btn-primary" style="width:100%; justify-content:center;" href="#request">Request drivers</a></li>
     </ul>
   </div>
@@ -776,14 +850,14 @@
     <div class="wrap">
       <div>
         <div class="badge" style="background:rgba(251,133,0,0.22); color:#FB8500; border:1px solid rgba(251,133,0,0.45); padding:6px 14px; border-radius:20px; font-size:13px; font-weight:700; margin-bottom:18px; display:inline-flex; align-items:center; gap:6px;">
-          <span>🛡️</span> #1 Verified Driver Placement Desk in Delhi NCR
+          #1 Verified Driver Placement Desk in Delhi NCR
         </div>
         <h1 style="color:#ffffff;">Verified drivers for fleets &amp; private cars, across Delhi&nbsp;NCR</h1>
         <p class="lede">Drivers Saathi authenticates licenses, clears police records, and deploys trained professional drivers for commercial fleets, corporate transport, and personal car owners — backed by an unconditional 24-hr replacement guarantee.</p>
         <div class="cta-row">
           <a href="#request" class="btn btn-primary" onclick="switchFormTab('fleet')">Request Fleet Drivers &rarr;</a>
-          <a href="#request" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); backdrop-filter:blur(6px);" onclick="switchFormTab('individual')">Hire Personally 👤</a>
-          <a href="driver-apply.html" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.3); background:transparent;">Drive with Us 🚗</a>
+          <a href="#request" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); backdrop-filter:blur(6px);" onclick="switchFormTab('individual')">Hire Personally</a>
+          <a href="driver-apply.html" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.3); background:transparent;">Drive with Us</a>
         </div>
         <div class="trust-chips">
           <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>100% Police verified</span>
@@ -1099,21 +1173,21 @@
       <!-- 3 INTERACTIVE BREAKDOWN TABS -->
       <div class="model-tabs-nav" style="display:flex; gap:14px; margin-bottom:32px; justify-content:center; flex-wrap:wrap;">
         <a href="pay-per-hire.html" target="_blank" class="model-tab-btn" style="padding:14px 22px; border-radius:12px; background:#FFFFFF; border:1.5px solid #E2E8F0; text-decoration:none; color:#0F172A; font-weight:700; display:flex; align-items:center; gap:10px; box-shadow:0 4px 16px rgba(15,23,42,0.06); transition:transform .2s, border-color .2s;">
-          <span style="font-size:18px;">📦</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FB8500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
           <div>
             <div style="font-size:15px; line-height:1.2;">Pay-per-hire</div>
             <div style="font-size:11.5px; color:#FB8500; font-weight:600;">Hassles Solved &amp; Details &rarr;</div>
           </div>
         </a>
         <a href="monthly-retainer.html" target="_blank" class="model-tab-btn" style="padding:14px 22px; border-radius:12px; background:#FFFFFF; border:1.5px solid #FB8500; text-decoration:none; color:#0F172A; font-weight:700; display:flex; align-items:center; gap:10px; box-shadow:0 4px 16px rgba(251,133,0,0.12); transition:transform .2s, border-color .2s;">
-          <span style="font-size:18px;">🔄</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FB8500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l6.73-6.73"></path></svg>
           <div>
             <div style="font-size:15px; line-height:1.2;">Monthly retainer</div>
             <div style="font-size:11.5px; color:#FB8500; font-weight:600;">Hassles Solved &amp; Details &rarr;</div>
           </div>
         </a>
         <a href="enterprise-custom.html" target="_blank" class="model-tab-btn" style="padding:14px 22px; border-radius:12px; background:#FFFFFF; border:1.5px solid #E2E8F0; text-decoration:none; color:#0F172A; font-weight:700; display:flex; align-items:center; gap:10px; box-shadow:0 4px 16px rgba(15,23,42,0.06); transition:transform .2s, border-color .2s;">
-          <span style="font-size:18px;">🏢</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FB8500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M9 11h.01M9 15h.01M15 11h.01M15 15h.01M12 21v-4"></path></svg>
           <div>
             <div style="font-size:15px; line-height:1.2;">Enterprise custom</div>
             <div style="font-size:11.5px; color:#FB8500; font-weight:600;">Hassles Solved &amp; Details &rarr;</div>
@@ -1194,21 +1268,27 @@
       <div class="form-tab-container">
         <div class="form-tab-nav" role="tablist">
           <button type="button" class="form-tab-btn active" onclick="switchFormTab('fleet')" id="btn-fleet" role="tab" aria-selected="true">
-            <span class="tab-icon">🏢</span>
+            <span class="tab-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M9 11h.01M9 15h.01M15 11h.01M15 15h.01M12 21v-4"></path></svg>
+            </span>
             <span class="tab-labels">
               <span class="tab-title">Fleet &amp; Business Hire</span>
               <span class="tab-desc">Cabs, corporate shuttles &amp; bulk staffing</span>
             </span>
           </button>
           <button type="button" class="form-tab-btn" onclick="switchFormTab('individual')" id="btn-individual" role="tab" aria-selected="false">
-            <span class="tab-icon">👤</span>
+            <span class="tab-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </span>
             <span class="tab-labels">
               <span class="tab-title">Hire Personally</span>
               <span class="tab-desc">Private car, chauffeur &amp; daily commute</span>
             </span>
           </button>
           <button type="button" class="form-tab-btn" onclick="switchFormTab('driver')" id="btn-driver" role="tab" aria-selected="false">
-            <span class="tab-icon">🚗</span>
+            <span class="tab-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="2"></circle><line x1="12" y1="2" x2="12" y2="10"></line><line x1="4.93" y1="19.07" x2="10.59" y2="13.41"></line><line x1="19.07" y1="19.07" x2="13.41" y2="13.41"></line></svg>
+            </span>
             <span class="tab-labels">
               <span class="tab-title">Apply as a Driver</span>
               <span class="tab-desc">Verified jobs &amp; steady monthly pay</span>
@@ -1390,14 +1470,14 @@
         <div class="form-panel-body">
           <div class="form-panel-header">
             <div>
-              <h3>🏢 Fleet &amp; Business Driver Request</h3>
+              <h3>Fleet &amp; Business Driver Request</h3>
               <p>For cab fleets, aggregators, corporate employee shuttles &amp; logistics operators in Delhi NCR.</p>
             </div>
             <span class="badge" style="background:#E0F2FE; color:#0369A1; border:1px solid #BAE6FD; padding:4px 10px; font-size:12px; font-weight:700; border-radius:20px;">SLA 24-hr Replacement</span>
           </div>
           <div class="form-wrap">
             <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="formFleet" class="form-body" novalidate>
-              <input type="hidden" name="_subject" value="🏢 Fleet/Business Driver Request — Drivers Saathi">
+              <input type="hidden" name="_subject" value="Fleet/Business Driver Request — Drivers Saathi">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
               <input type="hidden" name="Category" value="Fleet / Corporate Staffing">
@@ -1458,13 +1538,13 @@
               </div>
 
               <div class="alert-success" id="fleetSuccess">
-                <h4>✅ Fleet Request Received</h4>
+                <h4>Fleet Request Received</h4>
                 <p>Thank you! Your requirements have been delivered to <strong>support@driverssaathi.com</strong>. Our fleet account manager will contact you within 1 business day.</p>
                 <button type="button" class="btn btn-ghost" onclick="resetForm('formFleet','fleetSuccess')">Submit another requirement</button>
               </div>
 
               <div class="form-foot">
-                <p class="form-note">⚡ Shortlisted &amp; police-verified candidate profiles shared within 24–48 hours.</p>
+                <p class="form-note">Shortlisted &amp; police-verified candidate profiles shared within 24–48 hours.</p>
                 <button type="submit" class="btn btn-primary">Submit Fleet Request &rarr;</button>
               </div>
             </form>
@@ -1477,14 +1557,14 @@
         <div class="form-panel-body">
           <div class="form-panel-header">
             <div>
-              <h3>👤 Hire a Personal / Private Car Driver</h3>
+              <h3>Hire a Personal / Private Car Driver</h3>
               <p>For personal car owners, families, daily office commute &amp; executive chauffeur service.</p>
             </div>
             <span class="badge" style="background:#FEF3C7; color:#B45309; border:1px solid #FDE68A; padding:4px 10px; font-size:12px; font-weight:700; border-radius:20px;">100% Police Verified</span>
           </div>
           <div class="form-wrap">
             <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="formIndividual" class="form-body" novalidate>
-              <input type="hidden" name="_subject" value="👤 Personal Driver Hire Request — Drivers Saathi">
+              <input type="hidden" name="_subject" value="Personal Driver Hire Request — Drivers Saathi">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
               <input type="hidden" name="Category" value="Personal Driver Hire">
@@ -1549,13 +1629,13 @@
               </div>
 
               <div class="alert-success" id="individualSuccess">
-                <h4>✅ Personal Driver Request Received</h4>
+                <h4>Personal Driver Request Received</h4>
                 <p>Thank you! Your request has been sent to <strong>support@driverssaathi.com</strong>. We will contact you shortly with verified driver profiles suited for your car and location.</p>
                 <button type="button" class="btn btn-ghost" onclick="resetForm('formIndividual','individualSuccess')">Submit another request</button>
               </div>
 
               <div class="form-foot">
-                <p class="form-note">🛡️ All personal drivers pass background verification, address checks &amp; a driving trial.</p>
+                <p class="form-note">All personal drivers pass background verification, address checks &amp; a driving trial.</p>
                 <button type="submit" class="btn btn-primary">Find My Driver &rarr;</button>
               </div>
             </form>
@@ -1568,14 +1648,14 @@
         <div class="form-panel-body">
           <div class="form-panel-header">
             <div>
-              <h3>🚗 Apply as a Driver — Join Driver Saathi</h3>
+              <h3>Apply as a Driver — Join Drivers Saathi</h3>
               <p>Looking for a steady driving job in Delhi NCR? Join our verified network with fair, prompt payments.</p>
             </div>
             <a href="driver-apply.html" class="btn btn-ghost" style="font-size:12.5px; padding:6px 14px;">Open Full Page &rarr;</a>
           </div>
           <div class="form-wrap">
             <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="formDriver" class="form-body" novalidate>
-              <input type="hidden" name="_subject" value="🚗 Driver Job Application — Drivers Saathi">
+              <input type="hidden" name="_subject" value="Driver Job Application — Drivers Saathi">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
               <input type="hidden" name="Category" value="Driver Job Application">
@@ -1643,13 +1723,13 @@
               </div>
 
               <div class="alert-success" id="driverSuccess">
-                <h4>✅ Application Received</h4>
+                <h4>Application Received</h4>
                 <p>Dhanyawad! Your details have been sent to <strong>support@driverssaathi.com</strong>. Our team will call you within 2 business days for interview &amp; document verification.</p>
                 <button type="button" class="btn btn-ghost" onclick="resetForm('formDriver','driverSuccess')">Submit another application</button>
               </div>
 
               <div class="form-foot">
-                <p class="form-note">📞 Our recruitment team will call you on your phone number within 48 hours.</p>
+                <p class="form-note">Our recruitment team will call you on your phone number within 48 hours.</p>
                 <button type="submit" class="btn btn-primary">Submit Driver Application &rarr;</button>
               </div>
             </form>
@@ -1659,8 +1739,8 @@
 
       <!-- Quick direct contact helper -->
       <div class="direct-contact-banner">
-        <span>📧 Prefer email? Write directly to <strong>support@driverssaathi.com</strong> with your requirement.</span>
-        <span>📍 Dispatch Hub: Gurugram, Delhi NCR</span>
+        <span>Prefer email? Write directly to <strong>support@driverssaathi.com</strong> with your requirement.</span>
+        <span>Dispatch Hub: Gurugram, Delhi NCR</span>
       </div>
 
     </div>
@@ -1976,7 +2056,48 @@
     }
   }, { passive: true });
 
+  // ---------- English / Hindi Language Switcher ----------
+  function setLanguage(lang) {
+    const btnEn = document.getElementById('btnLangEn');
+    const btnHi = document.getElementById('btnLangHi');
+    if(btnEn) btnEn.classList.toggle('active', lang === 'en');
+    if(btnHi) btnHi.classList.toggle('active', lang === 'hi');
+
+    const domain = window.location.hostname;
+    document.cookie = "googtrans=" + (lang === 'hi' ? '/en/hi' : '/en/en') + "; path=/;";
+    if (domain && domain.includes('.')) {
+      document.cookie = "googtrans=" + (lang === 'hi' ? '/en/hi' : '/en/en') + "; path=/; domain=" + domain + ";";
+    }
+
+    const select = document.querySelector('.goog-te-combo');
+    if (select) {
+      select.value = lang;
+      select.dispatchEvent(new Event('change'));
+    } else {
+      window.location.reload();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.cookie.indexOf('/en/hi') !== -1) {
+      const btnHi = document.getElementById('btnLangHi');
+      const btnEn = document.getElementById('btnLangEn');
+      if (btnHi) btnHi.classList.add('active');
+      if (btnEn) btnEn.classList.remove('active');
+    }
+  });
 </script>
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,hi',
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>
