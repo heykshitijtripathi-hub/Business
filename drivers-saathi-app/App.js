@@ -20,129 +20,226 @@ import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// ─── Design System & Palette ───────────────────────────────────────────────────
+// ─── Executive Color System ───────────────────────────────────────────────────
 const THEME = {
-  primary: '#0F172A',       // Deep Executive Navy
+  primary: '#0F172A',         // Rich Executive Navy
   primaryLight: '#1E293B',
-  accent: '#FB8500',        // Warm Marigold Accent
+  accent: '#FB8500',          // Signature Warm Marigold
+  accentDeep: '#D97706',
   accentSoft: '#FFF7ED',
   accentBorder: '#FDBA74',
-  canvas: '#F8FAFC',        // Crisp Soft White Background
-  surface: '#FFFFFF',       // Pure White Card Surface
-  border: '#E2E8F0',        // Subtle Divider Line
+  canvas: '#F8FAFC',          // Soft Off-White Background
+  surface: '#FFFFFF',         // Crisp White Cards
+  border: '#E2E8F0',          // Subtle Border Lines
   borderSoft: '#F1F5F9',
-  textPrimary: '#0F172A',   // High Contrast Dark Slate
-  textSecondary: '#475569', // Readable Subtitle Slate
-  textMuted: '#94A3B8',     // Helper Slate
-  success: '#059669',       // Clean Verified Emerald
+  textPrimary: '#0F172A',
+  textSecondary: '#475569',
+  textMuted: '#94A3B8',
+  success: '#059669',         // Verified Emerald
   successSoft: '#ECFDF5',
   sosRed: '#EF4444',
   sosSoft: '#FEF2F2',
   blue: '#2563EB',
   blueSoft: '#EFF6FF',
+  gold: '#F59E0B',
+  goldSoft: '#FFFBEB',
 };
 
-// ─── Highway Routes Data ────────────────────────────────────────────────────────
-const POPULAR_ROUTES = [
+// ─── Real Verified Chauffeur Candidates ─────────────────────────────────────────
+const VERIFIED_CHAUFFEURS = [
+  {
+    id: 'c1',
+    name: 'Rameshwar Dayal',
+    age: 42,
+    exp: '15 Yrs Exp',
+    rating: '4.95',
+    trips: 184,
+    skills: ['Automatic', 'Fortuner / Innova', 'VIP Executive'],
+    languages: 'Hindi, Working English',
+    badge: 'GOLD CHAUFFEUR',
+    zone: 'South Delhi & Gurugram',
+    policeCleared: true,
+    photo: require('./assets/indian_driver_portrait.jpg'),
+    bio: 'Ex-corporate chauffeur for MNC directors. Strict on-time arrival and defensive driving trained.',
+  },
+  {
+    id: 'c2',
+    name: 'Vikramaditya Singh',
+    age: 36,
+    exp: '11 Yrs Exp',
+    rating: '4.88',
+    trips: 142,
+    skills: ['Automatic', 'BMW / Mercedes', 'EV Specialist'],
+    languages: 'Hindi, English',
+    badge: 'LUXURY CHAUFFEUR',
+    zone: 'Gurugram (Golf Course & Cyber City)',
+    policeCleared: true,
+    photo: require('./assets/indian_driver_wheel.jpg'),
+    bio: 'Specialist in German luxury sedans and electric vehicles. Smooth braking and polite route management.',
+  },
+  {
+    id: 'c3',
+    name: 'Mohan Lal Verma',
+    age: 46,
+    exp: '18 Yrs Exp',
+    rating: '4.98',
+    trips: 260,
+    skills: ['Manual & Automatic', 'All SUVs', 'Night Driving'],
+    languages: 'Hindi',
+    badge: 'MASTER DRIVER',
+    zone: 'Noida & Central Delhi',
+    policeCleared: true,
+    photo: require('./assets/driver_passenger_service.jpg'),
+    bio: '18 years accident-free commercial record. Exceptional expressway experience across North India.',
+  },
+  {
+    id: 'c4',
+    name: 'Satish Chand Sharma',
+    age: 33,
+    exp: '8 Yrs Exp',
+    rating: '4.85',
+    trips: 98,
+    skills: ['Highway Trips', 'Yamuna Expy', 'FASTag Expert'],
+    languages: 'Hindi, Basic English',
+    badge: 'HIGHWAY SPECIALIST',
+    zone: 'Delhi NCR & Outstation',
+    policeCleared: true,
+    photo: require('./assets/driver_team_standing.jpg'),
+    bio: 'Preferred chauffeur for weekend getaways to Agra, Jaipur, and Chandigarh. Non-smoker, clean etiquette.',
+  },
+];
+
+// ─── Highway Routes Database ────────────────────────────────────────────────────
+const HIGHWAY_ROUTES = [
   { id: 'agra', name: 'Delhi to Agra', route: 'Yamuna Expressway', dist: '210 km', time: '3.5 hrs', fare: '₹1,500/day', toll: '₹415', da: '₹400 DA' },
   { id: 'jaipur', name: 'Delhi to Jaipur', route: 'Delhi-Mumbai Expy', dist: '270 km', time: '4 hrs', fare: '₹1,800/day', toll: '₹590', da: '₹500 DA' },
   { id: 'chandigarh', name: 'Delhi to Chandigarh', route: 'NH-44 Highway', dist: '250 km', time: '4.5 hrs', fare: '₹1,600/day', toll: '₹390', da: '₹400 DA' },
   { id: 'dehradun', name: 'Delhi to Dehradun', route: 'Meerut Expressway', dist: '260 km', time: '5 hrs', fare: '₹1,800/day', toll: '₹310', da: '₹500 DA' },
 ];
 
-// ─── Verified Driver Jobs ───────────────────────────────────────────────────────
-const JOB_LISTINGS = [
-  { id: 'j1', title: 'Personal Chauffeur for Creta', salary: '₹22,000 - ₹24,000/mo', location: 'South Delhi (Vasant Vihar)', type: 'Full-time', badge: 'LMV' },
-  { id: 'j2', title: 'Luxury Chauffeur (BMW 5-Series)', salary: '₹26,000 - ₹28,000/mo', location: 'Gurugram (Golf Course Rd)', type: 'Full-time', badge: 'Luxury' },
-  { id: 'j3', title: 'Corporate Fleet Driver', salary: '₹20,000 - ₹22,000/mo', location: 'Noida (Sector 62)', type: 'Commercial', badge: 'Commercial' },
-  { id: 'j4', title: 'Executive Chauffeur for Director', salary: '₹28,000 - ₹32,000/mo', location: 'Aerocity, New Delhi', type: 'Full-time', badge: 'VIP' },
+// ─── Active Job Listings for Drivers ───────────────────────────────────────────
+const DRIVER_JOBS = [
+  { id: 'j1', title: 'Personal Chauffeur for Creta (Automatic)', salary: '₹22,000 - ₹24,000/mo', location: 'Vasant Vihar, South Delhi', type: '10-Hr Duty', tag: 'URGENT' },
+  { id: 'j2', title: 'Luxury Chauffeur (Mercedes E-Class)', salary: '₹26,000 - ₹30,000/mo', location: 'DLF Phase 5, Gurugram', type: '12-Hr Executive', tag: 'PREMIUM' },
+  { id: 'j3', title: 'Corporate Fleet Driver for Startup Shuttle', salary: '₹20,000 - ₹22,000/mo', location: 'Sector 62, Noida', type: 'Commercial LMV', tag: 'IMMEDIATE' },
+  { id: 'j4', title: 'Full-Time Chauffeur for Family Fortuner', salary: '₹24,000 - ₹26,000/mo', location: 'Punjabi Bagh, New Delhi', type: '10-Hr Duty', tag: 'POPULAR' },
 ];
 
 export default function App() {
-  // Navigation: 'home' | 'bookings' | 'support' | 'driver'
-  const [activeTab, setActiveTab] = useState('home');
+  // Navigation Tabs: 'explore' | 'chauffeurs' | 'bookings' | 'driver'
+  const [activeTab, setActiveTab] = useState('explore');
   const [lang, setLang] = useState('en'); // 'en' | 'hi'
 
-  // Booking Modal Flow
-  const [bookingModal, setBookingModal] = useState({ visible: false, service: null });
-  const [bookingType, setBookingType] = useState('onetime'); // 'onetime' | 'subscription'
-  const [loading, setLoading] = useState(false);
-
-  // Success Confirmation Modal
-  const [successModal, setSuccessModal] = useState({ visible: false, message: '' });
-
-  // Customer Booking Form
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    car: '',
-    cityArea: '',
-    travelDate: '',
-    route: '',
-    companyName: '',
-    gstin: '',
-    driverCount: '1',
-    driverDL: '',
-    referralCode: '',
+  // User Profile & Saved Garage
+  const [profileModal, setProfileModal] = useState(false);
+  const [userProfile, setUserProfile] = useState({
+    name: 'Priya Sharma',
+    phone: '+91 98110 23456',
+    email: 'priya.sharma@example.com',
+    primaryCar: 'Hyundai Creta 2023 (Automatic)',
+    address: 'DLF Phase 5, Gurugram',
+    savedCars: ['Hyundai Creta (Automatic)', 'Honda City ZX (Manual)'],
   });
 
-  // Client History & Duty Logs
+  // Filter for Chauffeurs Directory
+  const [chauffeurFilter, setChauffeurFilter] = useState('All');
+
+  // Multi-Step Smart Booking Modal
+  const [bookingModal, setBookingModal] = useState({ visible: false, service: null, selectedChauffeur: null });
+  const [bookingStep, setBookingStep] = useState(1); // 1: Requirements -> 2: Date/Hours -> 3: Contact & Token
+  const [smartBooking, setSmartBooking] = useState({
+    shiftHours: '10 Hours (Standard Day)',
+    transmission: 'Automatic',
+    weeklyOff: 'Sunday Off',
+    reportingTime: '08:30 AM',
+    startDate: 'Tomorrow',
+    carModel: 'Hyundai Creta',
+    locationArea: 'South Delhi / Gurugram',
+    pricingPlan: 'onetime', // 'onetime' (₹4,500) | 'subscription' (₹3,500/mo)
+    tokenOption: 'token500', // 'token500' | 'payLater'
+    upiApp: 'Google Pay',
+  });
+
+  // Loading & Confirmation
+  const [loading, setLoading] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({ visible: false, bookingId: '', message: '' });
+
+  // Client Bookings & Duty Records
   const [bookings, setBookings] = useState([]);
   const [dutyLogs, setDutyLogs] = useState([]);
-  const [dutyForm, setDutyForm] = useState({ date: new Date().toISOString().split('T')[0], inTime: '09:00 AM', outTime: '07:30 PM', km: '50', ot: '1.5' });
-  const [bookingsSubTab, setBookingsSubTab] = useState('list'); // 'list' | 'duty' | 'replacement'
+  const [dutyInput, setDutyInput] = useState({
+    date: new Date().toISOString().split('T')[0],
+    inTime: '08:30 AM',
+    outTime: '07:00 PM',
+    km: '54',
+    ot: '1.5',
+  });
+  const [bookingsTab, setBookingsTab] = useState('active'); // 'active' | 'duty' | 'fleet'
 
-  // Driver KYC State
-  const [driverForm, setDriverForm] = useState({ name: '', phone: '', experience: '', city: 'Delhi NCR', licenseCategory: 'Commercial LMV' });
+  // Driver Mode Cockpit
+  const [driverModeSubTab, setDriverModeSubTab] = useState('cockpit'); // 'cockpit' | 'jobs' | 'wallet' | 'kyc'
+  const [dutyOtpEntered, setDutyOtpEntered] = useState('');
+  const [isDutyActive, setIsDutyActive] = useState(false);
+  const [driverWallet, setDriverWallet] = useState({ balance: 3800, pendingOT: 600, referrals: 1000 });
+  const [driverKYC, setDriverKYC] = useState({ name: '', phone: '', exp: '', licenseCategory: 'Commercial LMV' });
   const [licenseImg, setLicenseImg] = useState(null);
   const [aadhaarImg, setAadhaarImg] = useState(null);
 
-  // Support / Grievance State
-  const [grievanceText, setGrievanceText] = useState('');
-  const [tickets, setTickets] = useState([
-    { id: 't1', issue: 'Driver replacement inquiry for South Delhi location', status: 'Resolved', date: '08 Sep 2026' }
+  // Corporate Fleet Roster
+  const [fleetVehicles, setFleetVehicles] = useState([
+    { id: 'f1', vehicle: 'Swift Dzire (DL-1Z-9042)', driver: 'Suresh Kumar', status: 'On Duty', dlExpiry: '14 Oct 2027' },
+    { id: 'f2', vehicle: 'Innova Crysta (DL-1Z-4411)', driver: 'Vikram Singh', status: 'On Duty', dlExpiry: '22 Nov 2026' },
+    { id: 'f3', vehicle: 'Honda City (HR-26-8802)', driver: 'Deepak Verma', status: 'Substitute Needed', dlExpiry: 'Expired (Action Required)' },
   ]);
 
   // Load Saved Data
   useEffect(() => {
     (async () => {
       try {
-        const savedBookings = await AsyncStorage.getItem('@ds_client_bookings_v1');
+        const savedBookings = await AsyncStorage.getItem('@ds_client_bookings_v2');
         if (savedBookings) setBookings(JSON.parse(savedBookings));
         else {
           setBookings([
-            { id: 'b1', title: 'Personal Chauffeur Placement', date: '05 Sep 2026', status: 'Active', price: '₹4,500', car: 'Honda City' }
+            {
+              id: 'DS-9042',
+              title: 'Personal Chauffeur Placement',
+              chauffeurName: 'Rameshwar Dayal',
+              car: 'Hyundai Creta (Automatic)',
+              date: '04 Sep 2026',
+              status: 'Active Duty',
+              fee: '₹4,500 Paid',
+              replacementExpiry: '04 Oct 2026 (23 days remaining)',
+            },
           ]);
         }
-        const savedLogs = await AsyncStorage.getItem('@ds_duty_logs_v1');
+        const savedLogs = await AsyncStorage.getItem('@ds_duty_logs_v2');
         if (savedLogs) setDutyLogs(JSON.parse(savedLogs));
         else {
           setDutyLogs([
-            { id: 'l1', date: '08 Sep 2026', in: '09:00 AM', out: '07:30 PM', km: '62 km', ot: '1.5 hrs' },
-            { id: 'l2', date: '09 Sep 2026', in: '08:45 AM', out: '08:00 PM', km: '78 km', ot: '2.0 hrs' }
+            { id: 'd1', date: '2026-09-08', in: '08:30 AM', out: '07:15 PM', km: '62 km', ot: '1.5 hrs' },
+            { id: 'd2', date: '2026-09-09', in: '08:30 AM', out: '07:45 PM', km: '78 km', ot: '2.0 hrs' },
           ]);
         }
       } catch (e) {}
     })();
   }, []);
 
-  const openWhatsApp = (msg = '') => {
-    const defaultMsg = lang === 'en'
-      ? 'Hello Drivers Saathi, I need a verified driver in Delhi NCR. Please assist.'
-      : 'नमस्ते ड्राइवर्स साथी, मुझे दिल्ली एनसीआर में वेरिफाइड ड्राइवर की जरूरत है।';
-    Linking.openURL(`https://wa.me/918175087004?text=${encodeURIComponent(msg || defaultMsg)}`);
-  };
-
   const makeCall = () => Linking.openURL('tel:+918175087004');
+
+  const openWhatsApp = (customMsg = '') => {
+    const text = customMsg || (lang === 'en'
+      ? 'Hello Drivers Saathi, I need a verified chauffeur in Delhi NCR. Please share available drivers.'
+      : 'नमस्ते ड्राइवर्स साथी, मुझे दिल्ली एनसीआर में वेरिफाइड ड्राइवर की आवश्यकता है।');
+    Linking.openURL(`https://wa.me/918175087004?text=${encodeURIComponent(text)}`);
+  };
 
   const triggerSOS = () => {
     Alert.alert(
-      'Emergency SOS & Dispatch',
-      'Direct line to Drivers Saathi Delhi NCR dispatch control desk.\n\nHelpline: +91 8175087004',
+      'Emergency Dispatch & Roadside SOS',
+      'Direct line to Drivers Saathi Delhi NCR live dispatch desk.\n\nHelpline: +91 8175087004\nOperational: 24 Hours / 7 Days',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Call Control Desk Now', onPress: makeCall }
+        { text: 'Call Dispatch Desk Now', onPress: makeCall },
       ]
     );
   };
@@ -162,71 +259,69 @@ export default function App() {
     } catch (e) {}
   };
 
-  const handleOpenBooking = (service) => {
-    setBookingModal({ visible: true, service });
+  const openBookingFlow = (service, chauffeur = null) => {
+    setBookingModal({
+      visible: true,
+      service: service || { title: 'Personal Chauffeur Placement', price: '₹4,500 Fee' },
+      selectedChauffeur: chauffeur,
+    });
+    setBookingStep(1);
+    if (chauffeur) {
+      setSmartBooking(prev => ({ ...prev, carModel: userProfile.primaryCar }));
+    }
   };
 
-  const handleSaveDutyLog = async () => {
-    if (!dutyForm.inTime || !dutyForm.outTime) {
+  const handleSaveDutyEntry = async () => {
+    if (!dutyInput.inTime || !dutyInput.outTime) {
       Alert.alert('Required', 'Please enter check-in and check-out times.');
       return;
     }
     const newLog = {
       id: Date.now().toString(),
-      date: dutyForm.date,
-      in: dutyForm.inTime,
-      out: dutyForm.outTime,
-      km: `${dutyForm.km || 0} km`,
-      ot: `${dutyForm.ot || 0} hrs`,
+      date: dutyInput.date,
+      in: dutyInput.inTime,
+      out: dutyInput.outTime,
+      km: `${dutyInput.km || 0} km`,
+      ot: `${dutyInput.ot || 0} hrs`,
     };
     const updated = [newLog, ...dutyLogs];
     setDutyLogs(updated);
-    await AsyncStorage.setItem('@ds_duty_logs_v1', JSON.stringify(updated));
-    Alert.alert('Duty Saved', `Duty logged for ${dutyForm.date} with ${dutyForm.ot} hrs overtime.`);
+    await AsyncStorage.setItem('@ds_duty_logs_v2', JSON.stringify(updated));
+    Alert.alert('Duty Logged', `Logged duty for ${dutyInput.date} (+${dutyInput.ot} hrs OT).`);
   };
 
-  const handleCreateTicket = () => {
-    if (!grievanceText.trim()) {
-      Alert.alert('Required', 'Please describe your query or issue.');
-      return;
-    }
-    const newTicket = {
-      id: Date.now().toString(),
-      issue: grievanceText,
-      status: 'In Review',
-      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-    };
-    setTickets([newTicket, ...tickets]);
-    setGrievanceText('');
-    Alert.alert('Ticket Raised', 'Your query has been logged. Our dispatch manager will contact you within 2 hours.');
-  };
-
-  const handleSubmitBooking = async () => {
-    if (!form.name.trim() || !form.phone.trim()) {
-      Alert.alert('Required Information', 'Please enter your Full Name and Mobile Number.');
+  const handleConfirmSmartBooking = async () => {
+    if (!userProfile.name.trim() || !userProfile.phone.trim()) {
+      Alert.alert('Contact Details', 'Please provide your full name and phone number.');
       return;
     }
 
     setLoading(true);
-    const serviceName = bookingModal.service?.title || 'Driver Service';
-    const price = bookingType === 'subscription' ? '₹3,500/month Subscription' : bookingModal.service?.price;
+    const bookingId = `DS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const serviceTitle = bookingModal.selectedChauffeur
+      ? `Hire Chauffeur: ${bookingModal.selectedChauffeur.name}`
+      : (bookingModal.service?.title || 'Chauffeur Placement');
+
+    const amount = smartBooking.pricingPlan === 'subscription' ? '₹3,500/Month Retainer' : '₹4,500 One-time Placement';
 
     const payload = {
-      Service: serviceName,
-      Package: price,
-      Name: form.name,
-      Phone: form.phone,
-      Email: form.email || 'Not Provided',
-      'Car / Vehicle': form.car || 'Not Specified',
-      'Location / Area': form.cityArea || 'Delhi NCR',
-      'Travel Date': form.travelDate || 'Immediate / Flexible',
-      Company: form.companyName || 'Individual Client',
-      GSTIN: form.gstin || 'N/A',
-      'Driver Count': form.driverCount || '1',
-      'Driver DL to Verify': form.driverDL || 'N/A',
-      'Referral Code': form.referralCode || 'None',
-      _subject: `[Booking] ${serviceName} - ${form.name} (${form.phone})`,
-      _autoresponse: `Thank you for booking with Drivers Saathi! We have received your request for ${serviceName}. An account manager is assigned and will call you within 1 business day.\n\nHelpline: +91 8175087004\nEmail: support@driverssaathi.com`,
+      BookingID: bookingId,
+      Service: serviceTitle,
+      SelectedChauffeur: bookingModal.selectedChauffeur?.name || 'Assigned by Dispatch Desk',
+      ClientName: userProfile.name,
+      ClientPhone: userProfile.phone,
+      ClientEmail: userProfile.email,
+      Vehicle: smartBooking.carModel || userProfile.primaryCar,
+      Transmission: smartBooking.transmission,
+      ShiftHours: smartBooking.shiftHours,
+      ReportingTime: smartBooking.reportingTime,
+      WeeklyOff: smartBooking.weeklyOff,
+      StartDate: smartBooking.startDate,
+      Location: smartBooking.locationArea || userProfile.address,
+      Plan: amount,
+      AdvancePayment: smartBooking.tokenOption === 'token500' ? '₹500 Token Paid via ' + smartBooking.upiApp : 'Pay Post Placement',
+      _subject: `[Confirmed Booking #${bookingId}] ${serviceTitle} - ${userProfile.name}`,
+      _autoresponse: `Dear ${userProfile.name}, your booking #${bookingId} is confirmed with Drivers Saathi! Our dispatch coordinator is allocating your verified driver and will connect with you within 4 hours. Helpline: +91 8175087004`,
     };
 
     try {
@@ -236,112 +331,73 @@ export default function App() {
         body: JSON.stringify(payload),
       });
 
-      // Save to local active bookings
-      const newBooking = {
-        id: Date.now().toString(),
-        title: serviceName,
+      const newBookingRecord = {
+        id: bookingId,
+        title: serviceTitle,
+        chauffeurName: bookingModal.selectedChauffeur?.name || 'Chauffeur Allocation In Progress',
+        car: smartBooking.carModel || userProfile.primaryCar,
         date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-        status: 'Confirmation Pending',
-        price: price,
-        car: form.car || 'Private Vehicle',
+        status: smartBooking.tokenOption === 'token500' ? 'Token Confirmed' : 'Request Logged',
+        fee: amount,
+        replacementExpiry: '30-Day Free Replacement Active',
       };
-      const updated = [newBooking, ...bookings];
-      setBookings(updated);
-      await AsyncStorage.setItem('@ds_client_bookings_v1', JSON.stringify(updated));
 
-      setBookingModal({ visible: false, service: null });
-      setSuccessModal({
+      const updatedBookings = [newBookingRecord, ...bookings];
+      setBookings(updatedBookings);
+      await AsyncStorage.setItem('@ds_client_bookings_v2', JSON.stringify(updatedBookings));
+
+      setBookingModal({ visible: false, service: null, selectedChauffeur: null });
+      setConfirmationModal({
         visible: true,
-        message: `Your booking for ${serviceName} is received!\n\nOur account manager will call you within 1 business day to confirm driver allocation and invoice details.`
+        bookingId: bookingId,
+        message: `Booking #${bookingId} is successfully confirmed!\n\nDriver profile details and interview schedule have been sent to ${userProfile.phone}.\n\nOur dispatch manager will call you within 2 hours.`,
       });
-
-      setForm({ name: '', phone: '', email: '', car: '', cityArea: '', travelDate: '', route: '', companyName: '', gstin: '', driverCount: '1', driverDL: '', referralCode: '' });
     } catch (e) {
-      Alert.alert('Notice', 'Your request has been recorded. Our team will contact you shortly.');
-      setBookingModal({ visible: false, service: null });
+      Alert.alert('Notice', 'Your request has been logged. Our dispatch team will call you shortly.');
+      setBookingModal({ visible: false, service: null, selectedChauffeur: null });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDriverKYCSubmit = async () => {
-    if (!driverForm.name.trim() || !driverForm.phone.trim()) {
-      Alert.alert('Required', 'Please enter your Full Name and Mobile Number.');
-      return;
-    }
-    setLoading(true);
-    const payload = {
-      Category: 'Driver Partner Onboarding',
-      Name: driverForm.name,
-      Phone: driverForm.phone,
-      Experience: driverForm.experience || 'Not Specified',
-      Location: driverForm.city || 'Delhi NCR',
-      LicenseCategory: driverForm.licenseCategory,
-      LicenseAttached: licenseImg ? 'Yes' : 'Pending',
-      AadhaarAttached: aadhaarImg ? 'Yes' : 'Pending',
-      _subject: `[Driver KYC] ${driverForm.name} (${driverForm.phone})`,
-      _autoresponse: 'ड्राइवर्स साथी में आवेदन के लिए धन्यवाद! हमारे रिक्रूटमेंट अधिकारी आपसे 24 घंटे के भीतर संपर्क करेंगे। हेल्पलाइन: +91 8175087004',
-    };
-
-    try {
-      await fetch('https://formsubmit.co/ajax/support@driverssaathi.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      setSuccessModal({
-        visible: true,
-        message: 'Driver Application Submitted!\n\nOur recruitment team will review your credentials and call you for verification and onboarding within 24 hours.'
-      });
-      setDriverForm({ name: '', phone: '', experience: '', city: 'Delhi NCR', licenseCategory: 'Commercial LMV' });
-      setLicenseImg(null);
-      setAadhaarImg(null);
-    } catch (e) {
-      Alert.alert('Notice', 'Application recorded. Our recruitment desk will call you shortly.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ─── TAB 1: EXPLORE / HOME ───────────────────────────────────────────────────
-  const renderHomeScreen = () => (
+  // ─── TAB 1: EXPLORE & SERVICES ───────────────────────────────────────────────
+  const renderExploreScreen = () => (
     <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
-      {/* Hero Welcome Card */}
+      {/* Hero Banner */}
       <View style={styles.heroCard}>
         <View style={styles.heroBadgeRow}>
           <View style={styles.liveDot} />
-          <Text style={styles.heroBadgeText}>DELHI NCR DISPATCH DESK • ACTIVE</Text>
+          <Text style={styles.heroBadgeText}>DELHI NCR LIVE DISPATCH • 24/7 ACTIVE</Text>
         </View>
         <Text style={styles.heroTitle}>
-          {lang === 'en' ? 'Verified Private Chauffeurs & Highway Drivers' : 'वेरिफाइड पर्सनल व हाईवे ड्राइवर्स'}
+          {lang === 'en' ? 'Verified Private Chauffeurs for Your Car' : 'आपकी निजी कार के लिए वेरिफाइड ड्राइवर्स'}
         </Text>
         <Text style={styles.heroSubtitle}>
           {lang === 'en'
-            ? 'Trained, background-checked chauffeurs for your personal car, outstation getaways & corporate fleets.'
-            : 'आपकी कार के लिए पुलिस वेरिफाइड, अनुभवी ड्राइवर्स। 30 दिन की फ्री रिप्लेसमेंट गारंटी।'}
+            ? 'Police-cleared, background-verified personal chauffeurs & highway expressway drivers. 30-day free replacement guarantee.'
+            : 'अनुभवी, पुलिस वेरिफाइड ड्राइवर्स। 30 दिन की फ्री रिप्लेसमेंट वारंटी और ट्रांसपेरेंट प्राइसिंग।'}
         </Text>
 
         <View style={styles.heroActionRow}>
           <TouchableOpacity
             style={styles.heroPrimaryBtn}
-            onPress={() => handleOpenBooking({
-              title: 'Personal Chauffeur Placement',
-              price: '₹4,500 One-time Fee',
-              tag: 'MOST POPULAR',
-              sub: 'Full-time personal chauffeur for daily office and family commute.'
-            })}
+            onPress={() => openBookingFlow({ title: 'Personal Chauffeur Placement', price: '₹4,500 Fee' })}
             activeOpacity={0.88}
           >
             <Text style={styles.heroPrimaryBtnText}>Book Chauffeur</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.heroSecondaryBtn} onPress={() => openWhatsApp()} activeOpacity={0.88}>
-            <Text style={styles.heroSecondaryBtnText}>WhatsApp</Text>
+          <TouchableOpacity style={styles.heroSecondaryBtn} onPress={() => setActiveTab('chauffeurs')} activeOpacity={0.88}>
+            <Text style={styles.heroSecondaryBtnText}>Browse Drivers</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.heroWhatsAppBtn} onPress={() => openWhatsApp()} activeOpacity={0.88}>
+            <Text style={styles.heroWhatsAppBtnText}>WhatsApp</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Trust Highlights Strip */}
+      {/* Trust Guarantee Strip */}
       <View style={styles.trustStrip}>
         <View style={styles.trustItem}>
           <Text style={styles.trustNumber}>100%</Text>
@@ -355,30 +411,70 @@ export default function App() {
         <View style={styles.trustDivider} />
         <View style={styles.trustItem}>
           <Text style={styles.trustNumber}>GST</Text>
-          <Text style={styles.trustLabel}>Input Tax Invoice</Text>
+          <Text style={styles.trustLabel}>Tax Invoices</Text>
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustItem}>
-          <Text style={styles.trustNumber}>4.8 ★</Text>
-          <Text style={styles.trustLabel}>User Rating</Text>
+          <Text style={styles.trustNumber}>4.9 ★</Text>
+          <Text style={styles.trustLabel}>Client Rating</Text>
         </View>
       </View>
 
-      {/* Section: Select a Service */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{lang === 'en' ? 'Our Driver Services' : 'हमारी सेवाएं'}</Text>
-        <Text style={styles.sectionSub}>Transparent pricing with dedicated client support</Text>
+      {/* Featured Candidates Preview */}
+      <View style={styles.sectionHeaderRow}>
+        <View>
+          <Text style={styles.sectionTitle}>Available Chauffeurs Today</Text>
+          <Text style={styles.sectionSub}>Pre-verified candidates ready for 1-day trial</Text>
+        </View>
+        <TouchableOpacity onPress={() => setActiveTab('chauffeurs')}>
+          <Text style={styles.seeAllLink}>View All &rarr;</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Service Card 1: Personal Chauffeur */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chauffeurHorizontalScroll}>
+        {VERIFIED_CHAUFFEURS.map(c => (
+          <View key={c.id} style={styles.compactCandidateCard}>
+            <Image source={c.photo} style={styles.candidateThumb} resizeMode="cover" />
+            <View style={styles.candidateContent}>
+              <View style={styles.candidateBadgeRow}>
+                <Text style={styles.candidateRatingText}>★ {c.rating}</Text>
+                <Text style={styles.candidateExpText}>{c.exp}</Text>
+              </View>
+              <Text style={styles.candidateNameText}>{c.name}</Text>
+              <Text style={styles.candidateZoneText}>📍 {c.zone}</Text>
+              <View style={styles.skillPillRow}>
+                {c.skills.slice(0, 2).map((s, idx) => (
+                  <View key={idx} style={styles.skillPill}>
+                    <Text style={styles.skillPillText}>{s}</Text>
+                  </View>
+                ))}
+              </View>
+              <TouchableOpacity
+                style={styles.btnHireCompact}
+                onPress={() => openBookingFlow({ title: `Placement with ${c.name}`, price: '₹4,500 Fee' }, c)}
+              >
+                <Text style={styles.btnHireCompactText}>Book Trial &rarr;</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Core Services Section */}
+      <View style={[styles.sectionHeaderRow, { marginTop: 22 }]}>
+        <View>
+          <Text style={styles.sectionTitle}>Driver Services</Text>
+          <Text style={styles.sectionSub}>Transparent pricing with dedicated client SLA</Text>
+        </View>
+      </View>
+
+      {/* Service 1: Personal Chauffeur */}
       <TouchableOpacity
         style={styles.serviceCard}
-        onPress={() => handleOpenBooking({
+        onPress={() => openBookingFlow({
           title: 'Personal Chauffeur Placement',
           price: '₹4,500 Placement Fee',
-          sub: 'Dedicated full-time driver for daily office commute and personal family car. 30-day replacement warranty included.',
-          tag: 'DAILY COMMUTE',
-          hasSubscription: true,
+          sub: 'Dedicated full-time driver for daily office and family commute. 30-day replacement warranty included.',
         })}
         activeOpacity={0.9}
       >
@@ -388,28 +484,26 @@ export default function App() {
             <View style={[styles.pillBadge, { backgroundColor: THEME.accentSoft }]}>
               <Text style={[styles.pillBadgeText, { color: THEME.accent }]}>DAILY COMMUTE</Text>
             </View>
-            <Text style={styles.servicePrice}>₹4,500</Text>
+            <Text style={styles.servicePrice}>₹4,500 Fee</Text>
           </View>
           <Text style={styles.serviceTitle}>Personal Chauffeur Placement</Text>
           <Text style={styles.serviceDesc}>
-            Full-time, police-cleared driver for your personal vehicle. Covers route familiarity, punctual daily reporting & 30-day free replacement warranty.
+            Full-time, police-cleared driver for your personal car. Daily reporting, route familiarity & 30-day free replacement warranty. Monthly retainer option also available.
           </Text>
           <View style={styles.serviceFooter}>
-            <Text style={styles.servicePerks}>✓ Police Verified  •  ✓ 30-Day Warranty  •  ✓ Monthly Plan Available</Text>
-            <Text style={styles.bookNowLink}>Book Service &rarr;</Text>
+            <Text style={styles.servicePerks}>✓ Police Cleared  •  ✓ 30-Day Guarantee  •  ✓ Monthly Retainer</Text>
+            <Text style={styles.bookNowLink}>Select Options &rarr;</Text>
           </View>
         </View>
       </TouchableOpacity>
 
-      {/* Service Card 2: Outstation & Highway */}
+      {/* Service 2: Outstation Highway Trips */}
       <TouchableOpacity
         style={styles.serviceCard}
-        onPress={() => handleOpenBooking({
-          title: 'Outstation & Highway Driver',
+        onPress={() => openBookingFlow({
+          title: 'Outstation Highway Driver',
           price: 'Starting ₹1,500/day',
-          sub: 'Experienced expressway driver for 1-day or multi-day road trips. Yamuna Expressway, Jaipur, Chandigarh & hills.',
-          tag: 'HIGHWAY & TRIPS',
-          isOutstation: true,
+          sub: 'Experienced expressway driver for 1-day or multi-day highway travel. Yamuna Expy, Jaipur, Chandigarh.',
         })}
         activeOpacity={0.9}
       >
@@ -417,35 +511,33 @@ export default function App() {
         <View style={styles.serviceContent}>
           <View style={styles.serviceTopRow}>
             <View style={[styles.pillBadge, { backgroundColor: THEME.successSoft }]}>
-              <Text style={[styles.pillBadgeText, { color: THEME.success }]}>HIGHWAY & OUTSTATION</Text>
+              <Text style={[styles.pillBadgeText, { color: THEME.success }]}>HIGHWAY TRAVEL</Text>
             </View>
             <Text style={styles.servicePrice}>₹1,500/day</Text>
           </View>
           <Text style={styles.serviceTitle}>1-Day & Outstation Highway Driver</Text>
           <Text style={styles.serviceDesc}>
-            Skilled commercial badge drivers for long-distance expressway driving. Relax with family while an expert drives your car.
+            Commercial badge highway drivers for expressway journeys. Sit back and enjoy the trip with family while an expert drives your vehicle safely.
           </Text>
           <View style={styles.serviceFooter}>
-            <Text style={styles.servicePerks}>✓ Expressway Expert  •  ✓ FASTag Guidance  •  ✓ 24/7 SOS Cover</Text>
-            <Text style={styles.bookNowLink}>Plan Trip &rarr;</Text>
+            <Text style={styles.servicePerks}>✓ Expressway Expert  •  ✓ FASTag Assistance  •  ✓ 24/7 SOS</Text>
+            <Text style={styles.bookNowLink}>Plan Route &rarr;</Text>
           </View>
         </View>
       </TouchableOpacity>
 
-      {/* Popular Highway Routes Horizontal Scroll */}
+      {/* Popular Highway Routes Horizontal Carousel */}
       <View style={styles.subSectionBox}>
         <Text style={styles.subSectionTitle}>Popular Outstation Highway Destinations</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.routeScroll}>
-          {POPULAR_ROUTES.map(r => (
+          {HIGHWAY_ROUTES.map(r => (
             <TouchableOpacity
               key={r.id}
               style={styles.routePillCard}
-              onPress={() => handleOpenBooking({
-                title: `Outstation to ${r.name}`,
+              onPress={() => openBookingFlow({
+                title: `Outstation Driver: ${r.name}`,
                 price: r.fare,
                 sub: `${r.route} (${r.dist} • ~${r.time}). FASTag toll: ${r.toll}, Driver DA: ${r.da}.`,
-                tag: 'HIGHWAY TRIP',
-                routePrefill: r.name,
               })}
               activeOpacity={0.85}
             >
@@ -460,15 +552,13 @@ export default function App() {
         </ScrollView>
       </View>
 
-      {/* Service Card 3: Corporate Fleet Retainer */}
+      {/* Service 3: Corporate Fleet Retainer */}
       <TouchableOpacity
         style={styles.serviceCard}
-        onPress={() => handleOpenBooking({
+        onPress={() => openBookingFlow({
           title: 'Corporate Fleet Driver Retainer',
           price: '₹1,800 / Slot / Month',
-          sub: 'Continuous driver supply for corporate cabs, staff shuttles & logistics. Includes guaranteed replacement backup within 4 hours.',
-          tag: 'B2B CONTRACT',
-          isFleet: true,
+          sub: 'Continuous driver supply for corporate cabs, staff shuttles & travel desks. Guaranteed replacement backup within 4 hours.',
         })}
         activeOpacity={0.9}
       >
@@ -480,217 +570,261 @@ export default function App() {
             </View>
             <Text style={styles.servicePrice}>B2B Contract</Text>
           </View>
-          <Text style={styles.serviceTitle}>Corporate Fleet Retainer Hub</Text>
+          <Text style={styles.serviceTitle}>Corporate Fleet Driver Retainer</Text>
           <Text style={styles.serviceDesc}>
-            Monthly driver retention contract for travel desks, cab aggregators and corporate offices. Dedicated backup pool ensures zero vehicle downtime.
+            Monthly driver retention contract for travel desks, cab aggregators and offices. Dedicated backup pool ensures zero vehicle downtime and complete GST invoicing.
           </Text>
           <View style={styles.serviceFooter}>
-            <Text style={styles.servicePerks}>✓ 100% SLA Backup  •  ✓ Full GST Invoices  •  ✓ Shift Management</Text>
-            <Text style={styles.bookNowLink}>Get Proposal &rarr;</Text>
+            <Text style={styles.servicePerks}>✓ Guaranteed Backup  •  ✓ Input GST Invoices  •  ✓ Shift Coverage</Text>
+            <Text style={styles.bookNowLink}>B2B Proposal &rarr;</Text>
           </View>
         </View>
       </TouchableOpacity>
 
-      {/* Service Card 4: Background Verification */}
-      <TouchableOpacity
-        style={styles.serviceCard}
-        onPress={() => handleOpenBooking({
-          title: 'Driver Background Verification',
-          price: '₹1,200 / Driver Check',
-          sub: 'Complete background audit for your existing driver: Driving License authenticity, Aadhaar identity, criminal screening & driving test.',
-          tag: 'STANDALONE AUDIT',
-          isVerify: true,
-        })}
-        activeOpacity={0.9}
-      >
-        <Image source={require('./assets/driver_verification_assessment.jpg')} style={styles.serviceImage} resizeMode="cover" />
-        <View style={styles.serviceContent}>
-          <View style={styles.serviceTopRow}>
-            <View style={[styles.pillBadge, { backgroundColor: '#FEF3C7' }]}>
-              <Text style={[styles.pillBadgeText, { color: '#B45309' }]}>VERIFICATION AUDIT</Text>
-            </View>
-            <Text style={styles.servicePrice}>₹1,200</Text>
-          </View>
-          <Text style={styles.serviceTitle}>Driver Background Verification</Text>
-          <Text style={styles.serviceDesc}>
-            Already have a driver? Verify him before trusting your family or expensive vehicle. Comprehensive report delivered within 48 hours.
-          </Text>
-          <View style={styles.serviceFooter}>
-            <Text style={styles.servicePerks}>✓ Parivahan DL Check  •  ✓ Police Screening  •  ✓ 48h Turnaround</Text>
-            <Text style={styles.bookNowLink}>Verify Driver &rarr;</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-
-      {/* Driver Recruitment Banner */}
+      {/* Driver Partner Invite Banner */}
       <View style={styles.driverCtaBanner}>
         <View style={{ flex: 1 }}>
           <Text style={styles.driverCtaBadge}>CAREERS FOR DRIVERS</Text>
-          <Text style={styles.driverCtaTitle}>Are you a Driver looking for work?</Text>
-          <Text style={styles.driverCtaSub}>Earn ₹22,000–₹32,000/mo with verified families and corporates across Delhi NCR.</Text>
+          <Text style={styles.driverCtaTitle}>Are you an experienced driver?</Text>
+          <Text style={styles.driverCtaSub}>Earn ₹22,000 to ₹32,000/month with verified families and corporate fleets in Delhi NCR.</Text>
         </View>
-        <TouchableOpacity style={styles.driverCtaBtn} onPress={() => setActiveTab('driver')} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.driverCtaBtn} onPress={() => setActiveTab('driver')} activeOpacity={0.88}>
           <Text style={styles.driverCtaBtnText}>Apply Now</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Helpline Assistance Box */}
-      <View style={styles.helplineCard}>
-        <Text style={styles.helplineTitle}>Need immediate driver assistance?</Text>
-        <Text style={styles.helplineSub}>Our dispatch coordinators are available Mon–Sat from 8:00 AM to 9:00 PM.</Text>
-        <View style={styles.helplineBtnRow}>
-          <TouchableOpacity style={styles.btnCallSupport} onPress={makeCall} activeOpacity={0.88}>
-            <Text style={styles.btnCallSupportText}>Call +91 8175087004</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.btnWhatsAppSupport} onPress={() => openWhatsApp()} activeOpacity={0.88}>
-            <Text style={styles.btnWhatsAppSupportText}>WhatsApp Desk</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </ScrollView>
   );
 
-  // ─── TAB 2: BOOKINGS & CLIENT HUB ─────────────────────────────────────────────
+  // ─── TAB 2: VERIFIED CHAUFFEURS DIRECTORY ────────────────────────────────────
+  const renderChauffeursScreen = () => {
+    const filtered = chauffeurFilter === 'All'
+      ? VERIFIED_CHAUFFEURS
+      : VERIFIED_CHAUFFEURS.filter(c => c.skills.some(s => s.toLowerCase().includes(chauffeurFilter.toLowerCase())));
+
+    return (
+      <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
+        <View style={styles.screenHeader}>
+          <Text style={styles.screenHeading}>Browse Verified Chauffeurs</Text>
+          <Text style={styles.screenSubheading}>
+            Review candidate profiles, experience records & customer ratings before booking.
+          </Text>
+        </View>
+
+        {/* Filter Pills */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+          {['All', 'Automatic', 'Innova', 'BMW', 'Highway'].map(f => (
+            <TouchableOpacity
+              key={f}
+              style={[styles.filterChip, chauffeurFilter === f && styles.filterChipActive]}
+              onPress={() => setChauffeurFilter(f)}
+            >
+              <Text style={[styles.filterChipText, chauffeurFilter === f && styles.filterChipTextActive]}>
+                {f === 'All' ? 'All Chauffeurs' : f}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {filtered.map(c => (
+          <View key={c.id} style={styles.fullCandidateCard}>
+            <View style={styles.candidateHeaderRow}>
+              <Image source={c.photo} style={styles.candidateLargeAvatar} resizeMode="cover" />
+              <View style={{ flex: 1, marginLeft: 14 }}>
+                <View style={styles.candidateBadgeRow}>
+                  <View style={[styles.pillBadge, { backgroundColor: THEME.accentSoft }]}>
+                    <Text style={[styles.pillBadgeText, { color: THEME.accentDeep }]}>{c.badge}</Text>
+                  </View>
+                  <Text style={styles.candidateRatingScore}>★ {c.rating} ({c.trips} duties)</Text>
+                </View>
+                <Text style={styles.candidateFullName}>{c.name}</Text>
+                <Text style={styles.candidateSubInfo}>{c.age} Yrs  •  {c.exp}  •  📍 {c.zone}</Text>
+              </View>
+            </View>
+
+            <Text style={styles.candidateBioText}>{c.bio}</Text>
+
+            <View style={styles.candidateSkillsContainer}>
+              <Text style={styles.candidateSkillLabel}>Specializations:</Text>
+              <View style={styles.skillWrapRow}>
+                {c.skills.map((s, idx) => (
+                  <View key={idx} style={styles.candidateSkillBadge}>
+                    <Text style={styles.candidateSkillBadgeText}>{s}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.candidateVerificationRow}>
+              <Text style={styles.verificationCheckItem}>✓ Police Verification Cleared</Text>
+              <Text style={styles.verificationCheckItem}>✓ Parivahan DL Authenticated</Text>
+            </View>
+
+            <View style={styles.candidateActionRow}>
+              <TouchableOpacity
+                style={styles.btnCandidateTrial}
+                onPress={() => openBookingFlow({ title: `Placement with ${c.name}`, price: '₹4,500 Fee' }, c)}
+                activeOpacity={0.88}
+              >
+                <Text style={styles.btnCandidateTrialText}>Hire / Schedule 1-Day Trial</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.btnCandidateWhatsApp}
+                onPress={() => openWhatsApp(`Hello Drivers Saathi, I want to interview driver candidate ${c.name} (${c.badge}) for my car.`)}
+                activeOpacity={0.88}
+              >
+                <Text style={styles.btnCandidateWhatsAppText}>Chat</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    );
+  };
+
+  // ─── TAB 3: BOOKINGS & FLEET HUB ─────────────────────────────────────────────
   const renderBookingsScreen = () => (
     <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
       <View style={styles.screenHeader}>
-        <Text style={styles.screenHeading}>My Bookings & Duty Hub</Text>
-        <Text style={styles.screenSubheading}>Manage active driver placements, daily duty logbook & replacements.</Text>
+        <Text style={styles.screenHeading}>Client Duty & Bookings Hub</Text>
+        <Text style={styles.screenSubheading}>Manage active chauffeur placements, duty timesheets & fleet vehicles.</Text>
       </View>
 
-      {/* Sub tabs */}
+      {/* Sub Tabs */}
       <View style={styles.segmentedControl}>
         {[
-          { key: 'list', label: 'My Bookings' },
-          { key: 'duty', label: 'Duty & OT Log' },
-          { key: 'replacement', label: '30-Day Claim' },
+          { key: 'active', label: 'My Bookings' },
+          { key: 'duty', label: 'Daily Timesheet' },
+          { key: 'fleet', label: 'Fleet Console' },
         ].map(s => (
           <TouchableOpacity
             key={s.key}
-            style={[styles.segmentItem, bookingsSubTab === s.key && styles.segmentItemActive]}
-            onPress={() => setBookingsSubTab(s.key)}
+            style={[styles.segmentItem, bookingsTab === s.key && styles.segmentItemActive]}
+            onPress={() => setBookingsTab(s.key)}
           >
-            <Text style={[styles.segmentItemText, bookingsSubTab === s.key && styles.segmentItemTextActive]}>
+            <Text style={[styles.segmentItemText, bookingsTab === s.key && styles.segmentItemTextActive]}>
               {s.label}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Bookings List */}
-      {bookingsSubTab === 'list' && (
+      {/* Active Bookings */}
+      {bookingsTab === 'active' && (
         <View>
-          {bookings.length === 0 ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyTitle}>No Bookings Yet</Text>
-              <Text style={styles.emptySub}>Book a personal chauffeur or highway trip to see your contract and driver details here.</Text>
-              <TouchableOpacity style={styles.btnPrimaryCompact} onPress={() => setActiveTab('home')}>
-                <Text style={styles.btnPrimaryCompactText}>Browse Services</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            bookings.map(b => (
-              <View key={b.id} style={styles.clientBookingCard}>
-                <View style={styles.bookingCardHeader}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.bookingCardTitle}>{b.title}</Text>
-                    <Text style={styles.bookingCardMeta}>{b.car} • Placed on {b.date}</Text>
-                  </View>
-                  <View style={[styles.statusPill, { backgroundColor: b.status === 'Active' ? THEME.successSoft : THEME.accentSoft }]}>
-                    <Text style={[styles.statusPillText, { color: b.status === 'Active' ? THEME.success : THEME.accent }]}>
-                      {b.status}
-                    </Text>
-                  </View>
+          {bookings.map(b => (
+            <View key={b.id} style={styles.bookingCardModern}>
+              <View style={styles.bookingTopRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.bookingIdBadge}>BOOKING #{b.id}</Text>
+                  <Text style={styles.bookingTitleText}>{b.title}</Text>
+                  <Text style={styles.bookingSubText}>Assigned: <Text style={{ fontWeight: '800', color: THEME.textPrimary }}>{b.chauffeurName}</Text></Text>
+                  <Text style={styles.bookingSubText}>Vehicle: {b.car}  •  Placed: {b.date}</Text>
                 </View>
-
-                <View style={styles.bookingDivider} />
-
-                <View style={styles.bookingFooterRow}>
-                  <Text style={styles.bookingPriceTag}>{b.price}</Text>
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity
-                      style={styles.btnSmallAction}
-                      onPress={() => openWhatsApp(`Hello Drivers Saathi, I have an inquiry about my booking: ${b.title}.`)}
-                    >
-                      <Text style={styles.btnSmallActionText}>Contact Desk</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.btnSmallAction, { borderColor: THEME.border }]}
-                      onPress={() => setBookingsSubTab('replacement')}
-                    >
-                      <Text style={[styles.btnSmallActionText, { color: THEME.textSecondary }]}>Replacement</Text>
-                    </TouchableOpacity>
-                  </View>
+                <View style={[styles.statusPill, { backgroundColor: THEME.successSoft }]}>
+                  <Text style={[styles.statusPillText, { color: THEME.success }]}>{b.status}</Text>
                 </View>
               </View>
-            ))
-          )}
+
+              <View style={styles.bookingDivider} />
+
+              <View style={styles.bookingWarrantyRow}>
+                <Text style={styles.warrantyText}>🛡️ {b.replacementExpiry}</Text>
+              </View>
+
+              <View style={styles.bookingActionRow}>
+                <Text style={styles.bookingPriceTag}>{b.fee}</Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    style={styles.btnSmallAction}
+                    onPress={() => openWhatsApp(`Inquiry regarding Booking #${b.id} for driver ${b.chauffeurName}.`)}
+                  >
+                    <Text style={styles.btnSmallActionText}>Call Manager</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.btnSmallAction, { borderColor: THEME.border }]}
+                    onPress={() => {
+                      Alert.alert(
+                        'Request Driver Replacement',
+                        `You have active 30-day replacement warranty for Booking #${b.id}.\n\nOur account manager will share 2 replacement chauffeur profiles within 24 hours at zero extra charge.`,
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          { text: 'Confirm Replacement Claim', onPress: () => Alert.alert('Claim Submitted', 'Our priority dispatch manager has been notified.') },
+                        ]
+                      );
+                    }}
+                  >
+                    <Text style={[styles.btnSmallActionText, { color: THEME.textSecondary }]}>Replace Driver</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ))}
         </View>
       )}
 
-      {/* Duty & OT Logbook */}
-      {bookingsSubTab === 'duty' && (
+      {/* Daily Timesheet & OT */}
+      {bookingsTab === 'duty' && (
         <View>
           <View style={styles.panelCard}>
             <Text style={styles.panelTitle}>Record Daily Duty & Overtime</Text>
-            <Text style={styles.panelSubtitle}>Log your driver's daily reporting hours for accurate monthly payroll.</Text>
+            <Text style={styles.panelSubtitle}>Log your driver's daily reporting hours for accurate monthly payroll calculations.</Text>
 
             <View style={styles.formRowTwo}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.inputLabel}>Date</Text>
                 <TextInput
                   style={styles.formInput}
-                  value={dutyForm.date}
-                  onChangeText={v => setDutyForm({ ...dutyForm, date: v })}
+                  value={dutyInput.date}
+                  onChangeText={v => setDutyInput({ ...dutyInput, date: v })}
                 />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>Check-In Time</Text>
+                <Text style={styles.inputLabel}>In Time</Text>
                 <TextInput
                   style={styles.formInput}
-                  value={dutyForm.inTime}
-                  onChangeText={v => setDutyForm({ ...dutyForm, inTime: v })}
+                  value={dutyInput.inTime}
+                  onChangeText={v => setDutyInput({ ...dutyInput, inTime: v })}
                 />
               </View>
             </View>
 
             <View style={styles.formRowTwo}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>Check-Out Time</Text>
+                <Text style={styles.inputLabel}>Out Time</Text>
                 <TextInput
                   style={styles.formInput}
-                  value={dutyForm.outTime}
-                  onChangeText={v => setDutyForm({ ...dutyForm, outTime: v })}
+                  value={dutyInput.outTime}
+                  onChangeText={v => setDutyInput({ ...dutyInput, outTime: v })}
                 />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>Kilometers Run</Text>
+                <Text style={styles.inputLabel}>Distance (KM)</Text>
                 <TextInput
                   style={styles.formInput}
-                  value={dutyForm.km}
+                  value={dutyInput.km}
                   keyboardType="numeric"
-                  onChangeText={v => setDutyForm({ ...dutyForm, km: v })}
+                  onChangeText={v => setDutyInput({ ...dutyInput, km: v })}
                 />
               </View>
             </View>
 
             <View style={{ marginTop: 8 }}>
-              <Text style={styles.inputLabel}>Overtime Hours (Beyond 10 hrs)</Text>
+              <Text style={styles.inputLabel}>Overtime Hours (Beyond 10 Hours)</Text>
               <TextInput
                 style={styles.formInput}
-                value={dutyForm.ot}
+                value={dutyInput.ot}
                 keyboardType="numeric"
-                onChangeText={v => setDutyForm({ ...dutyForm, ot: v })}
+                onChangeText={v => setDutyInput({ ...dutyInput, ot: v })}
               />
             </View>
 
-            <TouchableOpacity style={styles.btnPrimaryFull} onPress={handleSaveDutyLog}>
-              <Text style={styles.btnPrimaryFullText}>Save Duty Entry</Text>
+            <TouchableOpacity style={styles.btnPrimaryFull} onPress={handleSaveDutyEntry}>
+              <Text style={styles.btnPrimaryFullText}>Save Duty Timesheet</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Past Log Entries */}
-          <Text style={[styles.subSectionTitle, { marginTop: 14, marginBottom: 8 }]}>Recent Recorded Duties</Text>
+          <Text style={[styles.subSectionTitle, { marginTop: 14, marginBottom: 8 }]}>Past Logged Timesheets</Text>
           {dutyLogs.map(l => (
             <View key={l.id} style={styles.dutyEntryCard}>
               <View style={styles.dutyEntryTop}>
@@ -699,275 +833,275 @@ export default function App() {
                   <Text style={styles.otBadgeText}>+{l.ot} Overtime</Text>
                 </View>
               </View>
-              <Text style={styles.dutyMetaText}>In: {l.in}  •  Out: {l.out}  •  Distance: {l.km}</Text>
+              <Text style={styles.dutyMetaText}>In: {l.in}  •  Out: {l.out}  •  Odometer Run: {l.km}</Text>
             </View>
           ))}
         </View>
       )}
 
-      {/* 30-Day Free Replacement Claim */}
-      {bookingsSubTab === 'replacement' && (
-        <View style={styles.panelCard}>
-          <View style={[styles.pillBadge, { backgroundColor: THEME.successSoft, alignSelf: 'flex-start' }]}>
-            <Text style={[styles.pillBadgeText, { color: THEME.success }]}>ZERO EXTRA FEE</Text>
+      {/* Fleet Console */}
+      {bookingsTab === 'fleet' && (
+        <View>
+          <View style={styles.fleetHeaderBox}>
+            <Text style={styles.panelTitle}>Corporate Fleet Vehicle Roster</Text>
+            <Text style={styles.panelSubtitle}>Track active drivers, vehicle allocation & license expiry across your corporate fleet.</Text>
           </View>
-          <Text style={styles.panelTitle}>30-Day Free Driver Replacement</Text>
-          <Text style={styles.panelSubtitle}>
-            If you are not 100% satisfied with your driver's punctuality or behavior within 30 days of placement, request a free replacement.
-          </Text>
 
-          <Text style={styles.inputLabel}>Original Booking Name *</Text>
-          <TextInput
-            style={styles.formInput}
-            placeholder="Name on placement invoice"
-            value={form.name}
-            onChangeText={v => setForm({ ...form, name: v })}
-          />
-
-          <Text style={styles.inputLabel}>Registered Mobile Number *</Text>
-          <TextInput
-            style={styles.formInput}
-            placeholder="+91 98765 43210"
-            keyboardType="phone-pad"
-            value={form.phone}
-            onChangeText={v => setForm({ ...form, phone: v })}
-          />
-
-          <Text style={styles.inputLabel}>Reason for Replacement *</Text>
-          <TextInput
-            style={[styles.formInput, { height: 80, textAlignVertical: 'top' }]}
-            multiline
-            placeholder="e.g. Driver unpunctual / route knowledge issues / left job"
-            value={grievanceText}
-            onChangeText={setGrievanceText}
-          />
+          {fleetVehicles.map(v => (
+            <View key={v.id} style={styles.fleetVehicleCard}>
+              <View style={styles.fleetTopRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.fleetVehicleText}>{v.vehicle}</Text>
+                  <Text style={styles.fleetDriverText}>Driver: <Text style={{ fontWeight: '800' }}>{v.driver}</Text></Text>
+                </View>
+                <View style={[styles.statusPill, { backgroundColor: v.status === 'On Duty' ? THEME.successSoft : THEME.sosSoft }]}>
+                  <Text style={[styles.statusPillText, { color: v.status === 'On Duty' ? THEME.success : THEME.sosRed }]}>
+                    {v.status}
+                  </Text>
+                </View>
+              </View>
+              <Text style={[styles.fleetExpiryText, v.dlExpiry.includes('Expired') && { color: THEME.sosRed, fontWeight: '800' }]}>
+                DL Expiry: {v.dlExpiry}
+              </Text>
+            </View>
+          ))}
 
           <TouchableOpacity
             style={styles.btnPrimaryFull}
-            onPress={() => {
-              if (!form.name || !form.phone) {
-                Alert.alert('Required', 'Please enter your name and phone number.');
-                return;
-              }
-              Alert.alert('Claim Submitted', 'Your replacement claim is registered. Our account manager will share candidate profiles within 24 hours.');
-              setGrievanceText('');
-            }}
+            onPress={() => openWhatsApp('Hello Drivers Saathi, I need to request commercial replacement drivers for our corporate fleet.')}
           >
-            <Text style={styles.btnPrimaryFullText}>Submit Priority Replacement Claim</Text>
+            <Text style={styles.btnPrimaryFullText}>Request Fleet Driver Replacement</Text>
           </TouchableOpacity>
         </View>
       )}
     </ScrollView>
   );
 
-  // ─── TAB 3: HELP & SUPPORT ───────────────────────────────────────────────────
-  const renderSupportScreen = () => (
-    <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
-      <View style={styles.screenHeader}>
-        <Text style={styles.screenHeading}>Help & 24/7 Support</Text>
-        <Text style={styles.screenSubheading}>Emergency assistance, live dispatch coordination & grievance tickets.</Text>
-      </View>
-
-      {/* Emergency Card */}
-      <View style={styles.emergencyCard}>
-        <View style={styles.emergencyHeaderRow}>
-          <View style={styles.sosDot} />
-          <Text style={styles.emergencyTag}>24/7 EMERGENCY SOS HOTLINE</Text>
-        </View>
-        <Text style={styles.emergencyTitle}>Roadside & Dispatch Assistance</Text>
-        <Text style={styles.emergencySub}>
-          Facing vehicle breakdown or need immediate driver replacement on the road? Connect directly with our Delhi NCR dispatch control desk.
-        </Text>
-        <TouchableOpacity style={styles.btnEmergencyCall} onPress={triggerSOS} activeOpacity={0.9}>
-          <Text style={styles.btnEmergencyCallText}>Call Control Desk: +91 8175087004</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Instant Contact Channels */}
-      <View style={styles.contactRow}>
-        <TouchableOpacity style={styles.contactCard} onPress={() => openWhatsApp()} activeOpacity={0.88}>
-          <Text style={styles.contactCardTitle}>WhatsApp Support</Text>
-          <Text style={styles.contactCardSub}>Chat with dedicated account coordinator</Text>
-          <Text style={styles.contactCardAction}>Open Chat &rarr;</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.contactCard} onPress={makeCall} activeOpacity={0.88}>
-          <Text style={styles.contactCardTitle}>Phone Desk</Text>
-          <Text style={styles.contactCardSub}>Mon–Sat (8:00 AM – 9:00 PM)</Text>
-          <Text style={styles.contactCardAction}>Call Now &rarr;</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Raise a Support Ticket / Grievance */}
-      <View style={styles.panelCard}>
-        <Text style={styles.panelTitle}>Raise a Ticket or Grievance</Text>
-        <Text style={styles.panelSubtitle}>Have an issue with driver conduct, duty hours, or billing? Submit below for 2-hour SLA resolution.</Text>
-
-        <TextInput
-          style={[styles.formInput, { height: 90, textAlignVertical: 'top', marginTop: 10 }]}
-          multiline
-          placeholder="Describe your query or complaint in detail..."
-          value={grievanceText}
-          onChangeText={setGrievanceText}
-        />
-
-        <TouchableOpacity style={styles.btnPrimaryFull} onPress={handleCreateTicket}>
-          <Text style={styles.btnPrimaryFullText}>Submit Ticket</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Active Tickets Tracker */}
-      <Text style={[styles.subSectionTitle, { marginTop: 16, marginBottom: 8 }]}>Your Support Tickets</Text>
-      {tickets.map(t => (
-        <View key={t.id} style={styles.ticketCard}>
-          <View style={styles.ticketTopRow}>
-            <Text style={styles.ticketDate}>{t.date}</Text>
-            <View style={[styles.statusPill, { backgroundColor: t.status === 'Resolved' ? THEME.successSoft : '#FEF3C7' }]}>
-              <Text style={[styles.statusPillText, { color: t.status === 'Resolved' ? THEME.success : '#B45309' }]}>
-                {t.status}
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.ticketIssueText}>{t.issue}</Text>
-        </View>
-      ))}
-    </ScrollView>
-  );
-
-  // ─── TAB 4: DRIVER PARTNER PORTAL ─────────────────────────────────────────────
+  // ─── TAB 4: DRIVER MODE (WORK COCKPIT & JOBS) ────────────────────────────────
   const renderDriverScreen = () => (
     <ScrollView contentContainerStyle={styles.scrollBody} showsVerticalScrollIndicator={false}>
       <View style={styles.screenHeader}>
         <View style={[styles.pillBadge, { backgroundColor: THEME.accentSoft, alignSelf: 'flex-start' }]}>
-          <Text style={[styles.pillBadgeText, { color: THEME.accent }]}>JOIN AS A SAATHI DRIVER</Text>
+          <Text style={[styles.pillBadgeText, { color: THEME.accentDeep }]}>SAATHI DRIVER PARTNER</Text>
         </View>
-        <Text style={styles.screenHeading}>Driver Partner Hub</Text>
-        <Text style={styles.screenSubheading}>Join thousands of verified drivers earning ₹22,000 to ₹32,000 monthly.</Text>
+        <Text style={styles.screenHeading}>Driver Work Cockpit</Text>
+        <Text style={styles.screenSubheading}>Manage today's duty, record start/end odometer readings, and view earnings.</Text>
       </View>
 
-      {/* Driver Benefits Highlights */}
-      <View style={styles.driverBenefitsCard}>
-        <Text style={styles.driverBenefitsTitle}>Why Join Drivers Saathi?</Text>
-        <Text style={styles.driverBenefitItem}>✓ Verified high-salary family & corporate placements</Text>
-        <Text style={styles.driverBenefitItem}>✓ Guaranteed overtime payouts (₹80–₹120/hour)</Text>
-        <Text style={styles.driverBenefitItem}>✓ ₹500 referral bonus for every driver friend you refer</Text>
-        <Text style={styles.driverBenefitItem}>✓ 24/7 Roadside SOS & legal assistance support</Text>
-      </View>
-
-      {/* KYC Onboarding Form */}
-      <View style={styles.panelCard}>
-        <Text style={styles.panelTitle}>Apply for Driver Placement</Text>
-        <Text style={styles.panelSubtitle}>Submit your credentials for police verification and direct client interview.</Text>
-
-        <Text style={styles.inputLabel}>Full Name (as on Aadhaar Card) *</Text>
-        <TextInput
-          style={styles.formInput}
-          placeholder="e.g. Ramesh Kumar"
-          value={driverForm.name}
-          onChangeText={v => setDriverForm({ ...driverForm, name: v })}
-        />
-
-        <Text style={styles.inputLabel}>Mobile Number (WhatsApp) *</Text>
-        <TextInput
-          style={styles.formInput}
-          placeholder="+91 98765 43210"
-          keyboardType="phone-pad"
-          value={driverForm.phone}
-          onChangeText={v => setDriverForm({ ...driverForm, phone: v })}
-        />
-
-        <View style={styles.formRowTwo}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.inputLabel}>Driving Experience</Text>
-            <TextInput
-              style={styles.formInput}
-              placeholder="e.g. 5 Years"
-              value={driverForm.experience}
-              onChangeText={v => setDriverForm({ ...driverForm, experience: v })}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.inputLabel}>Preferred City</Text>
-            <TextInput
-              style={styles.formInput}
-              placeholder="e.g. South Delhi"
-              value={driverForm.city}
-              onChangeText={v => setDriverForm({ ...driverForm, city: v })}
-            />
-          </View>
-        </View>
-
-        <Text style={[styles.inputLabel, { marginTop: 12 }]}>Attach Documents for Quick Verification</Text>
-        <View style={styles.docUploadRow}>
+      {/* Driver Sub Navigation */}
+      <View style={styles.segmentedControl}>
+        {[
+          { key: 'cockpit', label: 'Today Duty' },
+          { key: 'wallet', label: 'Earnings' },
+          { key: 'jobs', label: 'Jobs Board' },
+          { key: 'kyc', label: 'KYC Join' },
+        ].map(s => (
           <TouchableOpacity
-            style={[styles.docUploadBtn, licenseImg && styles.docUploadBtnSuccess]}
-            onPress={() => pickDoc('license')}
+            key={s.key}
+            style={[styles.segmentItem, driverModeSubTab === s.key && styles.segmentItemActive]}
+            onPress={() => setDriverModeSubTab(s.key)}
           >
-            <Text style={styles.docUploadBtnText}>{licenseImg ? 'License Attached ✓' : 'Attach Driving License'}</Text>
+            <Text style={[styles.segmentItemText, driverModeSubTab === s.key && styles.segmentItemTextActive]}>
+              {s.label}
+            </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.docUploadBtn, aadhaarImg && styles.docUploadBtnSuccess]}
-            onPress={() => pickDoc('aadhaar')}
-          >
-            <Text style={styles.docUploadBtnText}>{aadhaarImg ? 'Aadhaar Attached ✓' : 'Attach Aadhaar Card'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.btnPrimaryFull} onPress={handleDriverKYCSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.btnPrimaryFullText}>Submit Driver Application</Text>}
-        </TouchableOpacity>
+        ))}
       </View>
 
-      {/* Available Driving Jobs Board */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Active Driving Opportunities</Text>
-        <Text style={styles.sectionSub}>Apply directly to start duty immediately.</Text>
-      </View>
-
-      {JOB_LISTINGS.map(j => (
-        <View key={j.id} style={styles.jobCard}>
-          <View style={styles.jobCardTop}>
-            <Text style={styles.jobSalaryText}>{j.salary}</Text>
-            <View style={[styles.pillBadge, { backgroundColor: THEME.borderSoft }]}>
-              <Text style={[styles.pillBadgeText, { color: THEME.textSecondary }]}>{j.badge}</Text>
+      {/* Cockpit: Today Duty */}
+      {driverModeSubTab === 'cockpit' && (
+        <View>
+          <View style={styles.dutyCockpitCard}>
+            <View style={styles.cockpitBadgeRow}>
+              <View style={styles.liveDot} />
+              <Text style={styles.cockpitBadgeText}>{isDutyActive ? 'DUTY IN PROGRESS' : 'ASSIGNED DUTY TODAY'}</Text>
             </View>
+
+            <Text style={styles.cockpitClientName}>Mr. Rajesh Agarwal (Vasant Vihar)</Text>
+            <Text style={styles.cockpitMeta}>Car: Hyundai Creta (Automatic) • Shift: 08:30 AM – 06:30 PM</Text>
+            <Text style={styles.cockpitAddress}>📍 Pickup: Villa 14, Poorvi Marg, Vasant Vihar, New Delhi</Text>
+
+            <View style={styles.dutyOtpBox}>
+              <Text style={styles.dutyOtpLabel}>Passenger Start-Duty OTP:</Text>
+              <Text style={styles.dutyOtpNumber}>4821</Text>
+            </View>
+
+            {!isDutyActive ? (
+              <View>
+                <Text style={styles.inputLabel}>Enter 4-Digit Passenger OTP to Start Duty</Text>
+                <TextInput
+                  style={[styles.formInput, { textAlign: 'center', fontSize: 18, letterSpacing: 4 }]}
+                  placeholder="----"
+                  keyboardType="numeric"
+                  maxLength={4}
+                  value={dutyOtpEntered}
+                  onChangeText={setDutyOtpEntered}
+                />
+                <TouchableOpacity
+                  style={[styles.btnPrimaryFull, { backgroundColor: THEME.success }]}
+                  onPress={() => {
+                    if (dutyOtpEntered === '4821') {
+                      setIsDutyActive(true);
+                      Alert.alert('Duty Started', 'Duty timer is running. Drive safely!');
+                    } else {
+                      Alert.alert('Invalid OTP', 'Please ask the car owner for the 4-digit start OTP (4821).');
+                    }
+                  }}
+                >
+                  <Text style={styles.btnPrimaryFullText}>Start Today Duty</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                <Text style={[styles.inputLabel, { color: THEME.success, fontWeight: '800' }]}>Duty is active. Enter Closing Odometer KM to finish.</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="Closing Odometer KM (e.g. 48,290)"
+                  keyboardType="numeric"
+                />
+                <TouchableOpacity
+                  style={[styles.btnPrimaryFull, { backgroundColor: THEME.primary }]}
+                  onPress={() => {
+                    setIsDutyActive(false);
+                    setDutyOtpEntered('');
+                    Alert.alert('Duty Completed', 'Duty closed successfully. Overtime payout credited to your wallet.');
+                  }}
+                >
+                  <Text style={styles.btnPrimaryFullText}>End Duty & Record Overtime</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-          <Text style={styles.jobCardTitle}>{j.title}</Text>
-          <Text style={styles.jobCardLocation}>📍 {j.location} • {j.type}</Text>
+        </View>
+      )}
+
+      {/* Driver Wallet */}
+      {driverModeSubTab === 'wallet' && (
+        <View>
+          <View style={styles.walletCard}>
+            <Text style={styles.walletCardLabel}>TOTAL WALLET BALANCE</Text>
+            <Text style={styles.walletCardAmount}>₹{driverWallet.balance.toLocaleString('en-IN')}</Text>
+            <View style={styles.walletBreakdownRow}>
+              <Text style={styles.walletBreakdownText}>Base Duty: ₹2,200</Text>
+              <Text style={styles.walletBreakdownText}>OT: ₹{driverWallet.pendingOT}</Text>
+              <Text style={styles.walletBreakdownText}>Referral: ₹{driverWallet.referrals}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.btnWithdrawUPI}
+              onPress={() => {
+                Alert.prompt
+                  ? Alert.prompt('Withdraw via UPI', 'Enter your UPI ID (GPay / PhonePe / Paytm):', [
+                      { text: 'Cancel' },
+                      { text: 'Submit Payout', onPress: () => Alert.alert('Payout Requested', '₹3,800 transfer initiated to your UPI account.') },
+                    ])
+                  : Alert.alert('UPI Withdrawal', 'Your available balance of ₹3,800 will be credited to your linked UPI ID within 2 hours.');
+              }}
+            >
+              <Text style={styles.btnWithdrawUPIText}>Instant Withdraw to Bank / UPI</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.panelCard}>
+            <Text style={styles.panelTitle}>Refer Driver Friend — Earn ₹500</Text>
+            <Text style={styles.panelSubtitle}>Refer any experienced driver in Delhi NCR. Get ₹500 via UPI when they complete 30 days of duty.</Text>
+            <TouchableOpacity
+              style={[styles.btnPrimaryFull, { backgroundColor: THEME.success }]}
+              onPress={() => openWhatsApp('Hello Drivers Saathi, I want to refer a driver friend. Name and phone: ')}
+            >
+              <Text style={styles.btnPrimaryFullText}>Share Referral Link via WhatsApp</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Jobs Board */}
+      {driverModeSubTab === 'jobs' && (
+        <View>
+          {DRIVER_JOBS.map(j => (
+            <View key={j.id} style={styles.jobCard}>
+              <View style={styles.jobCardTop}>
+                <Text style={styles.jobSalaryText}>{j.salary}</Text>
+                <View style={[styles.pillBadge, { backgroundColor: THEME.accentSoft }]}>
+                  <Text style={[styles.pillBadgeText, { color: THEME.accentDeep }]}>{j.tag}</Text>
+                </View>
+              </View>
+              <Text style={styles.jobCardTitle}>{j.title}</Text>
+              <Text style={styles.jobCardLocation}>📍 {j.location} • {j.type}</Text>
+              <TouchableOpacity
+                style={styles.btnApplyCompact}
+                onPress={() => {
+                  Alert.alert('Applied Successfully', `You have expressed interest in: ${j.title}. Our recruitment manager will call you for an interview.`);
+                }}
+              >
+                <Text style={styles.btnApplyCompactText}>Apply for this Opening &rarr;</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* KYC Onboarding */}
+      {driverModeSubTab === 'kyc' && (
+        <View style={styles.panelCard}>
+          <Text style={styles.panelTitle}>Driver KYC Registration</Text>
+          <Text style={styles.panelSubtitle}>Submit your documents for police verification and direct placement.</Text>
+
+          <Text style={styles.inputLabel}>Full Name (as on Aadhaar Card) *</Text>
+          <TextInput
+            style={styles.formInput}
+            placeholder="e.g. Ramesh Kumar"
+            value={driverKYC.name}
+            onChangeText={v => setDriverKYC({ ...driverKYC, name: v })}
+          />
+
+          <Text style={styles.inputLabel}>Mobile Number (WhatsApp) *</Text>
+          <TextInput
+            style={styles.formInput}
+            placeholder="+91 98765 43210"
+            keyboardType="phone-pad"
+            value={driverKYC.phone}
+            onChangeText={v => setDriverKYC({ ...driverKYC, phone: v })}
+          />
+
+          <View style={styles.docUploadRow}>
+            <TouchableOpacity
+              style={[styles.docUploadBtn, licenseImg && styles.docUploadBtnSuccess]}
+              onPress={() => pickDoc('license')}
+            >
+              <Text style={styles.docUploadBtnText}>{licenseImg ? 'License Attached ✓' : 'Attach License'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.docUploadBtn, aadhaarImg && styles.docUploadBtnSuccess]}
+              onPress={() => pickDoc('aadhaar')}
+            >
+              <Text style={styles.docUploadBtnText}>{aadhaarImg ? 'Aadhaar Attached ✓' : 'Attach Aadhaar'}</Text>
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
-            style={styles.btnApplyCompact}
+            style={styles.btnPrimaryFull}
             onPress={() => {
-              setDriverForm({ ...driverForm, experience: j.title });
-              Alert.alert('Ready to Apply', 'Please enter your Name and Mobile Number in the application form above to apply for this opening.');
+              if (!driverKYC.name || !driverKYC.phone) {
+                Alert.alert('Required', 'Please enter your full name and phone number.');
+                return;
+              }
+              Alert.alert('Application Submitted', 'Your documents have been submitted for verification. Our recruitment officer will call you within 24 hours.');
             }}
           >
-            <Text style={styles.btnApplyCompactText}>Apply for this Role</Text>
+            <Text style={styles.btnPrimaryFullText}>Submit KYC Application</Text>
           </TouchableOpacity>
         </View>
-      ))}
-
-      {/* Refer & Earn Card */}
-      <View style={styles.referCard}>
-        <Text style={styles.referCardTitle}>Refer a Driver Friend — Earn ₹500</Text>
-        <Text style={styles.referCardSub}>
-          Know an experienced driver in Delhi NCR? Refer them to Drivers Saathi. When they complete 30 days of duty, you receive ₹500 directly via UPI.
-        </Text>
-        <TouchableOpacity
-          style={styles.btnReferWhatsApp}
-          onPress={() => openWhatsApp('Hello Drivers Saathi, I want to refer a driver friend. His name and contact: ')}
-        >
-          <Text style={styles.btnReferWhatsAppText}>Refer Friend via WhatsApp</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </ScrollView>
   );
 
-  // ─── MODAL: STEP-BY-STEP SERVICE BOOKING ──────────────────────────────────────
-  const renderBookingModal = () => {
+  // ─── MODAL: SMART STEP-BY-STEP BOOKING & TOKEN CHECKOUT ───────────────────────
+  const renderSmartBookingModal = () => {
+    if (!bookingModal.visible) return null;
+    const c = bookingModal.selectedChauffeur;
     const s = bookingModal.service;
-    if (!s) return null;
 
     return (
       <Modal visible={bookingModal.visible} animationType="slide" transparent>
@@ -975,152 +1109,336 @@ export default function App() {
           <View style={styles.bookingSheet}>
             <View style={styles.sheetHandle} />
 
+            {/* Header */}
             <View style={styles.sheetHeaderRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.sheetTitle}>{s.title}</Text>
-                <Text style={styles.sheetPriceTag}>{s.price}</Text>
+                <Text style={styles.sheetTitle}>
+                  {c ? `Hire Chauffeur: ${c.name}` : (s?.title || 'Book Driver Service')}
+                </Text>
+                <Text style={styles.sheetPriceTag}>
+                  {smartBooking.pricingPlan === 'subscription' ? '₹3,500/Month Retainer' : (s?.price || '₹4,500 Fee')}
+                </Text>
               </View>
-              <TouchableOpacity style={styles.btnCloseSheet} onPress={() => setBookingModal({ visible: false, service: null })}>
+              <TouchableOpacity
+                style={styles.btnCloseSheet}
+                onPress={() => setBookingModal({ visible: false, service: null, selectedChauffeur: null })}
+              >
                 <Text style={styles.btnCloseSheetText}>✕</Text>
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 420 }}>
-              <Text style={styles.sheetDesc}>{s.sub}</Text>
+            {/* Step Progress Pills */}
+            <View style={styles.stepProgressRow}>
+              <View style={[styles.stepDot, bookingStep >= 1 && styles.stepDotActive]} />
+              <Text style={[styles.stepText, bookingStep === 1 && styles.stepTextActive]}>1. Requirements</Text>
+              <View style={styles.stepLine} />
+              <View style={[styles.stepDot, bookingStep >= 2 && styles.stepDotActive]} />
+              <Text style={[styles.stepText, bookingStep === 2 && styles.stepTextActive]}>2. Schedule</Text>
+              <View style={styles.stepLine} />
+              <View style={[styles.stepDot, bookingStep >= 3 && styles.stepDotActive]} />
+              <Text style={[styles.stepText, bookingStep === 3 && styles.stepTextActive]}>3. Payment</Text>
+            </View>
 
-              {/* Subscription vs One-time toggle if applicable */}
-              {s.hasSubscription && (
-                <View style={styles.planSelectorBox}>
-                  <TouchableOpacity
-                    style={[styles.planOption, bookingType === 'onetime' && styles.planOptionActive]}
-                    onPress={() => setBookingType('onetime')}
-                  >
-                    <Text style={[styles.planOptionTitle, bookingType === 'onetime' && styles.planOptionTitleActive]}>
-                      One-Time Placement
-                    </Text>
-                    <Text style={styles.planOptionPrice}>₹4,500 Fee</Text>
-                    <Text style={styles.planOptionSub}>30-Day Free Replacement</Text>
-                  </TouchableOpacity>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 380 }}>
+              {/* STEP 1: SHIFT & VEHICLE TRANSMISSION */}
+              {bookingStep === 1 && (
+                <View>
+                  <Text style={styles.inputLabel}>Vehicle Transmission Type</Text>
+                  <View style={styles.pillChoiceRow}>
+                    {['Automatic', 'Manual', 'Luxury German', 'Electric (EV)'].map(t => (
+                      <TouchableOpacity
+                        key={t}
+                        style={[styles.pillChoice, smartBooking.transmission === t && styles.pillChoiceActive]}
+                        onPress={() => setSmartBooking({ ...smartBooking, transmission: t })}
+                      >
+                        <Text style={[styles.pillChoiceText, smartBooking.transmission === t && styles.pillChoiceTextActive]}>
+                          {t}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
 
-                  <TouchableOpacity
-                    style={[styles.planOption, bookingType === 'subscription' && styles.planOptionActive]}
-                    onPress={() => setBookingType('subscription')}
-                  >
-                    <Text style={[styles.planOptionTitle, bookingType === 'subscription' && styles.planOptionTitleActive]}>
-                      Monthly Retainer Plan
-                    </Text>
-                    <Text style={styles.planOptionPrice}>₹3,500 / Month</Text>
-                    <Text style={styles.planOptionSub}>Unlimited Replacements</Text>
+                  <Text style={styles.inputLabel}>Car Model & Year</Text>
+                  <TextInput
+                    style={styles.formInput}
+                    placeholder="e.g. Hyundai Creta (2023) / Toyota Fortuner"
+                    value={smartBooking.carModel}
+                    onChangeText={v => setSmartBooking({ ...smartBooking, carModel: v })}
+                  />
+
+                  <Text style={styles.inputLabel}>Duty Shift Duration</Text>
+                  <View style={styles.pillChoiceRow}>
+                    {['8 Hours (Office)', '10 Hours (Standard)', '12 Hours (Executive)', '24-Hr Live-in'].map(h => (
+                      <TouchableOpacity
+                        key={h}
+                        style={[styles.pillChoice, smartBooking.shiftHours === h && styles.pillChoiceActive]}
+                        onPress={() => setSmartBooking({ ...smartBooking, shiftHours: h })}
+                      >
+                        <Text style={[styles.pillChoiceText, smartBooking.shiftHours === h && styles.pillChoiceTextActive]}>
+                          {h}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <TouchableOpacity style={styles.btnPrimaryFull} onPress={() => setBookingStep(2)}>
+                    <Text style={styles.btnPrimaryFullText}>Continue to Schedule &rarr;</Text>
                   </TouchableOpacity>
                 </View>
               )}
 
-              <Text style={styles.inputLabel}>Your Full Name *</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="e.g. Priya Sharma"
-                value={form.name}
-                onChangeText={v => setForm({ ...form, name: v })}
-              />
+              {/* STEP 2: SCHEDULE & WEEKLY OFF */}
+              {bookingStep === 2 && (
+                <View>
+                  <Text style={styles.inputLabel}>Reporting Time</Text>
+                  <View style={styles.pillChoiceRow}>
+                    {['08:00 AM', '08:30 AM', '09:00 AM', '09:30 AM', '10:00 AM'].map(rt => (
+                      <TouchableOpacity
+                        key={rt}
+                        style={[styles.pillChoice, smartBooking.reportingTime === rt && styles.pillChoiceActive]}
+                        onPress={() => setSmartBooking({ ...smartBooking, reportingTime: rt })}
+                      >
+                        <Text style={[styles.pillChoiceText, smartBooking.reportingTime === rt && styles.pillChoiceTextActive]}>
+                          {rt}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
 
-              <Text style={styles.inputLabel}>Mobile Number *</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="+91 98765 43210"
-                keyboardType="phone-pad"
-                value={form.phone}
-                onChangeText={v => setForm({ ...form, phone: v })}
-              />
+                  <Text style={styles.inputLabel}>Weekly Off Day</Text>
+                  <View style={styles.pillChoiceRow}>
+                    {['Sunday Off', 'Saturday & Sunday', 'Rotational Off'].map(wo => (
+                      <TouchableOpacity
+                        key={wo}
+                        style={[styles.pillChoice, smartBooking.weeklyOff === wo && styles.pillChoiceActive]}
+                        onPress={() => setSmartBooking({ ...smartBooking, weeklyOff: wo })}
+                      >
+                        <Text style={[styles.pillChoiceText, smartBooking.weeklyOff === wo && styles.pillChoiceTextActive]}>
+                          {wo}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
 
-              <Text style={styles.inputLabel}>Car Model & Transmission</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="e.g. Hyundai Creta (Automatic) / Fortuner"
-                value={form.car}
-                onChangeText={v => setForm({ ...form, car: v })}
-              />
-
-              <Text style={styles.inputLabel}>Your Residence Area in Delhi NCR</Text>
-              <TextInput
-                style={styles.formInput}
-                placeholder="e.g. South Delhi / DLF Phase 5 Gurugram"
-                value={form.cityArea}
-                onChangeText={v => setForm({ ...form, cityArea: v })}
-              />
-
-              {s.isFleet && (
-                <>
-                  <Text style={styles.inputLabel}>Company Name & GSTIN</Text>
+                  <Text style={styles.inputLabel}>Your Residence Area in Delhi NCR</Text>
                   <TextInput
                     style={styles.formInput}
-                    placeholder="e.g. NCR Logistics Pvt Ltd (07AAAAA0000A1Z5)"
-                    value={form.companyName}
-                    onChangeText={v => setForm({ ...form, companyName: v })}
+                    placeholder="e.g. South Delhi / DLF Phase 5 Gurugram"
+                    value={smartBooking.locationArea}
+                    onChangeText={v => setSmartBooking({ ...smartBooking, locationArea: v })}
                   />
-                  <Text style={styles.inputLabel}>Number of Drivers Needed</Text>
-                  <TextInput
-                    style={styles.formInput}
-                    placeholder="e.g. 5 Drivers"
-                    keyboardType="numeric"
-                    value={form.driverCount}
-                    onChangeText={v => setForm({ ...form, driverCount: v })}
-                  />
-                </>
+
+                  {/* Plan toggle */}
+                  <Text style={styles.inputLabel}>Choose Placement Model</Text>
+                  <View style={styles.planSelectorBox}>
+                    <TouchableOpacity
+                      style={[styles.planOption, smartBooking.pricingPlan === 'onetime' && styles.planOptionActive]}
+                      onPress={() => setSmartBooking({ ...smartBooking, pricingPlan: 'onetime' })}
+                    >
+                      <Text style={[styles.planOptionTitle, smartBooking.pricingPlan === 'onetime' && styles.planOptionTitleActive]}>
+                        One-Time Placement
+                      </Text>
+                      <Text style={styles.planOptionPrice}>₹4,500 Fee</Text>
+                      <Text style={styles.planOptionSub}>30-Day Free Replacement</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.planOption, smartBooking.pricingPlan === 'subscription' && styles.planOptionActive]}
+                      onPress={() => setSmartBooking({ ...smartBooking, pricingPlan: 'subscription' })}
+                    >
+                      <Text style={[styles.planOptionTitle, smartBooking.pricingPlan === 'subscription' && styles.planOptionTitleActive]}>
+                        Monthly Retainer
+                      </Text>
+                      <Text style={styles.planOptionPrice}>₹3,500 / Month</Text>
+                      <Text style={styles.planOptionSub}>Unlimited Replacements</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                    <TouchableOpacity style={[styles.btnSmallAction, { flex: 1, paddingVertical: 12 }]} onPress={() => setBookingStep(1)}>
+                      <Text style={[styles.btnSmallActionText, { textAlign: 'center' }]}>&larr; Back</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.btnPrimaryFull, { flex: 2, marginTop: 0 }]} onPress={() => setBookingStep(3)}>
+                      <Text style={styles.btnPrimaryFullText}>Proceed to Confirm &rarr;</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               )}
 
-              {s.isVerify && (
-                <>
-                  <Text style={styles.inputLabel}>Driver's DL Number to Verify</Text>
+              {/* STEP 3: CONTACT & ADVANCE TOKEN PAYMENT */}
+              {bookingStep === 3 && (
+                <View>
+                  <Text style={styles.inputLabel}>Your Full Name *</Text>
                   <TextInput
                     style={styles.formInput}
-                    placeholder="e.g. DL-0420110012345"
-                    autoCapitalize="characters"
-                    value={form.driverDL}
-                    onChangeText={v => setForm({ ...form, driverDL: v })}
+                    placeholder="Full Name"
+                    value={userProfile.name}
+                    onChangeText={v => setUserProfile({ ...userProfile, name: v })}
                   />
-                </>
-              )}
 
-              {s.isOutstation && (
-                <>
-                  <Text style={styles.inputLabel}>Trip Destination & Date</Text>
+                  <Text style={styles.inputLabel}>Mobile Number *</Text>
                   <TextInput
                     style={styles.formInput}
-                    placeholder="e.g. Agra (Yamuna Expy) — Tomorrow 6:00 AM"
-                    value={form.travelDate}
-                    onChangeText={v => setForm({ ...form, travelDate: v })}
+                    placeholder="+91 98765 43210"
+                    keyboardType="phone-pad"
+                    value={userProfile.phone}
+                    onChangeText={v => setUserProfile({ ...userProfile, phone: v })}
                   />
-                </>
+
+                  {/* Advance Token Option */}
+                  <View style={styles.tokenPaymentBox}>
+                    <Text style={styles.tokenPaymentTitle}>Token Advance Booking Option</Text>
+                    <Text style={styles.tokenPaymentDesc}>
+                      Pay ₹500 advance token to prioritize driver candidate interview. Deducted from final ₹4,500 invoice.
+                    </Text>
+
+                    <View style={styles.pillChoiceRow}>
+                      {[
+                        { key: 'token500', label: 'Pay ₹500 Advance Token (GPay/UPI)' },
+                        { key: 'payLater', label: 'Pay Post Placement (Trial First)' },
+                      ].map(to => (
+                        <TouchableOpacity
+                          key={to.key}
+                          style={[styles.pillChoice, smartBooking.tokenOption === to.key && styles.pillChoiceActive]}
+                          onPress={() => setSmartBooking({ ...smartBooking, tokenOption: to.key })}
+                        >
+                          <Text style={[styles.pillChoiceText, smartBooking.tokenOption === to.key && styles.pillChoiceTextActive]}>
+                            {to.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+
+                    {smartBooking.tokenOption === 'token500' && (
+                      <View style={{ marginTop: 8 }}>
+                        <Text style={styles.inputLabel}>Select UPI App for Token</Text>
+                        <View style={styles.pillChoiceRow}>
+                          {['Google Pay', 'PhonePe', 'Paytm UPI', 'Direct QR Code'].map(app => (
+                            <TouchableOpacity
+                              key={app}
+                              style={[styles.pillChoice, smartBooking.upiApp === app && styles.pillChoiceActive]}
+                              onPress={() => setSmartBooking({ ...smartBooking, upiApp: app })}
+                            >
+                              <Text style={[styles.pillChoiceText, smartBooking.upiApp === app && styles.pillChoiceTextActive]}>
+                                {app}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+                    )}
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.btnPrimaryFull, { backgroundColor: THEME.accent }]}
+                    onPress={handleConfirmSmartBooking}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#FFF" />
+                    ) : (
+                      <Text style={styles.btnPrimaryFullText}>
+                        {smartBooking.tokenOption === 'token500'
+                          ? `Pay ₹500 & Confirm Booking`
+                          : `Confirm Booking (Pay Post Trial)`}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={{ marginTop: 8, alignItems: 'center' }} onPress={() => setBookingStep(2)}>
+                    <Text style={{ fontSize: 12, color: THEME.textSecondary }}>&larr; Back to Schedule</Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </ScrollView>
-
-            <TouchableOpacity style={styles.btnConfirmBooking} onPress={handleSubmitBooking} disabled={loading}>
-              {loading ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={styles.btnConfirmBookingText}>
-                  Confirm Booking ({bookingType === 'subscription' ? '₹3,500/mo' : s.price})
-                </Text>
-              )}
-            </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       </Modal>
     );
   };
 
-  // ─── MAIN APP SCAFFOLD ───────────────────────────────────────────────────────
+  // ─── MODAL: USER PROFILE & SAVED GARAGE ───────────────────────────────────────
+  const renderProfileModal = () => (
+    <Modal visible={profileModal} transparent animationType="slide">
+      <View style={styles.modalOverlay}>
+        <View style={styles.bookingSheet}>
+          <View style={styles.sheetHandle} />
+          <View style={styles.sheetHeaderRow}>
+            <Text style={styles.sheetTitle}>My Client Profile & Garage</Text>
+            <TouchableOpacity style={styles.btnCloseSheet} onPress={() => setProfileModal(false)}>
+              <Text style={styles.btnCloseSheetText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.inputLabel}>Your Name</Text>
+          <TextInput
+            style={styles.formInput}
+            value={userProfile.name}
+            onChangeText={v => setUserProfile({ ...userProfile, name: v })}
+          />
+
+          <Text style={styles.inputLabel}>Registered Mobile Number</Text>
+          <TextInput
+            style={styles.formInput}
+            value={userProfile.phone}
+            keyboardType="phone-pad"
+            onChangeText={v => setUserProfile({ ...userProfile, phone: v })}
+          />
+
+          <Text style={styles.inputLabel}>Saved Garage (Vehicles)</Text>
+          <TextInput
+            style={styles.formInput}
+            value={userProfile.primaryCar}
+            onChangeText={v => setUserProfile({ ...userProfile, primaryCar: v })}
+          />
+
+          <Text style={styles.inputLabel}>Saved Residence / Office Address</Text>
+          <TextInput
+            style={styles.formInput}
+            value={userProfile.address}
+            onChangeText={v => setUserProfile({ ...userProfile, address: v })}
+          />
+
+          <TouchableOpacity
+            style={styles.btnPrimaryFull}
+            onPress={() => {
+              setProfileModal(false);
+              Alert.alert('Profile Saved', 'Your client garage and contact details have been updated.');
+            }}
+          >
+            <Text style={styles.btnPrimaryFullText}>Save Profile</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  // ─── MAIN SCAFFOLD RENDER ────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.safeContainer}>
       <StatusBar style="light" backgroundColor={THEME.primary} />
 
-      {/* Top Navigation Bar */}
+      {/* High-Visibility Header with Crisp Emblem & Typography */}
       <View style={styles.navBar}>
-        <Image source={require('./assets/logo.png')} style={styles.navLogo} resizeMode="contain" />
+        <View style={styles.brandRow}>
+          <Image
+            source={require('./assets/driver-saathi-logo-light.png')}
+            style={styles.brandEmblem}
+            resizeMode="contain"
+          />
+          <View style={styles.brandTextCol}>
+            <Text style={styles.brandTitleText}>DRIVERS SAATHI</Text>
+            <Text style={styles.brandSubText}>DELHI NCR VERIFIED DESK</Text>
+          </View>
+        </View>
 
         <View style={styles.navRightActions}>
+          <TouchableOpacity style={styles.btnProfilePill} onPress={() => setProfileModal(true)} activeOpacity={0.85}>
+            <Text style={styles.btnProfilePillText}>Garage</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.btnSOS} onPress={triggerSOS} activeOpacity={0.85}>
-            <Text style={styles.btnSOSText}>SOS 24/7</Text>
+            <Text style={styles.btnSOSText}>SOS</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -1133,24 +1451,30 @@ export default function App() {
         </View>
       </View>
 
-      {/* Main Active Tab Screen */}
+      {/* Main Tab Screen */}
       <View style={{ flex: 1 }}>
-        {activeTab === 'home' && renderHomeScreen()}
+        {activeTab === 'explore' && renderExploreScreen()}
+        {activeTab === 'chauffeurs' && renderChauffeursScreen()}
         {activeTab === 'bookings' && renderBookingsScreen()}
-        {activeTab === 'support' && renderSupportScreen()}
         {activeTab === 'driver' && renderDriverScreen()}
       </View>
 
-      {/* Clean Bottom Navigation Bar */}
+      {/* Clean 4-Tab Bottom Navigation Bar */}
       <View style={styles.bottomNav}>
         <TouchableOpacity
-          style={[styles.bottomNavItem, activeTab === 'home' && styles.bottomNavItemActive]}
-          onPress={() => setActiveTab('home')}
+          style={[styles.bottomNavItem, activeTab === 'explore' && styles.bottomNavItemActive]}
+          onPress={() => setActiveTab('explore')}
         >
-          <Text style={[styles.bottomNavIcon, activeTab === 'home' && styles.bottomNavIconActive]}>◈</Text>
-          <Text style={[styles.bottomNavLabel, activeTab === 'home' && styles.bottomNavLabelActive]}>
-            Explore
-          </Text>
+          <Text style={[styles.bottomNavIcon, activeTab === 'explore' && styles.bottomNavIconActive]}>◈</Text>
+          <Text style={[styles.bottomNavLabel, activeTab === 'explore' && styles.bottomNavLabelActive]}>Explore</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.bottomNavItem, activeTab === 'chauffeurs' && styles.bottomNavItemActive]}
+          onPress={() => setActiveTab('chauffeurs')}
+        >
+          <Text style={[styles.bottomNavIcon, activeTab === 'chauffeurs' && styles.bottomNavIconActive]}>👥</Text>
+          <Text style={[styles.bottomNavLabel, activeTab === 'chauffeurs' && styles.bottomNavLabelActive]}>Chauffeurs</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -1158,19 +1482,7 @@ export default function App() {
           onPress={() => setActiveTab('bookings')}
         >
           <Text style={[styles.bottomNavIcon, activeTab === 'bookings' && styles.bottomNavIconActive]}>▤</Text>
-          <Text style={[styles.bottomNavLabel, activeTab === 'bookings' && styles.bottomNavLabelActive]}>
-            Bookings
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.bottomNavItem, activeTab === 'support' && styles.bottomNavItemActive]}
-          onPress={() => setActiveTab('support')}
-        >
-          <Text style={[styles.bottomNavIcon, activeTab === 'support' && styles.bottomNavIconActive]}>◉</Text>
-          <Text style={[styles.bottomNavLabel, activeTab === 'support' && styles.bottomNavLabelActive]}>
-            Support
-          </Text>
+          <Text style={[styles.bottomNavLabel, activeTab === 'bookings' && styles.bottomNavLabelActive]}>Bookings</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -1178,29 +1490,33 @@ export default function App() {
           onPress={() => setActiveTab('driver')}
         >
           <Text style={[styles.bottomNavIcon, activeTab === 'driver' && styles.bottomNavIconActive]}>❖</Text>
-          <Text style={[styles.bottomNavLabel, activeTab === 'driver' && styles.bottomNavLabelActive]}>
-            Driver Mode
-          </Text>
+          <Text style={[styles.bottomNavLabel, activeTab === 'driver' && styles.bottomNavLabelActive]}>Driver Mode</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Booking Modal */}
-      {renderBookingModal()}
+      {/* Smart Booking Modal */}
+      {renderSmartBookingModal()}
 
-      {/* Success Modal */}
-      <Modal visible={successModal.visible} transparent animationType="fade">
+      {/* Profile & Garage Modal */}
+      {renderProfileModal()}
+
+      {/* Confirmation Modal */}
+      <Modal visible={confirmationModal.visible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.successCard}>
             <View style={styles.successCheckCircle}>
               <Text style={styles.successCheckText}>✓</Text>
             </View>
-            <Text style={styles.successTitle}>Request Confirmed</Text>
-            <Text style={styles.successMessage}>{successModal.message}</Text>
+            <Text style={styles.successTitle}>Booking Confirmed</Text>
+            <Text style={styles.successMessage}>{confirmationModal.message}</Text>
             <TouchableOpacity
               style={styles.btnSuccessClose}
-              onPress={() => setSuccessModal({ visible: false, message: '' })}
+              onPress={() => {
+                setConfirmationModal({ visible: false, bookingId: '', message: '' });
+                setActiveTab('bookings');
+              }}
             >
-              <Text style={styles.btnSuccessCloseText}>Continue</Text>
+              <Text style={styles.btnSuccessCloseText}>View in My Bookings</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1209,12 +1525,14 @@ export default function App() {
   );
 }
 
-// ─── PREMIUM STYLESHEET ────────────────────────────────────────────────────────
+// ─── MASTER STYLESHEET ─────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
     backgroundColor: THEME.canvas,
   },
+
+  // Navbar & High-Visibility Brand Block
   navBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1225,48 +1543,82 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#1E293B',
   },
-  navLogo: {
-    width: 140,
-    height: 36,
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brandEmblem: {
+    width: 38,
+    height: 38,
+    borderRadius: 8,
+  },
+  brandTextCol: {
+    justifyContent: 'center',
+  },
+  brandTitleText: {
+    color: '#FFF',
+    fontSize: 15.5,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  brandSubText: {
+    color: THEME.accent,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.6,
   },
   navRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
+  },
+  btnProfilePill: {
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  btnProfilePillText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: '700',
   },
   btnSOS: {
     backgroundColor: THEME.sosSoft,
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#FCA5A5',
   },
   btnSOSText: {
     color: THEME.sosRed,
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '800',
   },
   btnLangToggle: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     borderRadius: 14,
   },
   btnLangToggleText: {
     color: '#FFF',
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '700',
   },
 
-  // Bottom Navigation Bar
+  // Bottom Navigation
   bottomNav: {
     flexDirection: 'row',
     backgroundColor: THEME.surface,
     borderTopWidth: 1,
     borderTopColor: THEME.border,
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     elevation: 8,
     shadowColor: '#000',
     shadowOpacity: 0.05,
@@ -1279,7 +1631,7 @@ const styles = StyleSheet.create({
   },
   bottomNavItemActive: {},
   bottomNavIcon: {
-    fontSize: 17,
+    fontSize: 16,
     color: THEME.textMuted,
     marginBottom: 2,
   },
@@ -1287,7 +1639,7 @@ const styles = StyleSheet.create({
     color: THEME.accent,
   },
   bottomNavLabel: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
     color: THEME.textMuted,
   },
@@ -1306,7 +1658,7 @@ const styles = StyleSheet.create({
   heroCard: {
     backgroundColor: THEME.primary,
     borderRadius: 18,
-    padding: 20,
+    padding: 18,
     marginBottom: 16,
   },
   heroBadgeRow: {
@@ -1323,52 +1675,61 @@ const styles = StyleSheet.create({
   },
   heroBadgeText: {
     color: THEME.accent,
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.6,
   },
   heroTitle: {
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: '800',
     color: '#FFF',
-    lineHeight: 28,
+    lineHeight: 27,
     marginBottom: 8,
   },
   heroSubtitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: '#CBD5E1',
-    lineHeight: 19,
-    marginBottom: 16,
+    lineHeight: 18,
+    marginBottom: 14,
   },
   heroActionRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
   },
   heroPrimaryBtn: {
     backgroundColor: THEME.accent,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
   },
   heroPrimaryBtnText: {
     color: '#FFF',
     fontWeight: '800',
-    fontSize: 13.5,
+    fontSize: 13,
   },
   heroSecondaryBtn: {
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.25)',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 10,
-    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
   },
   heroSecondaryBtnText: {
     color: '#FFF',
     fontWeight: '700',
-    fontSize: 13.5,
+    fontSize: 13,
+  },
+  heroWhatsAppBtn: {
+    backgroundColor: THEME.successSoft,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  heroWhatsAppBtnText: {
+    color: THEME.success,
+    fontWeight: '800',
+    fontSize: 12.5,
   },
 
   // Trust Strip
@@ -1377,46 +1738,132 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: THEME.surface,
     borderRadius: 14,
-    paddingVertical: 12,
+    paddingVertical: 11,
     paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: THEME.border,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   trustItem: {
     flex: 1,
     alignItems: 'center',
   },
   trustNumber: {
-    fontSize: 13.5,
+    fontSize: 13,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
   trustLabel: {
-    fontSize: 10,
+    fontSize: 9.5,
     color: THEME.textSecondary,
     marginTop: 2,
     textAlign: 'center',
   },
   trustDivider: {
     width: 1,
-    height: 24,
+    height: 22,
     backgroundColor: THEME.border,
   },
 
   // Section Headers
-  sectionHeader: {
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
   sectionSub: {
-    fontSize: 12.5,
+    fontSize: 12,
     color: THEME.textSecondary,
     marginTop: 2,
+  },
+  seeAllLink: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: THEME.accent,
+  },
+
+  // Horizontal Chauffeur Preview
+  chauffeurHorizontalScroll: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  compactCandidateCard: {
+    width: 200,
+    backgroundColor: THEME.surface,
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: THEME.border,
+    marginRight: 12,
+  },
+  candidateThumb: {
+    width: '100%',
+    height: 110,
+  },
+  candidateContent: {
+    padding: 10,
+  },
+  candidateBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  candidateRatingText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: THEME.accentDeep,
+  },
+  candidateExpText: {
+    fontSize: 10.5,
+    color: THEME.textSecondary,
+    fontWeight: '700',
+  },
+  candidateNameText: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: THEME.textPrimary,
+  },
+  candidateZoneText: {
+    fontSize: 10.5,
+    color: THEME.textSecondary,
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  skillPillRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginBottom: 8,
+  },
+  skillPill: {
+    backgroundColor: THEME.canvas,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: THEME.border,
+  },
+  skillPillText: {
+    fontSize: 9,
+    color: THEME.textSecondary,
+    fontWeight: '600',
+  },
+  btnHireCompact: {
+    backgroundColor: THEME.primary,
+    paddingVertical: 7,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  btnHireCompactText: {
+    color: '#FFF',
+    fontSize: 11.5,
+    fontWeight: '800',
   },
 
   // Service Cards
@@ -1426,51 +1873,44 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: THEME.border,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 5,
+    marginBottom: 14,
   },
   serviceImage: {
     width: '100%',
-    height: 140,
-  },
-  serviceContent: {
-    padding: 16,
+    height: 130,
   },
   serviceTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   pillBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 9,
-    borderRadius: 12,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 10,
   },
   pillBadgeText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   servicePrice: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
   serviceTitle: {
-    fontSize: 16.5,
+    fontSize: 16,
     fontWeight: '800',
     color: THEME.textPrimary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   serviceDesc: {
-    fontSize: 12.5,
+    fontSize: 12,
     color: THEME.textSecondary,
-    lineHeight: 18,
-    marginBottom: 12,
+    lineHeight: 17,
+    marginBottom: 10,
   },
   serviceFooter: {
     flexDirection: 'row',
@@ -1478,29 +1918,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: THEME.borderSoft,
-    paddingTop: 10,
+    paddingTop: 8,
   },
   servicePerks: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: THEME.textSecondary,
     flex: 1,
   },
   bookNowLink: {
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '800',
     color: THEME.accent,
-    marginLeft: 8,
+    marginLeft: 6,
   },
 
-  // Sub Section Box
+  // Sub Section Box & Routes
   subSectionBox: {
-    marginBottom: 18,
+    marginBottom: 16,
   },
   subSectionTitle: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '800',
     color: THEME.textPrimary,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   routeScroll: {
     flexDirection: 'row',
@@ -1509,21 +1949,21 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.surface,
     borderWidth: 1,
     borderColor: THEME.border,
-    borderRadius: 14,
-    padding: 12,
+    borderRadius: 12,
+    padding: 10,
     marginRight: 10,
-    width: 170,
+    width: 160,
   },
   routeDestText: {
-    fontSize: 13.5,
+    fontSize: 13,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
   routeViaText: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: THEME.textSecondary,
     marginTop: 2,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   routePriceRow: {
     flexDirection: 'row',
@@ -1531,128 +1971,215 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   routeFareText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '800',
     color: THEME.accent,
   },
   routeBookBtn: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '800',
     color: THEME.primary,
     backgroundColor: THEME.borderSoft,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 7,
+    borderRadius: 5,
   },
 
   // Driver Recruitment Banner
   driverCtaBanner: {
     backgroundColor: '#1E293B',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 14,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 14,
   },
   driverCtaBadge: {
-    fontSize: 9.5,
+    fontSize: 9,
     fontWeight: '800',
     color: THEME.accent,
     letterSpacing: 0.6,
     marginBottom: 2,
   },
   driverCtaTitle: {
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: '800',
     color: '#FFF',
     marginBottom: 2,
   },
   driverCtaSub: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: '#CBD5E1',
-    lineHeight: 16,
+    lineHeight: 15,
   },
   driverCtaBtn: {
     backgroundColor: THEME.accent,
-    paddingVertical: 9,
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 7,
   },
   driverCtaBtnText: {
     color: '#FFF',
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '800',
   },
 
-  // Helpline Box
-  helplineCard: {
+  // Screen Headers
+  screenHeader: {
+    marginBottom: 12,
+  },
+  screenHeading: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: THEME.textPrimary,
+  },
+  screenSubheading: {
+    fontSize: 12,
+    color: THEME.textSecondary,
+    marginTop: 2,
+  },
+
+  // Filter Chips
+  filterScroll: {
+    flexDirection: 'row',
+    marginBottom: 14,
+  },
+  filterChip: {
+    backgroundColor: THEME.surface,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    marginRight: 8,
+  },
+  filterChipActive: {
+    backgroundColor: THEME.primary,
+    borderColor: THEME.primary,
+  },
+  filterChipText: {
+    fontSize: 11.5,
+    color: THEME.textSecondary,
+    fontWeight: '600',
+  },
+  filterChipTextActive: {
+    color: '#FFF',
+    fontWeight: '800',
+  },
+
+  // Full Chauffeur Candidate Cards
+  fullCandidateCard: {
     backgroundColor: THEME.surface,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: THEME.border,
-    alignItems: 'center',
-    textAlign: 'center',
+    marginBottom: 14,
   },
-  helplineTitle: {
-    fontSize: 15,
+  candidateHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  candidateLargeAvatar: {
+    width: 65,
+    height: 65,
+    borderRadius: 32.5,
+    borderWidth: 2,
+    borderColor: THEME.accentBorder,
+  },
+  candidateRatingScore: {
+    fontSize: 11,
     fontWeight: '800',
+    color: THEME.accentDeep,
+  },
+  candidateFullName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.textPrimary,
+    marginTop: 2,
+  },
+  candidateSubInfo: {
+    fontSize: 11.5,
+    color: THEME.textSecondary,
+    marginTop: 1,
+  },
+  candidateBioText: {
+    fontSize: 12,
+    color: THEME.textSecondary,
+    lineHeight: 17,
+    marginBottom: 10,
+  },
+  candidateSkillsContainer: {
+    marginBottom: 8,
+  },
+  candidateSkillLabel: {
+    fontSize: 11,
+    fontWeight: '700',
     color: THEME.textPrimary,
     marginBottom: 4,
   },
-  helplineSub: {
-    fontSize: 12,
-    color: THEME.textSecondary,
-    textAlign: 'center',
-    marginBottom: 12,
-    lineHeight: 17,
-  },
-  helplineBtnRow: {
+  skillWrapRow: {
     flexDirection: 'row',
-    gap: 10,
-    width: '100%',
+    flexWrap: 'wrap',
+    gap: 6,
   },
-  btnCallSupport: {
-    flex: 1,
-    backgroundColor: THEME.primary,
-    paddingVertical: 11,
-    borderRadius: 9,
-    alignItems: 'center',
-  },
-  btnCallSupportText: {
-    color: '#FFF',
-    fontWeight: '700',
-    fontSize: 12.5,
-  },
-  btnWhatsAppSupport: {
-    flex: 1,
-    backgroundColor: THEME.successSoft,
+  candidateSkillBadge: {
+    backgroundColor: THEME.canvas,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: THEME.success,
-    paddingVertical: 11,
-    borderRadius: 9,
+    borderColor: THEME.border,
+  },
+  candidateSkillBadgeText: {
+    fontSize: 10.5,
+    color: THEME.textSecondary,
+    fontWeight: '600',
+  },
+  candidateVerificationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: THEME.successSoft,
+    borderRadius: 8,
+    padding: 8,
+    marginVertical: 10,
+  },
+  verificationCheckItem: {
+    fontSize: 10.5,
+    color: THEME.success,
+    fontWeight: '700',
+  },
+  candidateActionRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  btnCandidateTrial: {
+    flex: 1,
+    backgroundColor: THEME.accent,
+    paddingVertical: 10,
+    borderRadius: 8,
     alignItems: 'center',
   },
-  btnWhatsAppSupportText: {
-    color: THEME.success,
-    fontWeight: '800',
+  btnCandidateTrialText: {
+    color: '#FFF',
     fontSize: 12.5,
-  },
-
-  // Screen Header in Tabs
-  screenHeader: {
-    marginBottom: 14,
-  },
-  screenHeading: {
-    fontSize: 21,
     fontWeight: '800',
+  },
+  btnCandidateWhatsApp: {
+    backgroundColor: THEME.canvas,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  btnCandidateWhatsAppText: {
     color: THEME.textPrimary,
-  },
-  screenSubheading: {
-    fontSize: 12.5,
-    color: THEME.textSecondary,
-    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   // Segmented Control
@@ -1661,11 +2188,11 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.borderSoft,
     borderRadius: 10,
     padding: 3,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   segmentItem: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 7,
     alignItems: 'center',
     borderRadius: 8,
   },
@@ -1677,7 +2204,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   segmentItemText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: THEME.textSecondary,
   },
@@ -1686,66 +2213,8 @@ const styles = StyleSheet.create({
     color: THEME.textPrimary,
   },
 
-  // Panel Cards
-  panelCard: {
-    backgroundColor: THEME.surface,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: THEME.border,
-    marginBottom: 14,
-  },
-  panelTitle: {
-    fontSize: 16.5,
-    fontWeight: '800',
-    color: THEME.textPrimary,
-    marginTop: 4,
-    marginBottom: 2,
-  },
-  panelSubtitle: {
-    fontSize: 12,
-    color: THEME.textSecondary,
-    lineHeight: 17,
-    marginBottom: 12,
-  },
-
-  // Form Inputs
-  formRowTwo: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: THEME.textPrimary,
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  formInput: {
-    backgroundColor: THEME.canvas,
-    borderWidth: 1,
-    borderColor: THEME.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    fontSize: 13,
-    color: THEME.textPrimary,
-  },
-  btnPrimaryFull: {
-    backgroundColor: THEME.primary,
-    borderRadius: 9,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 14,
-  },
-  btnPrimaryFullText: {
-    color: '#FFF',
-    fontSize: 13.5,
-    fontWeight: '800',
-  },
-
-  // Client Bookings
-  clientBookingCard: {
+  // Modern Booking Cards
+  bookingCardModern: {
     backgroundColor: THEME.surface,
     borderRadius: 14,
     padding: 14,
@@ -1753,18 +2222,25 @@ const styles = StyleSheet.create({
     borderColor: THEME.border,
     marginBottom: 10,
   },
-  bookingCardHeader: {
+  bookingTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  bookingCardTitle: {
+  bookingIdBadge: {
+    fontSize: 9.5,
+    fontWeight: '800',
+    color: THEME.accent,
+    letterSpacing: 0.6,
+    marginBottom: 2,
+  },
+  bookingTitleText: {
     fontSize: 14.5,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
-  bookingCardMeta: {
-    fontSize: 12,
+  bookingSubText: {
+    fontSize: 11.5,
     color: THEME.textSecondary,
     marginTop: 2,
   },
@@ -1774,7 +2250,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   statusPillText: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '800',
   },
   bookingDivider: {
@@ -1782,15 +2258,26 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.borderSoft,
     marginVertical: 10,
   },
-  bookingFooterRow: {
+  bookingWarrantyRow: {
+    backgroundColor: THEME.accentSoft,
+    padding: 6,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  warrantyText: {
+    fontSize: 10.5,
+    color: THEME.accentDeep,
+    fontWeight: '700',
+  },
+  bookingActionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   bookingPriceTag: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
-    color: THEME.accent,
+    color: THEME.textPrimary,
   },
   btnSmallAction: {
     backgroundColor: THEME.surface,
@@ -1801,16 +2288,71 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   btnSmallActionText: {
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '700',
     color: THEME.accent,
+  },
+
+  // Panel Cards & Form Elements
+  panelCard: {
+    backgroundColor: THEME.surface,
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    marginBottom: 12,
+  },
+  panelTitle: {
+    fontSize: 15.5,
+    fontWeight: '800',
+    color: THEME.textPrimary,
+    marginBottom: 2,
+  },
+  panelSubtitle: {
+    fontSize: 11.5,
+    color: THEME.textSecondary,
+    lineHeight: 16,
+    marginBottom: 10,
+  },
+  formRowTwo: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  inputLabel: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: THEME.textPrimary,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  formInput: {
+    backgroundColor: THEME.canvas,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 12.5,
+    color: THEME.textPrimary,
+  },
+  btnPrimaryFull: {
+    backgroundColor: THEME.primary,
+    borderRadius: 8,
+    paddingVertical: 11,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  btnPrimaryFullText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: '800',
   },
 
   // Duty Logs
   dutyEntryCard: {
     backgroundColor: THEME.surface,
     borderRadius: 10,
-    padding: 12,
+    padding: 10,
     borderWidth: 1,
     borderColor: THEME.border,
     marginBottom: 8,
@@ -1821,7 +2363,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   dutyDateText: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
@@ -1829,96 +2371,23 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.accentSoft,
     paddingVertical: 2,
     paddingHorizontal: 6,
-    borderRadius: 6,
+    borderRadius: 5,
   },
   otBadgeText: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '800',
     color: THEME.accent,
   },
   dutyMetaText: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: THEME.textSecondary,
   },
 
-  // Support / Emergency
-  emergencyCard: {
-    backgroundColor: '#7F1D1D',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 14,
+  // Fleet Vehicles
+  fleetHeaderBox: {
+    marginBottom: 8,
   },
-  emergencyHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  sosDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#F87171',
-  },
-  emergencyTag: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#FCA5A5',
-    letterSpacing: 0.6,
-  },
-  emergencyTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 4,
-  },
-  emergencySub: {
-    fontSize: 12,
-    color: '#FECACA',
-    lineHeight: 17,
-    marginBottom: 12,
-  },
-  btnEmergencyCall: {
-    backgroundColor: '#FFF',
-    paddingVertical: 11,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnEmergencyCallText: {
-    color: '#7F1D1D',
-    fontWeight: '800',
-    fontSize: 13,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 14,
-  },
-  contactCard: {
-    flex: 1,
-    backgroundColor: THEME.surface,
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: THEME.border,
-  },
-  contactCardTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: THEME.textPrimary,
-  },
-  contactCardSub: {
-    fontSize: 11,
-    color: THEME.textSecondary,
-    marginVertical: 4,
-    lineHeight: 15,
-  },
-  contactCardAction: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: THEME.accent,
-  },
-  ticketCard: {
+  fleetVehicleCard: {
     backgroundColor: THEME.surface,
     borderRadius: 12,
     padding: 12,
@@ -1926,69 +2395,135 @@ const styles = StyleSheet.create({
     borderColor: THEME.border,
     marginBottom: 8,
   },
-  ticketTopRow: {
+  fleetTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
   },
-  ticketDate: {
+  fleetVehicleText: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: THEME.textPrimary,
+  },
+  fleetDriverText: {
     fontSize: 11.5,
     color: THEME.textSecondary,
+    marginTop: 2,
   },
-  ticketIssueText: {
-    fontSize: 13,
-    color: THEME.textPrimary,
-    lineHeight: 18,
+  fleetExpiryText: {
+    fontSize: 11,
+    color: THEME.textSecondary,
+    marginTop: 6,
   },
 
-  // Driver Screen
-  driverBenefitsCard: {
+  // Driver Cockpit
+  dutyCockpitCard: {
+    backgroundColor: THEME.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    marginBottom: 12,
+  },
+  cockpitBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  cockpitBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: THEME.success,
+    letterSpacing: 0.6,
+  },
+  cockpitClientName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: THEME.textPrimary,
+    marginBottom: 2,
+  },
+  cockpitMeta: {
+    fontSize: 11.5,
+    color: THEME.textSecondary,
+    marginBottom: 4,
+  },
+  cockpitAddress: {
+    fontSize: 11.5,
+    color: THEME.textPrimary,
+    lineHeight: 16,
+    marginBottom: 12,
+  },
+  dutyOtpBox: {
+    backgroundColor: THEME.canvas,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  dutyOtpLabel: {
+    fontSize: 10.5,
+    color: THEME.textSecondary,
+    fontWeight: '700',
+  },
+  dutyOtpNumber: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: THEME.accent,
+    letterSpacing: 4,
+    marginTop: 2,
+  },
+
+  // Driver Wallet
+  walletCard: {
     backgroundColor: THEME.primary,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 14,
+    marginBottom: 12,
   },
-  driverBenefitsTitle: {
-    fontSize: 15,
+  walletCardLabel: {
+    color: '#94A3B8',
+    fontSize: 10,
     fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 8,
+    letterSpacing: 0.8,
   },
-  driverBenefitItem: {
-    fontSize: 12,
-    color: '#CBD5E1',
-    lineHeight: 19,
+  walletCardAmount: {
+    color: THEME.accent,
+    fontSize: 28,
+    fontWeight: '900',
+    marginVertical: 4,
   },
-  docUploadRow: {
+  walletBreakdownRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 4,
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#334155',
+    paddingTop: 8,
+    marginBottom: 12,
   },
-  docUploadBtn: {
-    flex: 1,
-    backgroundColor: THEME.canvas,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: THEME.border,
+  walletBreakdownText: {
+    color: '#CBD5E1',
+    fontSize: 10.5,
+  },
+  btnWithdrawUPI: {
+    backgroundColor: THEME.success,
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
   },
-  docUploadBtnSuccess: {
-    backgroundColor: THEME.successSoft,
-    borderColor: THEME.success,
+  btnWithdrawUPIText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '800',
   },
-  docUploadBtnText: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: THEME.textSecondary,
-    textAlign: 'center',
-  },
+
+  // Job Cards
   jobCard: {
     backgroundColor: THEME.surface,
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 12,
+    padding: 12,
     borderWidth: 1,
     borderColor: THEME.border,
     marginBottom: 10,
@@ -2000,17 +2535,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   jobSalaryText: {
-    fontSize: 15,
+    fontSize: 14.5,
     fontWeight: '800',
     color: THEME.success,
   },
   jobCardTitle: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
   jobCardLocation: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: THEME.textSecondary,
     marginVertical: 4,
   },
@@ -2024,74 +2559,36 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   btnApplyCompactText: {
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '700',
     color: THEME.primary,
   },
-  referCard: {
-    backgroundColor: THEME.successSoft,
-    borderWidth: 1,
-    borderColor: '#A7F3D0',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 8,
-  },
-  referCardTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#065F46',
-    marginBottom: 4,
-  },
-  referCardSub: {
-    fontSize: 12,
-    color: '#047857',
-    lineHeight: 18,
-    marginBottom: 10,
-  },
-  btnReferWhatsApp: {
-    backgroundColor: '#059669',
-    paddingVertical: 9,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnReferWhatsAppText: {
-    color: '#FFF',
-    fontSize: 12.5,
-    fontWeight: '800',
-  },
 
-  // Empty State
-  emptyCard: {
-    backgroundColor: THEME.surface,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
+  // KYC Uploads
+  docUploadRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginVertical: 8,
+  },
+  docUploadBtn: {
+    flex: 1,
+    backgroundColor: THEME.canvas,
     borderWidth: 1,
+    borderStyle: 'dashed',
     borderColor: THEME.border,
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
   },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: THEME.textPrimary,
-    marginBottom: 4,
+  docUploadBtnSuccess: {
+    backgroundColor: THEME.successSoft,
+    borderColor: THEME.success,
   },
-  emptySub: {
-    fontSize: 12.5,
+  docUploadBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
     color: THEME.textSecondary,
     textAlign: 'center',
-    marginBottom: 14,
-    lineHeight: 18,
-  },
-  btnPrimaryCompact: {
-    backgroundColor: THEME.primary,
-    paddingVertical: 9,
-    paddingHorizontal: 18,
-    borderRadius: 8,
-  },
-  btnPrimaryCompactText: {
-    color: '#FFF',
-    fontSize: 12.5,
-    fontWeight: '800',
   },
 
   // Modal / Bottom Sheet
@@ -2102,18 +2599,18 @@ const styles = StyleSheet.create({
   },
   bookingSheet: {
     backgroundColor: THEME.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: 30,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    padding: 18,
+    paddingBottom: 28,
   },
   sheetHandle: {
-    width: 40,
+    width: 36,
     height: 4,
     backgroundColor: THEME.border,
     borderRadius: 2,
     alignSelf: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   sheetHeaderRow: {
     flexDirection: 'row',
@@ -2122,39 +2619,95 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sheetTitle: {
-    fontSize: 17,
+    fontSize: 16.5,
     fontWeight: '800',
     color: THEME.textPrimary,
   },
   sheetPriceTag: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '800',
     color: THEME.accent,
     marginTop: 2,
   },
   btnCloseSheet: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: THEME.borderSoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
   btnCloseSheetText: {
-    fontSize: 14,
+    fontSize: 13,
     color: THEME.textSecondary,
     fontWeight: '800',
   },
-  sheetDesc: {
-    fontSize: 12,
-    color: THEME.textSecondary,
-    lineHeight: 17,
-    marginBottom: 10,
+
+  // Progress Bar
+  stepProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+    gap: 6,
   },
+  stepDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.border,
+  },
+  stepDotActive: {
+    backgroundColor: THEME.accent,
+  },
+  stepLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: THEME.border,
+  },
+  stepText: {
+    fontSize: 10,
+    color: THEME.textMuted,
+    fontWeight: '600',
+  },
+  stepTextActive: {
+    color: THEME.textPrimary,
+    fontWeight: '800',
+  },
+
+  // Pill Choices
+  pillChoiceRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginVertical: 4,
+  },
+  pillChoice: {
+    backgroundColor: THEME.canvas,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  pillChoiceActive: {
+    borderColor: THEME.accent,
+    backgroundColor: THEME.accentSoft,
+  },
+  pillChoiceText: {
+    fontSize: 11,
+    color: THEME.textSecondary,
+    fontWeight: '600',
+  },
+  pillChoiceTextActive: {
+    color: THEME.accentDeep,
+    fontWeight: '800',
+  },
+
+  // Plan Selector
   planSelectorBox: {
     flexDirection: 'row',
     gap: 8,
-    marginVertical: 10,
+    marginVertical: 6,
   },
   planOption: {
     flex: 1,
@@ -2162,90 +2715,99 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: THEME.border,
     borderRadius: 10,
-    padding: 10,
+    padding: 8,
   },
   planOptionActive: {
     borderColor: THEME.accent,
     backgroundColor: THEME.accentSoft,
   },
   planOptionTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
     color: THEME.textSecondary,
   },
   planOptionTitleActive: {
-    color: THEME.accent,
+    color: THEME.accentDeep,
     fontWeight: '800',
   },
   planOptionPrice: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     color: THEME.textPrimary,
-    marginVertical: 2,
+    marginVertical: 1,
   },
   planOptionSub: {
-    fontSize: 10,
+    fontSize: 9.5,
     color: THEME.textMuted,
   },
-  btnConfirmBooking: {
-    backgroundColor: THEME.accent,
-    paddingVertical: 13,
+
+  // Token Box
+  tokenPaymentBox: {
+    backgroundColor: THEME.canvas,
     borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 14,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    marginTop: 8,
   },
-  btnConfirmBookingText: {
-    color: '#FFF',
-    fontSize: 14,
+  tokenPaymentTitle: {
+    fontSize: 12,
     fontWeight: '800',
+    color: THEME.textPrimary,
+  },
+  tokenPaymentDesc: {
+    fontSize: 10.5,
+    color: THEME.textSecondary,
+    marginVertical: 4,
+    lineHeight: 14,
   },
 
-  // Success Confirmation
+  // Success Confirmation Card
   successCard: {
     backgroundColor: THEME.surface,
     borderRadius: 20,
-    padding: 24,
+    padding: 22,
     margin: 20,
     alignItems: 'center',
   },
   successCheckCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: THEME.successSoft,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   successCheckText: {
-    fontSize: 26,
+    fontSize: 24,
     color: THEME.success,
     fontWeight: '800',
   },
   successTitle: {
-    fontSize: 19,
+    fontSize: 18,
     fontWeight: '800',
     color: THEME.textPrimary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   successMessage: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: THEME.textSecondary,
-    lineHeight: 19,
+    lineHeight: 18,
     textAlign: 'center',
-    marginBottom: 18,
+    marginBottom: 16,
   },
   btnSuccessClose: {
     backgroundColor: THEME.primary,
-    borderRadius: 10,
-    paddingVertical: 11,
-    paddingHorizontal: 28,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
     width: '100%',
     alignItems: 'center',
   },
   btnSuccessCloseText: {
     color: '#FFF',
-    fontSize: 13.5,
+    fontSize: 13,
     fontWeight: '700',
   },
 });
