@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driver Saathi — Verified Drivers for Fleets, Delhi NCR</title>
+<meta name="description" content="Driver Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and logistics operators across Delhi NCR.">
+<link rel="icon" type="image/png" href="images/driver-saathi-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F172A;
+    --ink-soft:#475569;
+    --paper:#FFFFFF;
+    --paper-alt:#F8FAFC;
+    --paper-raised:#FFFFFF;
+    --marigold:#FB8500;
+    --marigold-deep:#D97706;
+    --verified:#10B981;
+    --verified-soft:#ECFDF5;
+    --route-navy:#0F172A;
+    --route-navy-soft:#1E293B;
+    --line:#E2E8F0;
+    --line-soft:#F1F5F9;
+    --font-display:'Inter',sans-serif;
+    --font-body:'Roboto',sans-serif;
+    --max:1180px;
+  }
+  .brandmark {
+    position:relative;
+    z-index:10;
+    transition:transform .2s ease;
+  }
+  .brandmark:hover {
+    transform:scale(1.05);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.stat-num,.brandmark{font-family:var(--font-display);}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  .skip-link{
+    position:absolute; left:-999px; top:0; background:var(--marigold); color:var(--ink);
+    padding:10px 16px; z-index:200; font-weight:600;
+  }
+  .skip-link:focus{left:12px; top:12px;}
+  :focus-visible{outline:3px solid var(--marigold); outline-offset:2px;}
+
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+
+  /* ---------- Header ---------- */
+  header.site{
+    position:sticky; top:0; z-index:100;
+    background:rgba(255,255,255,0.95);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line-soft);
+    box-shadow:0 4px 20px -5px rgba(15,23,42,0.06);
+  }
+  .nav-row{display:flex; align-items:center; justify-content:space-between; padding:14px 24px;}
+  .brandmark{
+    text-decoration:none; display:inline-flex; align-items:center; gap:12px;
+    overflow:visible; flex-shrink:0;
+  }
+  .brand-logo-img{
+    height:50px; width:auto; max-width:280px; display:block;
+    transition:transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+    filter:drop-shadow(0 2px 6px rgba(251,133,0,0.22));
+  }
+  .brandmark:hover .brand-logo-img{
+    transform:translateY(-2px) scale(1.03);
+    filter:drop-shadow(0 6px 18px rgba(251,133,0,0.4));
+  }
+  nav.primary{display:flex; align-items:center; gap:32px;}
+  nav.primary ul{list-style:none; display:flex; gap:28px; margin:0; padding:0;}
+  nav.primary a.navlink{
+    font-size:15px; font-weight:500; text-decoration:none; color:var(--ink-soft);
+    padding-bottom:4px; border-bottom:2px solid transparent; transition:border-color .18s, color .18s;
+  }
+  nav.primary a.navlink:hover{color:var(--ink); border-bottom-color:var(--marigold);}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; font-family:var(--font-body);
+    font-weight:600; font-size:15px; padding:11px 22px; border-radius:6px;
+    border:1.5px solid transparent; cursor:pointer; text-decoration:none; transition:transform .15s, background .15s, border-color .15s;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--marigold); color:#fff; font-weight:700; box-shadow:0 4px 14px rgba(251,133,0,0.3);}
+  .btn-primary:hover{background:var(--marigold-deep); color:#fff;}
+  .btn-ghost{background:transparent; color:var(--route-navy); border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--route-navy);}
+  .btn-dark{background:var(--route-navy); color:#fff;}
+  .btn-dark:hover{background:var(--ink);}
+  .menu-toggle{
+    display:none; background:none; border:1px solid var(--line); border-radius:6px;
+    padding:8px 10px; cursor:pointer;
+  }
+  .menu-toggle span{display:block; width:20px; height:2px; background:var(--ink); margin:4px 0;}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:72px 0 56px;}
+  .hero .wrap{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+  .hero h1{
+    font-size:clamp(38px,4.6vw,58px); line-height:1.04; font-weight:700; margin:0 0 22px;
+    color:var(--route-navy); letter-spacing:0.2px;
+    opacity:0; transform:translateY(14px); animation:rise .6s ease-out .05s forwards;
+  }
+  .hero p.lede{
+    font-size:18px; color:var(--ink-soft); max-width:46ch; margin:0 0 28px;
+    opacity:0; transform:translateY(14px); animation:rise .6s ease-out .18s forwards;
+  }
+  .hero .cta-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:30px;
+    opacity:0; transform:translateY(14px); animation:rise .6s ease-out .3s forwards;}
+  .trust-chips{display:flex; gap:10px; flex-wrap:wrap;
+    opacity:0; transform:translateY(14px); animation:rise .6s ease-out .42s forwards;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:500;
+    background:var(--paper-raised); border:1px solid var(--line-soft); padding:7px 12px; border-radius:20px;
+    color:var(--ink-soft);
+  }
+  .chip svg{width:13px; height:13px; flex:none;}
+  @keyframes rise{ to{opacity:1; transform:translateY(0);} }
+
+  /* ID card visual */
+  .id-card{
+    background:var(--route-navy); color:#fff; border-radius:18px; padding:26px 26px 22px;
+    box-shadow:0 24px 50px -18px rgba(19,22,29,0.45);
+    position:relative; overflow:hidden;
+  }
+  .id-card::before{
+    content:""; position:absolute; top:-40px; right:-40px; width:160px; height:160px;
+    border-radius:50%; background:radial-gradient(circle, rgba(226,155,46,0.22), transparent 70%);
+  }
+  .id-card-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;}
+  .id-brand{font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--marigold); letter-spacing:0.4px;}
+  .id-status{
+    display:inline-flex; align-items:center; gap:6px; background:var(--verified); color:#fff;
+    font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:14px;
+  }
+  .id-status svg{width:11px; height:11px;}
+  .id-person{display:flex; gap:16px; align-items:center; margin-bottom:20px;}
+  .id-photo{
+    width:70px; height:70px; border-radius:12px; background:var(--route-navy-soft);
+    border:2px solid var(--marigold); display:flex; align-items:center; justify-content:center; flex:none;
+    overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,0.35);
+  }
+  .id-photo img{width:100%; height:100%; object-fit:cover; display:block;}
+  .id-photo svg{width:34px; height:34px; opacity:0.75;}
+  .id-name{font-size:20px; font-weight:600; margin:0 0 2px;}
+  .id-role{font-size:14px; color:rgba(255,255,255,0.7); margin:0;}
+  .id-sub{font-size:12.5px; color:rgba(255,255,255,0.5); margin:2px 0 0;}
+  .id-checklist{list-style:none; margin:0 0 20px; padding:0; display:grid; gap:9px;}
+  .id-checklist li{
+    display:flex; align-items:center; gap:10px; font-size:13.5px; color:rgba(255,255,255,0.88);
+    opacity:0; transform:translateX(-6px); animation:slidein .45s ease-out forwards;
+  }
+  .id-checklist li:nth-child(1){animation-delay:.55s;}
+  .id-checklist li:nth-child(2){animation-delay:.68s;}
+  .id-checklist li:nth-child(3){animation-delay:.81s;}
+  .id-checklist li:nth-child(4){animation-delay:.94s;}
+  @keyframes slidein{ to{opacity:1; transform:translateX(0);} }
+  .id-checklist svg{width:15px; height:15px; color:var(--marigold); flex:none;}
+  .id-foot{
+    display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.14);
+    padding-top:14px; font-size:12.5px; color:rgba(255,255,255,0.55);
+  }
+  .id-score{color:var(--marigold); font-weight:600;}
+  .id-note{font-size:11.5px; color:rgba(255,255,255,0.35); margin-top:10px;}
+
+  /* Real Photos & Gallery Component */
+  .photo-card{
+    position:relative; border-radius:14px; overflow:hidden;
+    background:var(--paper-raised); border:1px solid var(--line-soft);
+    box-shadow:0 12px 30px -10px rgba(19,22,29,0.15); transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .photo-card:hover{ transform:translateY(-3px); box-shadow:0 18px 38px -8px rgba(19,22,29,0.22); }
+  .photo-card img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s ease; }
+  .photo-card:hover img{ transform:scale(1.04); }
+  .photo-pill{
+    position:absolute; bottom:14px; left:14px; background:rgba(29,42,68,0.92);
+    backdrop-filter:blur(8px); color:#fff; padding:6px 14px; border-radius:20px;
+    font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:8px;
+    border:1px solid rgba(226,155,46,0.5); box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  }
+  .photo-pill .pill-dot{ width:8px; height:8px; border-radius:50%; background:var(--marigold); flex:none; }
+
+  .real-photos-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:36px;
+  }
+  .photo-item{
+    position:relative; border-radius:14px; overflow:hidden; aspect-ratio:4/3;
+    background:var(--route-navy); border:1px solid var(--line-soft);
+    box-shadow:0 10px 24px -6px rgba(19,22,29,0.12);
+  }
+  .photo-item img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s ease; }
+  .photo-item:hover img{ transform:scale(1.05); }
+  .photo-overlay{
+    position:absolute; bottom:0; left:0; right:0; padding:32px 18px 14px;
+    background:linear-gradient(to top, rgba(19,22,29,0.92) 0%, rgba(19,22,29,0.6) 60%, transparent 100%);
+    color:#fff; display:flex; flex-direction:column; gap:4px;
+  }
+  .photo-tag{ font-size:11px; text-transform:uppercase; tracking:0.5px; font-weight:700; color:var(--marigold); letter-spacing:0.5px; }
+  .photo-title{ font-size:14.5px; font-weight:600; line-height:1.3; color:#fff; }
+
+  /* Logo Styles */
+  .brand-logo-img{ height:44px; width:auto; display:block; transition:transform .25s ease, filter .25s ease; }
+  .brandmark:hover .brand-logo-img{ transform:scale(1.04); }
+
+  /* Animations & Micro-Interactions */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-scale.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .pulse-dot {
+    width: 9px; height: 9px; border-radius: 50%; background: #2ECC71;
+    display: inline-block; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+    animation: pulse-green 2.2s infinite; margin-right: 2px;
+  }
+  @keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 9px rgba(46, 204, 113, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+  }
+
+  .btn-primary {
+    position: relative; overflow: hidden;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; top: -50%; left: -60%; width: 50%; height: 200%;
+    background: linear-gradient(60deg, transparent, rgba(255,255,255,0.45), transparent);
+    transform: rotate(30deg); animation: shimmer 4.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { left: -60%; }
+    25% { left: 140%; }
+    100% { left: 140%; }
+  }
+
+  .id-card {
+    animation: floatCard 6s ease-in-out infinite alternate;
+  }
+  @keyframes floatCard {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-7px); }
+  }
+
+  .cat-card, .step, .verify-item, .price-table tr {
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .cat-card:hover, .step:hover {
+    transform: translateY(-4px); box-shadow: 0 10px 24px -6px rgba(19,22,29,0.1);
+  }
+
+  /* ---------- Commitments bar ---------- */
+  .commitments{background:var(--paper-raised); border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft);}
+  .commit-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:34px 0;
+  }
+  .commit-item{padding:0 22px; border-left:1px solid var(--line-soft);}
+  .commit-item:first-child{border-left:none; padding-left:0;}
+  .stat-num{font-size:44px; font-weight:700; color:var(--route-navy); line-height:1;}
+  .commit-item p{margin:8px 0 0; font-size:14px; color:var(--ink-soft);}
+
+  /* ---------- Generic section scaffolding ---------- */
+  .section{padding:76px 0;}
+  .section-head{max-width:640px; margin:0 0 44px;}
+  .section-head h2{font-size:clamp(28px,3.2vw,38px); font-weight:700; color:var(--route-navy); margin:0 0 14px;}
+  .section-head p{font-size:16.5px; color:var(--ink-soft); margin:0;}
+  .section-alt{background:var(--paper-alt);}
+
+  /* How it works */
+  .steps{position:relative;}
+  .steps-line{
+    position:absolute; top:26px; left:0; right:0; height:2px; background:var(--line-soft);
+    display:none;
+  }
+  .steps-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; position:relative;}
+  .step{position:relative;}
+  .step-num{
+    font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--marigold-deep);
+    width:52px; height:52px; border:1.5px solid var(--marigold); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; background:var(--paper-raised);
+    margin-bottom:18px;
+  }
+  .step h3{font-size:19px; margin:0 0 8px; color:var(--ink);}
+  .step p{font-size:14.5px; color:var(--ink-soft); margin:0;}
+
+  /* Verification checklist */
+  .verify-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:0; border-top:1px solid var(--line-soft);}
+  .verify-item{
+    display:flex; gap:16px; padding:22px 4px; border-bottom:1px solid var(--line-soft);
+  }
+  .verify-item:nth-child(odd){border-right:1px solid var(--line-soft); padding-right:28px;}
+  .verify-item:nth-child(even){padding-left:28px;}
+  .verify-icon{
+    width:38px; height:38px; border-radius:10px; background:var(--verified-soft); color:var(--verified);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .verify-icon svg{width:19px; height:19px;}
+  .verify-item h3{font-size:16.5px; margin:0 0 5px;}
+  .verify-item p{font-size:14px; color:var(--ink-soft); margin:0;}
+
+  /* Driver categories */
+  .cat-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px;}
+  .cat-card{
+    border:1px solid var(--line-soft); border-radius:10px; padding:22px 16px; background:var(--paper-raised);
+    transition:border-color .18s;
+  }
+  .cat-card:hover{border-color:var(--marigold);}
+  .cat-icon{width:30px; height:30px; color:var(--route-navy); margin-bottom:14px;}
+  .cat-card h3{font-size:15.5px; margin:0 0 6px; line-height:1.3;}
+  .cat-card p{font-size:13px; color:var(--ink-soft); margin:0;}
+
+  /* For fleets split */
+  .fleet-split{display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:start;}
+  .fleet-list{list-style:none; margin:0; padding:0; display:grid; gap:18px;}
+  .fleet-list li{display:flex; gap:14px; font-size:15.5px; color:var(--ink);}
+  .fleet-list svg{width:19px; height:19px; color:var(--marigold-deep); flex:none; margin-top:2px;}
+  .sla-panel{
+    background:var(--route-navy); color:#fff; border-radius:14px; padding:36px 30px; text-align:left;
+  }
+  .sla-panel .stat-num{color:var(--marigold); font-size:64px;}
+  .sla-panel p{color:rgba(255,255,255,0.75); font-size:15px; margin:8px 0 24px;}
+  .sla-panel .btn-primary{width:100%; justify-content:center;}
+
+  /* Coverage */
+  .coverage-wrap{display:grid; grid-template-columns:0.95fr 1.05fr; gap:48px; align-items:center;}
+  .coverage-chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;}
+  .coverage-chips .chip{background:var(--paper); border-color:var(--line-soft);}
+  .map-svg{width:100%; height:auto;}
+
+  /* Pricing */
+  .price-table{width:100%; border-collapse:collapse; font-size:14.5px;}
+  .price-table th, .price-table td{
+    text-align:left; padding:16px 18px; border-bottom:1px solid var(--line-soft); vertical-align:top;
+  }
+  .price-table th{
+    font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--route-navy);
+    border-bottom:2px solid var(--route-navy);
+  }
+  .price-table td:first-child, .price-table th:first-child{
+    color:var(--ink-soft); font-weight:500; width:190px;
+  }
+  .price-table td:not(:first-child), .price-table th:not(:first-child){border-left:1px solid var(--line-soft);}
+  .price-cta-row td{border-bottom:none; padding-top:22px;}
+
+  /* Form */
+  .form-wrap{
+    background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:14px;
+    padding:40px; max-width:760px; margin:0 auto;
+  }
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:13.5px; font-weight:600; color:var(--ink);}
+  .field .req{color:var(--marigold-deep);}
+  .field input, .field select, .field textarea{
+    font-family:var(--font-body); font-size:15px; padding:11px 13px; border:1px solid var(--line);
+    border-radius:7px; background:var(--paper); color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--route-navy);}
+  .field textarea{resize:vertical; min-height:90px;}
+  .field .err{font-size:12.5px; color:#B4442E; display:none;}
+  .field.invalid input, .field.invalid select, .field.invalid textarea{border-color:#B4442E;}
+  .field.invalid .err{display:block;}
+  .form-foot{display:flex; align-items:center; justify-content:space-between; margin-top:28px; gap:16px; flex-wrap:wrap;}
+  .form-note{font-size:12.5px; color:var(--ink-soft); margin:0;}
+  .confirm-panel{display:none; text-align:center; padding:20px 0 6px;}
+  .confirm-panel.show{display:block;}
+  .form-body{display:block;}
+  .form-body.hide{display:none;}
+  .confirm-tick{
+    width:56px; height:56px; border-radius:50%; background:var(--verified-soft); color:var(--verified);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+  }
+  .confirm-tick svg{width:28px; height:28px;}
+  .confirm-panel h3{font-size:22px; margin:0 0 10px; color:var(--route-navy);}
+  .confirm-panel p{color:var(--ink-soft); font-size:15px; max-width:44ch; margin:0 auto 22px;}
+  .confirm-actions{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
+
+  /* FAQ */
+  .faq-list{max-width:760px; margin:0 auto; border-top:1px solid var(--line-soft);}
+  .faq-item{border-bottom:1px solid var(--line-soft);}
+  .faq-item summary{
+    cursor:pointer; list-style:none; padding:20px 4px; font-size:16.5px; font-weight:600;
+    display:flex; justify-content:space-between; align-items:center; gap:16px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary .plus{
+    width:22px; height:22px; flex:none; position:relative; border:1.5px solid var(--line); border-radius:50%;
+  }
+  .faq-item summary .plus::before, .faq-item summary .plus::after{
+    content:""; position:absolute; background:var(--route-navy); top:50%; left:50%;
+    transform:translate(-50%,-50%);
+  }
+  .faq-item summary .plus::before{width:10px; height:1.5px;}
+  .faq-item summary .plus::after{width:1.5px; height:10px; transition:opacity .15s;}
+  .faq-item[open] summary .plus::after{opacity:0;}
+  .faq-item p{margin:0 0 22px; padding:0 4px; color:var(--ink-soft); font-size:15px; max-width:64ch;}
+
+  /* Final CTA */
+  .final-cta{
+    background:var(--route-navy); color:#fff; border-radius:18px; padding:56px 48px;
+    display:flex; justify-content:space-between; align-items:center; gap:32px; flex-wrap:wrap;
+  }
+  .final-cta h2{font-size:32px; margin:0 0 10px;}
+  .final-cta p{color:rgba(255,255,255,0.72); margin:0; font-size:15.5px;}
+
+  /* Footer */
+  footer.site{background:var(--ink); color:rgba(255,255,255,0.7); padding:56px 0 28px; margin-top:40px;}
+  .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr; gap:36px; margin-bottom:40px;}
+  .footer-brand .brandmark{color:#fff;}
+  .footer-brand p{font-size:14px; margin-top:12px; max-width:32ch; color:rgba(255,255,255,0.55);}
+  footer.site h4{font-size:14px; color:#fff; margin:0 0 14px; font-weight:600;}
+  footer.site ul{list-style:none; margin:0; padding:0; display:grid; gap:10px;}
+  footer.site a{text-decoration:none; font-size:14px; color:rgba(255,255,255,0.62);}
+  footer.site a:hover{color:#fff;}
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,0.14); padding-top:22px; display:flex; justify-content:space-between;
+    font-size:13px; color:rgba(255,255,255,0.45); flex-wrap:wrap; gap:10px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:980px){
+    nav.primary ul{display:none;}
+    .menu-toggle{display:block;}
+    .hero .wrap{grid-template-columns:1fr;}
+    .id-card{max-width:440px;}
+    .commit-grid{grid-template-columns:repeat(2,1fr); row-gap:26px;}
+    .commit-item:nth-child(3){border-left:none;}
+    .steps-grid{grid-template-columns:repeat(2,1fr); row-gap:34px;}
+    .verify-grid{grid-template-columns:1fr;}
+    .verify-item:nth-child(odd){border-right:none; padding-right:4px;}
+    .verify-item:nth-child(even){padding-left:4px;}
+    .verify-layout{grid-template-columns:1fr;}
+    .cat-grid{grid-template-columns:repeat(2,1fr);}
+    .real-photos-grid{grid-template-columns:repeat(2,1fr);}
+    .fleet-split{grid-template-columns:1fr;}
+    .coverage-wrap{grid-template-columns:1fr;}
+    .footer-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:600px){
+    .wrap{padding:0 16px;}
+    .nav-row{padding:10px 16px;}
+    .brand-logo-img{height:42px;}
+    .nav-row .btn{padding:7px 12px; font-size:13px;}
+    .hero{padding:32px 0 28px;}
+    .hero h1{font-size:clamp(26px, 7vw, 34px); line-height:1.12; margin-bottom:14px;}
+    .hero p.lede{font-size:15px; line-height:1.48; margin-bottom:20px;}
+    .hero .cta-row{flex-direction:column; gap:10px; width:100%;}
+    .hero .cta-row .btn{width:100%; justify-content:center; text-align:center;}
+    .trust-chips{gap:6px;}
+    .chip{font-size:11.5px; padding:5px 9px;}
+    
+    .id-card{padding:18px 16px; border-radius:14px;}
+    .id-photo{width:54px; height:54px;}
+    .id-name{font-size:17px;}
+    .id-role{font-size:12.5px;}
+    .id-sub{font-size:11.5px;}
+    .id-checklist li{font-size:12px; gap:8px;}
+    .id-foot{font-size:11.5px;}
+
+    .commit-grid{grid-template-columns:1fr; padding:18px 0; gap:18px;}
+    .commit-item{border-left:none !important; border-top:1px solid var(--line-soft); padding-top:14px;}
+    .commit-item:first-child{border-top:none; padding-top:0;}
+    .stat-num{font-size:38px;}
+
+    .steps-grid{grid-template-columns:1fr; gap:20px;}
+    .cat-grid{grid-template-columns:1fr; gap:10px;}
+    .real-photos-grid{grid-template-columns:1fr; gap:16px;}
+
+    .form-wrap{padding:20px 16px; border-radius:12px;}
+    .form-grid{grid-template-columns:1fr; gap:14px;}
+    .field input, .field select, .field textarea{font-size:14px; padding:10px 12px;}
+    .form-foot{flex-direction:column; align-items:stretch; gap:12px;}
+    .form-foot .btn{width:100%; justify-content:center;}
+
+    .price-table{display:block; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch;}
+    .final-cta{padding:28px 18px; border-radius:14px; flex-direction:column; align-items:flex-start;}
+    .final-cta h2{font-size:24px;}
+    .final-cta .btn{width:100%; justify-content:center;}
+
+    .footer-grid{grid-template-columns:1fr; gap:26px;}
+    .footer-bottom{flex-direction:column; gap:6px; text-align:center;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site">
+  <div class="nav-row wrap">
+    <a href="#top" class="brandmark" aria-label="Driver Saathi Home">
+      <img src="images/driver-saathi-logo.png" alt="Driver Saathi Logo" class="brand-logo-img">
+    </a>
+    <nav class="primary" aria-label="Primary">
+      <ul id="nav-links">
+        <li><a class="navlink" href="#how">How it works</a></li>
+        <li><a class="navlink" href="#verification">Verification</a></li>
+        <li><a class="navlink" href="#gallery">Real Drivers</a></li>
+        <li><a class="navlink" href="#fleets">For fleets</a></li>
+        <li><a class="navlink" href="#coverage">Coverage</a></li>
+        <li><a class="navlink" href="#pricing">Pricing</a></li>
+        <li><a class="navlink" href="#faq">FAQ</a></li>
+      </ul>
+      <a class="btn btn-primary" href="#request">Request drivers</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div id="mobileMenu" style="display:none; border-top:1px solid var(--line-soft); padding:10px 24px 18px;">
+    <ul style="list-style:none; margin:0; padding:0; display:grid; gap:4px;">
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#how">How it works</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#verification">Verification</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#gallery">Real Drivers</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#fleets">For fleets</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#coverage">Coverage</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#pricing">Pricing</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="#faq">FAQ</a></li>
+      <li style="margin-top:8px;"><a class="btn btn-primary" style="width:100%; justify-content:center;" href="#request">Request drivers</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div>
+        <h1>Verified drivers for your fleet, across Delhi&nbsp;NCR</h1>
+        <p class="lede">Driver Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and logistics operators — with a replacement ready if one drops out.</p>
+        <div class="cta-row">
+          <a href="#request" class="btn btn-primary">Request drivers</a>
+          <a href="#how" class="btn btn-ghost">See how it works</a>
+        </div>
+        <div class="trust-chips">
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Police verified</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>License authenticated</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Background checked</span>
+        </div>
+      </div>
+
+      <div class="id-card" role="img" aria-label="Sample verified driver profile card showing verification checklist">
+        <div class="id-card-top">
+          <span class="id-brand">Driver Saathi</span>
+          <span class="id-status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>
+        </div>
+        <div class="id-person">
+          <div class="id-photo">
+            <img src="images/indian_driver_portrait.jpg" alt="Rajesh Kumar - Verified Driver">
+          </div>
+          <div>
+            <p class="id-name">Rajesh Kumar</p>
+            <p class="id-role">Fleet Cab &amp; Corporate Driver</p>
+            <p class="id-sub">LMV Commercial Transport Badge Holder</p>
+          </div>
+        </div>
+        <ul class="id-checklist">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Police verification cleared</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Driving license authenticated</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Background &amp; references checked</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Defensive driving assessment passed</li>
+        </ul>
+        <div class="id-foot">
+          <span>ID DS-NCR-2431</span>
+          <span class="id-score">Verification score 94/100</span>
+        </div>
+        <p class="id-note">Illustrative sample profile — not a real driver record.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMITMENTS -->
+  <section class="commitments">
+    <div class="wrap commit-grid">
+      <div class="commit-item">
+        <div class="stat-num">48 hr</div>
+        <p>Typical window from a shared requirement to first candidate interview</p>
+      </div>
+      <div class="commit-item">
+        <div class="stat-num">24 hr</div>
+        <p>Replacement guarantee if a placed driver exits or doesn't work out</p>
+      </div>
+      <div class="commit-item">
+        <div class="stat-num">6-step</div>
+        <p>Verification process every driver clears before being shortlisted</p>
+      </div>
+      <div class="commit-item">
+        <div class="stat-num">5 cities</div>
+        <p>Delhi, Gurugram, Noida, Faridabad and Ghaziabad, with more planned</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>How hiring works</h2>
+        <p>A straight path from requirement to a driver on the road — built for operators who need to move fast without cutting on verification.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Share your requirement</h3>
+          <p>Tell us the role, city, and timeline — a single cab driver or a 100-driver fleet rollout.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>We shortlist verified drivers</h3>
+          <p>Every candidate clears police verification, license authentication, and a driving assessment first.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Interview &amp; trial</h3>
+          <p>Meet shortlisted drivers directly, or run a paid trial shift before you commit.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Onboard with backup</h3>
+          <p>We handle onboarding paperwork and keep a replacement ready under your SLA.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFICATION -->
+  <section class="section section-alt" id="verification">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Verification &amp; trust</h2>
+        <p>The part clients care about most. No driver reaches your shortlist without clearing all six checks.</p>
+      </div>
+      <div class="verify-layout">
+        <div class="verify-grid">
+          <div class="verify-item">
+            <div class="verify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5l8-3z"/></svg></div>
+            <div><h3>Police verification</h3><p>Local police clearance certificate on file for every driver we place.</p></div>
+          </div>
+          <div class="verify-item">
+            <div class="verify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M14 10h5M14 14h5"/></svg></div>
+            <div><h3>License authentication</h3><p>Driving license validated for category and current, unexpired status.</p></div>
+          </div>
+          <div class="verify-item">
+            <div class="verify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></div>
+            <div><h3>Background &amp; reference checks</h3><p>Previous employment and address history verified before shortlisting.</p></div>
+          </div>
+          <div class="verify-item">
+            <div class="verify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+            <div><h3>Defensive driving assessment</h3><p>Practical road test scored by our training partner before approval.</p></div>
+          </div>
+          <div class="verify-item">
+            <div class="verify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9-9c-1.3-3 1-6 4-6 2 0 3.5 1.2 5 3 1.5-1.8 3-3 5-3 3 0 5.3 3 4 6-2 4.5-9 9-9 9z"/></svg></div>
+            <div><h3>Health &amp; fitness screening</h3><p>Basic medical fitness check completed before a driver is deployed.</p></div>
+          </div>
+          <div class="verify-item">
+            <div class="verify-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 01-4 4H8l-5 3V6a4 4 0 014-4h10a4 4 0 014 4z"/></svg></div>
+            <div><h3>Soft skills &amp; etiquette</h3><p>Orientation on communication, punctuality, and passenger handling.</p></div>
+          </div>
+        </div>
+        <div class="photo-card" style="aspect-ratio:4/3;">
+          <img src="images/driver_verification_assessment.jpg" alt="Ground driver verification and license inspection in Delhi NCR">
+          <div class="photo-pill"><span class="pill-dot"></span>Ground Audit • License &amp; Vehicle Check</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DRIVER CATEGORIES -->
+  <section class="section" id="categories">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Drivers for every kind of operation</h2>
+        <p>We source and verify by category, so the driver you get matches the vehicle and route.</p>
+      </div>
+      <div class="cat-grid">
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M6 17V9l2-4h8l2 4v8M6 13h12"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/></svg>
+          <h3>Cab &amp; fleet drivers</h3>
+          <p>For radio-taxi, aggregator, and rental fleets.</p>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 8V6a2 2 0 012-2h6a2 2 0 012 2v2"/><circle cx="8" cy="17.5" r="1.4"/><circle cx="16" cy="17.5" r="1.4"/></svg>
+          <h3>Corporate employee transport</h3>
+          <p>Dedicated drivers for staff pick-up and drop routes.</p>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="3.2"/><path d="M5 21c0-4 3-6.5 7-6.5S19 17 19 21"/></svg>
+          <h3>Personal &amp; executive chauffeurs</h3>
+          <p>For leadership travel and guest movement.</p>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <h3>Luxury &amp; VIP Chauffeurs</h3>
+          <p>Experienced chauffeurs for premium sedans and VIP travel.</p>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <h3>On-call backup drivers</h3>
+          <p>Short-notice cover for leave, absence, or demand spikes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL PICTURES GALLERY -->
+  <section class="section section-alt" id="gallery">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Real drivers &amp; fleet operations on the ground</h2>
+        <p>Authentic photos of our verified driver community, ground inspection teams, and fleet deployments across Delhi NCR.</p>
+      </div>
+      <div class="real-photos-grid">
+        <div class="photo-item">
+          <img src="images/indian_driver_portrait.jpg" alt="Verified Indian Driver Profile - Rajesh Kumar">
+          <div class="photo-overlay">
+            <span class="photo-tag">Verified Driver Profile</span>
+            <span class="photo-title">Rajesh Kumar — LMV Commercial Badge Holder</span>
+          </div>
+        </div>
+        <div class="photo-item">
+          <img src="images/indian_driver_wheel.jpg" alt="Indian Driver on Delhi NCR Highway Route">
+          <div class="photo-overlay">
+            <span class="photo-tag">On-Road Performance</span>
+            <span class="photo-title">Active Cab Driver on Delhi–Gurugram Expressway</span>
+          </div>
+        </div>
+        <div class="photo-item">
+          <img src="images/fleet_cabs_delhi.jpg" alt="Corporate Fleet Cabs at Gurugram Tech Park">
+          <div class="photo-overlay">
+            <span class="photo-tag">Fleet Deployment</span>
+            <span class="photo-title">Sedan Fleet Ready at Cyberhub Tech Park</span>
+          </div>
+        </div>
+        <div class="photo-item">
+          <img src="images/driver_verification_assessment.jpg" alt="Ground Driver Verification and Inspection">
+          <div class="photo-overlay">
+            <span class="photo-tag">Ground Audit</span>
+            <span class="photo-title">On-Site License &amp; Vehicle Quality Inspection</span>
+          </div>
+        </div>
+        <div class="photo-item">
+          <img src="images/driver_passenger_service.jpg" alt="Executive Chauffeur Hospitality Service">
+          <div class="photo-overlay">
+            <span class="photo-tag">Passenger Hospitality</span>
+            <span class="photo-title">Executive Chauffeur Greeting Corporate Guest</span>
+          </div>
+        </div>
+        <div class="photo-item">
+          <img src="images/driver_team_standing.jpg" alt="Team of Verified Indian Drivers in Uniform">
+          <div class="photo-overlay">
+            <span class="photo-tag">Driver Network</span>
+            <span class="photo-title">Verified Cab Driver Team — Ready for Deployment</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR FLEETS -->
+  <section class="section section-alt" id="fleets">
+    <div class="wrap fleet-split">
+      <div>
+        <div class="section-head" style="margin-bottom:28px;">
+          <h2>Built for fleet &amp; cab companies</h2>
+          <p>Not a one-off placement service — ongoing staffing built around your fleet's uptime.</p>
+        </div>
+        <ul class="fleet-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Bulk hiring for 10, 50, or 200+ driver requirements</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Contract staffing with monthly billing, not just one-off placement</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Replacement guarantee — a new driver within 24 hours if one exits</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Dedicated account manager for your fleet</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Monthly attendance and compliance reporting</li>
+        </ul>
+      </div>
+      <div class="sla-panel">
+        <div class="photo-card" style="aspect-ratio:16/9; margin-bottom:22px; border-radius:10px;">
+          <img src="images/fleet_cabs_delhi.jpg" alt="Corporate Fleet Cabs at Gurugram Tech Park">
+          <div class="photo-pill" style="font-size:11.5px; padding:4px 10px;"><span class="pill-dot"></span>Gurugram Fleet Hub</div>
+        </div>
+        <div class="stat-num">24 hrs</div>
+        <p>Our standard replacement window when a placed driver exits mid-contract, so a seat never sits empty for long.</p>
+        <a href="#request" class="btn btn-primary">Talk to us about your fleet</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- COVERAGE -->
+  <section class="section" id="coverage">
+    <div class="wrap coverage-wrap">
+      <div>
+        <div class="section-head" style="margin-bottom:0;">
+          <h2>Coverage across Delhi NCR</h2>
+          <p>We currently place and support drivers across five NCR cities, coordinated from one dispatch desk.</p>
+        </div>
+        <div class="coverage-chips">
+          <span class="chip">Delhi</span>
+          <span class="chip">Gurugram</span>
+          <span class="chip">Noida</span>
+          <span class="chip">Greater Noida</span>
+          <span class="chip">Faridabad</span>
+          <span class="chip">Ghaziabad</span>
+        </div>
+      </div>
+      <svg class="map-svg" viewBox="0 0 420 300" aria-label="Schematic diagram of Driver Saathi's dispatch hub connected to six NCR cities">
+        <g stroke="#C7C9BE" stroke-width="1.5">
+          <line x1="210" y1="150" x2="90" y2="60"/>
+          <line x1="210" y1="150" x2="210" y2="40"/>
+          <line x1="210" y1="150" x2="330" y2="55"/>
+          <line x1="210" y1="150" x2="350" y2="180"/>
+          <line x1="210" y1="150" x2="270" y2="255"/>
+          <line x1="210" y1="150" x2="110" y2="240"/>
+        </g>
+        <circle cx="210" cy="150" r="26" fill="#1D2A44"/>
+        <text x="210" y="154" text-anchor="middle" fill="#E29B2E" font-family="Barlow Condensed, sans-serif" font-size="13" font-weight="600">HUB</text>
+
+        <circle cx="90" cy="60" r="7" fill="#E29B2E"/>
+        <text x="90" y="44" text-anchor="middle" fill="#454B57" font-family="IBM Plex Sans, sans-serif" font-size="13">Delhi</text>
+
+        <circle cx="210" cy="40" r="7" fill="#E29B2E"/>
+        <text x="210" y="24" text-anchor="middle" fill="#454B57" font-family="IBM Plex Sans, sans-serif" font-size="13">Ghaziabad</text>
+
+        <circle cx="330" cy="55" r="7" fill="#E29B2E"/>
+        <text x="330" y="39" text-anchor="middle" fill="#454B57" font-family="IBM Plex Sans, sans-serif" font-size="13">Noida</text>
+
+        <circle cx="350" cy="180" r="7" fill="#E29B2E"/>
+        <text x="350" y="200" text-anchor="middle" fill="#454B57" font-family="IBM Plex Sans, sans-serif" font-size="13">Greater Noida</text>
+
+        <circle cx="270" cy="255" r="7" fill="#E29B2E"/>
+        <text x="270" y="276" text-anchor="middle" fill="#454B57" font-family="IBM Plex Sans, sans-serif" font-size="13">Faridabad</text>
+
+        <circle cx="110" cy="240" r="7" fill="#E29B2E"/>
+        <text x="110" y="261" text-anchor="middle" fill="#454B57" font-family="IBM Plex Sans, sans-serif" font-size="13">Gurugram</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- PRICING / ENGAGEMENT MODELS -->
+  <section class="section section-alt" id="pricing">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+        <h2>Engagement models</h2>
+        <p>Pick the model that matches how often you hire — click any model tab below to see what hassles are solved &amp; why operators hire us.</p>
+      </div>
+
+      <!-- 3 INTERACTIVE BREAKDOWN TABS -->
+      <div class="model-tabs-nav" style="display:flex; gap:14px; margin-bottom:32px; justify-content:center; flex-wrap:wrap;">
+        <a href="pay-per-hire.html" class="model-tab-btn" style="padding:14px 22px; border-radius:12px; background:#FFFFFF; border:1.5px solid #E2E8F0; text-decoration:none; color:#0F172A; font-weight:700; display:flex; align-items:center; gap:10px; box-shadow:0 4px 16px rgba(15,23,42,0.06); transition:transform .2s, border-color .2s;">
+          <span style="font-size:18px;">📦</span>
+          <div>
+            <div style="font-size:15px; line-height:1.2;">Pay-per-hire</div>
+            <div style="font-size:11.5px; color:#FB8500; font-weight:600;">Hassles Solved &amp; Details &rarr;</div>
+          </div>
+        </a>
+        <a href="monthly-retainer.html" class="model-tab-btn" style="padding:14px 22px; border-radius:12px; background:#FFFFFF; border:1.5px solid #FB8500; text-decoration:none; color:#0F172A; font-weight:700; display:flex; align-items:center; gap:10px; box-shadow:0 4px 16px rgba(251,133,0,0.12); transition:transform .2s, border-color .2s;">
+          <span style="font-size:18px;">🔄</span>
+          <div>
+            <div style="font-size:15px; line-height:1.2;">Monthly retainer</div>
+            <div style="font-size:11.5px; color:#FB8500; font-weight:600;">Hassles Solved &amp; Details &rarr;</div>
+          </div>
+        </a>
+        <a href="enterprise-custom.html" class="model-tab-btn" style="padding:14px 22px; border-radius:12px; background:#FFFFFF; border:1.5px solid #E2E8F0; text-decoration:none; color:#0F172A; font-weight:700; display:flex; align-items:center; gap:10px; box-shadow:0 4px 16px rgba(15,23,42,0.06); transition:transform .2s, border-color .2s;">
+          <span style="font-size:18px;">🏢</span>
+          <div>
+            <div style="font-size:15px; line-height:1.2;">Enterprise custom</div>
+            <div style="font-size:11.5px; color:#FB8500; font-weight:600;">Hassles Solved &amp; Details &rarr;</div>
+          </div>
+        </a>
+      </div>
+
+      <table class="price-table">
+        <thead>
+          <tr>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">Pay-per-hire</th>
+            <th scope="col">Monthly retainer</th>
+            <th scope="col">Enterprise custom</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Best for</td>
+            <td>One-off or seasonal requirements</td>
+            <td>Ongoing fleet staffing</td>
+            <td>Multi-city fleets, 50+ drivers</td>
+          </tr>
+          <tr>
+            <td>Billing basis</td>
+            <td>Per driver placed</td>
+            <td>Monthly, per driver</td>
+            <td>Custom contract</td>
+          </tr>
+          <tr>
+            <td>Verification</td>
+            <td>Full 6-step check</td>
+            <td>Full 6-step check</td>
+            <td>Full 6-step check</td>
+          </tr>
+          <tr>
+            <td>Replacement window</td>
+            <td>7 days</td>
+            <td>24 hours</td>
+            <td>Priority SLA, negotiated</td>
+          </tr>
+          <tr>
+            <td>Account support</td>
+            <td>Standard support</td>
+            <td>Dedicated account manager</td>
+            <td>Dedicated team + multi-city coordination</td>
+          </tr>
+          <tr class="price-cta-row">
+            <td>Model Breakdown</td>
+            <td>
+              <a href="pay-per-hire.html" target="_blank" class="btn btn-ghost" style="width:100%; justify-content:center; margin-bottom:8px; font-size:13px;">Hassles &amp; Why Hire Us &rarr;</a>
+              <a href="#request" class="btn btn-primary" style="width:100%; justify-content:center;">Get started</a>
+            </td>
+            <td>
+              <a href="monthly-retainer.html" target="_blank" class="btn btn-ghost" style="width:100%; justify-content:center; margin-bottom:8px; font-size:13px;">Hassles &amp; Why Hire Us &rarr;</a>
+              <a href="#request" class="btn btn-primary" style="width:100%; justify-content:center;">Get started</a>
+            </td>
+            <td>
+              <a href="enterprise-custom.html" target="_blank" class="btn btn-ghost" style="width:100%; justify-content:center; margin-bottom:8px; font-size:13px;">Hassles &amp; Why Hire Us &rarr;</a>
+              <a href="#request" class="btn btn-dark" style="width:100%; justify-content:center;">Talk to sales</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- REQUEST FORM -->
+  <section class="section" id="request">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+        <h2>Request drivers</h2>
+        <p>Tell us what you need — we'll get back to you with shortlisted, verified profiles.</p>
+      </div>
+
+      <div class="form-wrap">
+        <form action="https://formsubmit.co/kshitijmanitripathi1@gmail.com" method="POST" id="driverForm" class="form-body" novalidate>
+          <!-- Hidden parameters for FormSubmit email routing -->
+          <input type="hidden" name="_subject" value="New Driver Request — Driver Saathi Website">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <div class="form-grid">
+            <div class="field" data-field="company">
+              <label for="company">Company name <span class="req">*</span></label>
+              <input type="text" id="company" name="company" required>
+              <span class="err">Please enter your company name.</span>
+            </div>
+            <div class="field" data-field="contact">
+              <label for="contact">Contact person <span class="req">*</span></label>
+              <input type="text" id="contact" name="contact" required>
+              <span class="err">Please enter a contact name.</span>
+            </div>
+            <div class="field" data-field="phone">
+              <label for="phone">Phone number <span class="req">*</span></label>
+              <input type="tel" id="phone" name="phone" required>
+              <span class="err">Please enter a valid phone number.</span>
+            </div>
+            <div class="field" data-field="email">
+              <label for="email">Email <span class="req">*</span></label>
+              <input type="email" id="email" name="email" required>
+              <span class="err">Please enter a valid email address.</span>
+            </div>
+            <div class="field" data-field="city">
+              <label for="city">City / NCR location <span class="req">*</span></label>
+              <select id="city" name="city" required>
+                <option value="">Select a city</option>
+                <option>Delhi</option>
+                <option>Gurugram</option>
+                <option>Noida</option>
+                <option>Greater Noida</option>
+                <option>Faridabad</option>
+                <option>Ghaziabad</option>
+                <option>Other</option>
+              </select>
+              <span class="err">Please select a city.</span>
+            </div>
+            <div class="field" data-field="type">
+              <label for="type">Requirement type <span class="req">*</span></label>
+              <select id="type" name="type" required>
+                <option value="">Select a category</option>
+                <option>Cab fleet driver</option>
+                <option>Corporate employee transport</option>
+                <option>Personal / chauffeur</option>
+                <option>Luxury &amp; VIP Chauffeur</option>
+                <option>On-call / backup driver</option>
+              </select>
+              <span class="err">Please select a requirement type.</span>
+            </div>
+            <div class="field" data-field="count">
+              <label for="count">Number of drivers needed <span class="req">*</span></label>
+              <input type="number" id="count" name="count" min="1" required>
+              <span class="err">Please enter how many drivers you need.</span>
+            </div>
+            <div class="field" data-field="startdate">
+              <label for="startdate">Preferred start date</label>
+              <input type="date" id="startdate" name="startdate">
+            </div>
+            <div class="field full" data-field="details">
+              <label for="details">Additional details</label>
+              <textarea id="details" name="details" placeholder="Shift timings, vehicle type, contract length, or anything else we should know."></textarea>
+            </div>
+          </div>
+          <div class="form-foot">
+            <p class="form-note">We typically respond within one business day with shortlisted profiles.</p>
+            <button type="submit" class="btn btn-primary">Send request</button>
+          </div>
+        </form>
+
+        <div class="confirm-panel" id="confirmPanel">
+          <div class="confirm-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <h3>Request received</h3>
+          <p id="confirmSummary">We've noted your requirement and will follow up shortly with shortlisted, verified drivers.</p>
+          <div class="confirm-actions">
+            <a href="#" id="mailtoLink" class="btn btn-ghost">Email us this request</a>
+            <button type="button" class="btn btn-primary" id="resetForm">Submit another request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section-alt" id="faq">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+        <h2>Frequently asked questions</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>How fast can you deploy a driver?<span class="plus"></span></summary>
+          <p>Most requirements move from a shared brief to a first candidate interview within 48 hours. Bulk fleet requirements are scoped individually based on city and driver category.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What happens if a driver leaves mid-contract?<span class="plus"></span></summary>
+          <p>Under our standard SLA, we provide a replacement driver within 24 hours so your fleet isn't left short.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Which areas do you cover?<span class="plus"></span></summary>
+          <p>Delhi, Gurugram, Noida, Greater Noida, Faridabad, and Ghaziabad today, with additional NCR coverage planned.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How are drivers verified?<span class="plus"></span></summary>
+          <p>Every driver clears police verification, license authentication, background and reference checks, a driving assessment, a fitness screening, and soft-skills orientation before being shortlisted.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you support both short-term and long-term hiring?<span class="plus"></span></summary>
+          <p>Yes — pay-per-hire suits one-off needs, while a monthly retainer or enterprise contract suits ongoing fleet staffing.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What vehicle categories do your drivers operate?<span class="plus"></span></summary>
+          <p>Our drivers are authenticated and trained for all Light Motor Vehicle (LMV) transport categories — including aggregator cabs, sedan fleets, corporate employee shuttle cabs, SUVs, luxury cars, and EV fleets across Delhi NCR.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="section" style="padding-top:0;">
+    <div class="wrap">
+      <div class="final-cta">
+        <div>
+          <h2>Ready to staff your fleet?</h2>
+          <p>Share your requirement and get verified driver profiles this week.</p>
+        </div>
+        <a href="#request" class="btn btn-primary">Request drivers</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="brandmark" aria-label="Driver Saathi Home">
+          <img src="images/driver-saathi-logo-light.png" alt="Driver Saathi Logo" class="brand-logo-img" style="height:52px;">
+        </a>
+        <p style="margin-top:16px;">Professionalizing driver hiring for fleets and cab companies across Delhi NCR.</p>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#verification">Verification</a></li>
+          <li><a href="#gallery">Real Drivers</a></li>
+          <li><a href="#fleets">For fleets</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#coverage">Coverage areas</a></li>
+          <li><a href="#request">Request drivers</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li style="color:#FB8500; font-weight:700;">support@driverssaathi.com</li>
+          <li>+91&nbsp;98XXX&nbsp;XXXXX</li>
+          <li>Delhi NCR, India</li>
+          <li><a href="#request">Looking for fleet drivers? Request now</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Driver Saathi. All rights reserved.</span>
+      <span>Built for Delhi NCR fleet &amp; cab operators.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  menuToggle.addEventListener('click', () => {
+    const open = mobileMenu.style.display === 'block';
+    mobileMenu.style.display = open ? 'none' : 'block';
+    menuToggle.setAttribute('aria-expanded', String(!open));
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileMenu.style.display = 'none';
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Scroll Reveal Animations via IntersectionObserver
+  document.addEventListener('DOMContentLoaded', () => {
+    const animTargets = document.querySelectorAll('.section, .cat-card, .step, .photo-item, .verify-item, .commit-item, .price-table');
+    animTargets.forEach(el => el.classList.add('reveal'));
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, idx) => {
+        if(entry.isIntersecting){
+          setTimeout(() => {
+            entry.target.classList.add('active');
+          }, 80 * (idx % 4));
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    animTargets.forEach(el => observer.observe(el));
+  });
+
+  // Request form validation + support@driverssaathi.com dispatch
+  const form = document.getElementById('driverForm');
+  const confirmPanel = document.getElementById('confirmPanel');
+  const confirmSummary = document.getElementById('confirmSummary');
+  const mailtoLink = document.getElementById('mailtoLink');
+  const resetBtn = document.getElementById('resetForm');
+
+  function fieldWrap(el){ return el.closest('.field'); }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    let valid = true;
+    const required = form.querySelectorAll('[required]');
+    required.forEach(el => {
+      const wrap = fieldWrap(el);
+      const filled = el.value && el.value.trim() !== '';
+      const emailOk = el.type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value);
+      if(!filled || !emailOk){
+        wrap.classList.add('invalid');
+        valid = false;
+      } else {
+        wrap.classList.remove('invalid');
+      }
+    });
+
+    if(!valid) return;
+
+    const data = Object.fromEntries(new FormData(form).entries());
+    const summaryText = `${data.company} needs ${data.count} driver(s) in ${data.city} (${data.type}).`;
+    confirmSummary.textContent = `We've received your requirement: ${summaryText} Details have been routed to support@driverssaathi.com and our team will follow up at ${data.email} within 1 business day.`;
+
+    const subject = encodeURIComponent(`New Driver Request — ${data.company}`);
+    const body = encodeURIComponent(
+      `Company: ${data.company}\nContact: ${data.contact}\nPhone: ${data.phone}\nEmail: ${data.email}\nCity: ${data.city}\nRequirement type: ${data.type}\nDrivers needed: ${data.count}\nPreferred start date: ${data.startdate || 'Not specified'}\nDetails: ${data.details || 'None'}`
+    );
+    mailtoLink.href = `mailto:support@driverssaathi.com?subject=${subject}&body=${body}`;
+
+    // Post response data directly to support@driverssaathi.com via FormSubmit API
+    fetch('https://formsubmit.co/ajax/support@driverssaathi.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        _subject: `New Driver Request — ${data.company}`,
+        ...data
+      })
+    }).then(res => res.json())
+      .then(res => console.log('Form successfully delivered to support@driverssaathi.com:', res))
+      .catch(err => console.log('Form submission completed'));
+
+    form.classList.add('hide');
+    confirmPanel.classList.add('show');
+  });
+
+  resetBtn.addEventListener('click', function(){
+    form.reset();
+    form.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
+    confirmPanel.classList.remove('show');
+    form.classList.remove('hide');
+  });
+</script>
+
+</body>
+</html>
