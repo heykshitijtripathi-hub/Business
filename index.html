@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Drivers Saathi — Verified Drivers for Fleets &amp; Private Cars | Delhi NCR</title>
+<title>Drivers Saathi â€” Verified Drivers for Fleets &amp; Private Cars | Delhi NCR</title>
 <meta name="description" content="Drivers Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and private car owners across Delhi NCR.">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="3ksN3TJ1VZYVfX7u7oqCy5uk9mz8xsQFZqRAd7TCYVg">
@@ -13,7 +13,7 @@
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://driverssaathi.com/">
-<meta property="og:title" content="Drivers Saathi — Verified Drivers for Fleets &amp; Private Cars | Delhi NCR">
+<meta property="og:title" content="Drivers Saathi â€” Verified Drivers for Fleets &amp; Private Cars | Delhi NCR">
 <meta property="og:description" content="Drivers Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and private car owners across Delhi NCR.">
 <meta property="og:image" content="https://driverssaathi.com/images/driver-saathi-logo.png">
 <meta property="og:site_name" content="Drivers Saathi">
@@ -22,7 +22,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://driverssaathi.com/">
-<meta name="twitter:title" content="Drivers Saathi — Verified Drivers for Fleets &amp; Private Cars | Delhi NCR">
+<meta name="twitter:title" content="Drivers Saathi â€” Verified Drivers for Fleets &amp; Private Cars | Delhi NCR">
 <meta name="twitter:description" content="Drivers Saathi sources, verifies, and deploys professional drivers for cab fleets, corporate transport, and private car owners across Delhi NCR.">
 <meta name="twitter:image" content="https://driverssaathi.com/images/driver-saathi-logo.png">
 
@@ -802,6 +802,97 @@
     .footer-grid{grid-template-columns:1fr; gap:26px;}
     .footer-bottom{flex-direction:column; gap:6px; text-align:center;}
   }
+
+  /* ===== MOBILE OVERFLOW & CUT-OFF FIXES ===== */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  *, *::before, *::after {
+    max-width: 100%;
+  }
+  img, video, iframe, svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Fix nav on small screens - hide Drive With Us pill */
+  @media (max-width: 480px) {
+    .btn-driver-pill { display: none; }
+    .nav-row { padding: 8px 12px; }
+    .brand-logo-img { height: 36px; }
+    .btn.btn-primary { font-size: 12.5px; padding: 8px 12px; }
+
+    /* Top bar - stack vertically on tiny screens */
+    .top-bar { padding: 6px 0; }
+    .top-bar-inner { flex-direction: column; align-items: center; gap: 4px; }
+    .top-contact-links { flex-wrap: wrap; justify-content: center; gap: 8px; font-size: 11px; }
+    .top-contact-links a { font-size: 11px; }
+    .top-contact-links span { font-size: 11px; }
+
+    /* Hide the separator pipe on tiny screens */
+    .top-contact-links span[style*="opacity:0.4"] { display: none; }
+
+    /* Language switcher smaller */
+    .lang-switch-box { padding: 2px 6px 2px 8px; }
+    .lang-btn { font-size: 10.5px; padding: 2px 7px; }
+    .lang-globe-icon { display: none; }
+    .lang-switch-box > span { display: none; }
+
+    /* Hero */
+    .hero-video { padding: 24px 0 20px; }
+    .hero-video h1 { font-size: clamp(22px, 6.5vw, 30px); }
+    .hero-video p.lede { font-size: 14px; }
+    .hero-video .chip { font-size: 11px; padding: 4px 8px; }
+
+    /* Sections */
+    .section { padding: 44px 0; }
+    .section-head h2 { font-size: clamp(22px, 5.5vw, 28px); }
+    .section-head { margin-bottom: 28px; }
+
+    /* Stats */
+    .stat-num { font-size: 34px; }
+
+    /* Cat cards full width */
+    .cat-grid { grid-template-columns: 1fr; }
+
+    /* Final CTA */
+    .final-cta { padding: 22px 16px; }
+    .final-cta h2 { font-size: 21px; }
+
+    /* Footer */
+    .footer-grid { grid-template-columns: 1fr; }
+
+    /* Form tabs */
+    .form-tab-bar { gap: 4px; }
+    .form-tab-btn { font-size: 12px; padding: 8px 10px; }
+
+    /* Pricing model tab buttons */
+    .pricing-tab-bar { gap: 4px; overflow-x: auto; }
+    .pricing-tab-btn { font-size: 12px; padding: 8px 12px; flex-shrink: 0; }
+
+    /* Price table scrollable */
+    .price-table { font-size: 13px; }
+
+    /* SLA panel */
+    .sla-panel { padding: 24px 18px; }
+    .sla-panel .stat-num { font-size: 48px; }
+  }
+
+  /* Ensure table doesn't overflow on mobile */
+  @media (max-width: 600px) {
+    .price-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .fleet-split { gap: 32px; }
+    .coverage-wrap { gap: 28px; }
+    .sla-panel { padding: 26px 18px; }
+
+    /* Fix form wrap overflow */
+    .form-wrap { padding: 18px 14px; margin: 0 4px; }
+
+    /* Real photos grid */
+    .real-photos-grid { gap: 12px; }
+    .photo-item { aspect-ratio: 3/2; }
+  }
 </style>
 </head>
 <body>
@@ -810,7 +901,7 @@
 <!<!-- TOP UTILITY ANNOUNCEMENT BAR WITH LANGUAGE CONVERTER -->
 <div class="top-bar">
   <div class="wrap top-bar-inner">
-    <div class="dispatch-live"><span class="pulse-dot"></span> Delhi NCR Dispatch Desk: Active &amp; Taking Bookings (Mon–Sat: 8 AM – 9 PM)</div>
+    <div class="dispatch-live"><span class="pulse-dot"></span> Delhi NCR Dispatch Desk: Active &amp; Taking Bookings (Monâ€“Sat: 8 AM â€“ 9 PM)</div>
     <div class="top-contact-links">
       <span>Helpline: <a href="mailto:support@driverssaathi.com">support@driverssaathi.com</a></span>
       <span style="opacity:0.4;">|</span>
@@ -820,7 +911,7 @@
         <span style="color:#94A3B8; font-size:11.5px; font-weight:500;">Language:</span>
         <div class="lang-btn-group">
           <button type="button" class="lang-btn active" id="btnLangEn" onclick="setLanguage('en')">English</button>
-          <button type="button" class="lang-btn" id="btnLangHi" onclick="setLanguage('hi')">हिन्दी</button>
+          <button type="button" class="lang-btn" id="btnLangHi" onclick="setLanguage('hi')">à¤¹à¤¿à¤¨à¥à¤¦à¥€</button>
         </div>
       </div>
       <div id="google_translate_element"></div>
@@ -849,7 +940,7 @@
     <a href="#coverage" class="tab-item" role="tab" data-target="coverage">Coverage</a>
     <a href="#pricing" class="tab-item" role="tab" data-target="pricing">Pricing</a>
     <a href="#faq" class="tab-item" role="tab" data-target="faq">FAQ</a>
-    <a href="pay-per-hire.html" class="tab-item" role="tab">Pay‑Per‑Hire</a>
+    <a href="pay-per-hire.html" class="tab-item" role="tab">Payâ€‘Perâ€‘Hire</a>
     <a href="monthly-retainer.html" class="tab-item" role="tab">Monthly Retainer</a>
     <a href="enterprise-custom.html" class="tab-item" role="tab">Enterprise Custom</a>
     <a href="#request" class="tab-item" role="tab" data-target="request" onclick="switchFormTab('individual')">Hire Personally</a>
@@ -864,7 +955,7 @@
       <li><a class="navlink" style="display:block; padding:10px 0;" href="#coverage">Coverage</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="#pricing">Pricing</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="#faq">FAQ</a></li>
-      <li><a class="navlink" style="display:block; padding:10px 0;" href="pay-per-hire.html">Pay‑Per‑Hire</a></li>
+      <li><a class="navlink" style="display:block; padding:10px 0;" href="pay-per-hire.html">Payâ€‘Perâ€‘Hire</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="monthly-retainer.html">Monthly Retainer</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="enterprise-custom.html">Enterprise Custom</a></li>
       <li><a class="navlink" style="display:block; padding:10px 0;" href="#request" onclick="switchFormTab('individual')">Hire Personally</a></li>
@@ -889,7 +980,7 @@
           #1 Verified Driver Placement Desk in Delhi NCR
         </div>
         <h1 style="color:#ffffff;">Verified drivers for fleets &amp; private cars, across Delhi&nbsp;NCR</h1>
-        <p class="lede">Drivers Saathi authenticates licenses, clears police records, and deploys trained professional drivers for commercial fleets, corporate transport, and personal car owners — backed by an unconditional 24-hr replacement guarantee.</p>
+        <p class="lede">Drivers Saathi authenticates licenses, clears police records, and deploys trained professional drivers for commercial fleets, corporate transport, and personal car owners â€” backed by an unconditional 24-hr replacement guarantee.</p>
         <div class="cta-row">
           <a href="#request" class="btn btn-primary" onclick="switchFormTab('fleet')">Request Fleet Drivers &rarr;</a>
           <a href="#request" class="btn btn-ghost" style="color:#ffffff; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); backdrop-filter:blur(6px);" onclick="switchFormTab('individual')">Hire Personally</a>
@@ -928,7 +1019,7 @@
           <span>ID DS-NCR-2431</span>
           <span class="id-score">Verification score 94/100</span>
         </div>
-        <p class="id-note">Illustrative sample profile — not a real driver record.</p>
+        <p class="id-note">Illustrative sample profile â€” not a real driver record.</p>
       </div>
     </div>
   </section>
@@ -960,13 +1051,13 @@
     <div class="wrap">
       <div class="section-head">
         <h2>How hiring works</h2>
-        <p>A straight path from requirement to a driver on the road — built for operators who need to move fast without cutting on verification.</p>
+        <p>A straight path from requirement to a driver on the road â€” built for operators who need to move fast without cutting on verification.</p>
       </div>
       <div class="steps-grid">
         <div class="step">
           <div class="step-num">1</div>
           <h3>Share your requirement</h3>
-          <p>Tell us the role, city, and timeline — a single cab driver or a 100-driver fleet rollout.</p>
+          <p>Tell us the role, city, and timeline â€” a single cab driver or a 100-driver fleet rollout.</p>
         </div>
         <div class="step">
           <div class="step-num">2</div>
@@ -1023,7 +1114,7 @@
         </div>
         <div class="photo-card" style="aspect-ratio:4/3;">
           <img src="images/driver_verification_assessment.jpg" alt="Ground driver verification and license inspection in Delhi NCR">
-          <div class="photo-pill"><span class="pill-dot"></span>Ground Audit • License &amp; Vehicle Check</div>
+          <div class="photo-pill"><span class="pill-dot"></span>Ground Audit â€¢ License &amp; Vehicle Check</div>
         </div>
       </div>
     </div>
@@ -1078,14 +1169,14 @@
           <img src="images/indian_driver_portrait.jpg" alt="Verified Indian Driver Profile - Rajesh Kumar">
           <div class="photo-overlay">
             <span class="photo-tag">Verified Driver Profile</span>
-            <span class="photo-title">Rajesh Kumar — LMV Commercial Badge Holder</span>
+            <span class="photo-title">Rajesh Kumar â€” LMV Commercial Badge Holder</span>
           </div>
         </div>
         <div class="photo-item">
           <img src="images/indian_driver_wheel.jpg" alt="Indian Driver on Delhi NCR Highway Route">
           <div class="photo-overlay">
             <span class="photo-tag">On-Road Performance</span>
-            <span class="photo-title">Active Cab Driver on Delhi–Gurugram Expressway</span>
+            <span class="photo-title">Active Cab Driver on Delhiâ€“Gurugram Expressway</span>
           </div>
         </div>
         <div class="photo-item">
@@ -1113,7 +1204,7 @@
           <img src="images/driver_team_standing.jpg" alt="Team of Verified Indian Drivers in Uniform">
           <div class="photo-overlay">
             <span class="photo-tag">Driver Network</span>
-            <span class="photo-title">Verified Cab Driver Team — Ready for Deployment</span>
+            <span class="photo-title">Verified Cab Driver Team â€” Ready for Deployment</span>
           </div>
         </div>
       </div>
@@ -1126,12 +1217,12 @@
       <div>
         <div class="section-head" style="margin-bottom:28px;">
           <h2>Built for fleet &amp; cab companies</h2>
-          <p>Not a one-off placement service — ongoing staffing built around your fleet's uptime.</p>
+          <p>Not a one-off placement service â€” ongoing staffing built around your fleet's uptime.</p>
         </div>
         <ul class="fleet-list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Bulk hiring for 10, 50, or 200+ driver requirements</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Contract staffing with monthly billing, not just one-off placement</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Replacement guarantee — a new driver within 24 hours if one exits</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Replacement guarantee â€” a new driver within 24 hours if one exits</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Dedicated account manager for your fleet</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Monthly attendance and compliance reporting</li>
         </ul>
@@ -1203,7 +1294,7 @@
     <div class="wrap">
       <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
         <h2>Engagement models</h2>
-        <p>Pick the model that matches how often you hire — click any model tab below to see what hassles are solved &amp; why operators hire us.</p>
+        <p>Pick the model that matches how often you hire â€” click any model tab below to see what hassles are solved &amp; why operators hire us.</p>
       </div>
 
       <!-- 3 INTERACTIVE BREAKDOWN TABS -->
@@ -1291,13 +1382,13 @@
     </div>
   </section>
 
-  <!-- REQUEST FORM — 3 tabs (Fleet, Individual, Driver) -->
+  <!-- REQUEST FORM â€” 3 tabs (Fleet, Individual, Driver) -->
   <section class="section" id="request">
     <div class="wrap">
       <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto; max-width:680px; margin-bottom:32px;">
         <span style="display:inline-block; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--marigold); background:rgba(251,133,0,0.1); padding:4px 12px; border-radius:20px; margin-bottom:12px;">Direct Placement &amp; Staffing Desk</span>
         <h2>Get in touch with Drivers Saathi</h2>
-        <p>Whether you need drivers for your fleet, a personal chauffeur, or you want to join our verified driver network — select your category below.</p>
+        <p>Whether you need drivers for your fleet, a personal chauffeur, or you want to join our verified driver network â€” select your category below.</p>
       </div>
 
       <!-- Human-friendly 3-part tab selector -->
@@ -1513,7 +1604,7 @@
           </div>
           <div class="form-wrap">
             <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="formFleet" class="form-body" novalidate>
-              <input type="hidden" name="_subject" value="Fleet/Business Driver Request — Drivers Saathi">
+              <input type="hidden" name="_subject" value="Fleet/Business Driver Request â€” Drivers Saathi">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
               <input type="hidden" name="Category" value="Fleet / Corporate Staffing">
@@ -1581,7 +1672,7 @@
               </div>
 
               <div class="form-foot">
-                <p class="form-note">Shortlisted &amp; police-verified candidate profiles shared within 24–48 hours.</p>
+                <p class="form-note">Shortlisted &amp; police-verified candidate profiles shared within 24â€“48 hours.</p>
                 <button type="submit" class="btn btn-primary">Submit Fleet Request &rarr;</button>
               </div>
             </form>
@@ -1601,7 +1692,7 @@
           </div>
           <div class="form-wrap">
             <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="formIndividual" class="form-body" novalidate>
-              <input type="hidden" name="_subject" value="Personal Driver Hire Request — Drivers Saathi">
+              <input type="hidden" name="_subject" value="Personal Driver Hire Request â€” Drivers Saathi">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
               <input type="hidden" name="Category" value="Personal Driver Hire">
@@ -1647,7 +1738,7 @@
                   <label for="i-schedule">Preferred working schedule <span class="req">*</span></label>
                   <select id="i-schedule" name="Schedule Preference" required>
                     <option value="">Select schedule</option>
-                    <option>Full Day (9–10 hours / day, 6 days a week)</option>
+                    <option>Full Day (9â€“10 hours / day, 6 days a week)</option>
                     <option>Morning + Evening Commute only</option>
                     <option>Flexible / On-call as needed</option>
                   </select>
@@ -1686,14 +1777,14 @@
         <div class="form-panel-body">
           <div class="form-panel-header">
             <div>
-              <h3>Apply as a Driver — Join Drivers Saathi</h3>
+              <h3>Apply as a Driver â€” Join Drivers Saathi</h3>
               <p>Looking for a steady driving job in Delhi NCR? Join our verified network with fair, prompt payments.</p>
             </div>
             <a href="driver-apply.html" class="btn btn-ghost" style="font-size:12.5px; padding:6px 14px;">Open Full Page &rarr;</a>
           </div>
           <div class="form-wrap">
             <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="formDriver" class="form-body" novalidate>
-              <input type="hidden" name="_subject" value="Driver Job Application — Drivers Saathi">
+              <input type="hidden" name="_subject" value="Driver Job Application â€” Drivers Saathi">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
               <input type="hidden" name="Category" value="Driver Job Application">
@@ -1812,11 +1903,11 @@
         </details>
         <details class="faq-item">
           <summary>Do you support both short-term and long-term hiring?<span class="plus"></span></summary>
-          <p>Yes — pay-per-hire suits one-off needs, while a monthly retainer or enterprise contract suits ongoing fleet staffing.</p>
+          <p>Yes â€” pay-per-hire suits one-off needs, while a monthly retainer or enterprise contract suits ongoing fleet staffing.</p>
         </details>
         <details class="faq-item">
           <summary>What vehicle categories do your drivers operate?<span class="plus"></span></summary>
-          <p>Our drivers are authenticated and trained for all Light Motor Vehicle (LMV) transport categories — including aggregator cabs, sedan fleets, corporate employee shuttle cabs, SUVs, luxury cars, and EV fleets across Delhi NCR.</p>
+          <p>Our drivers are authenticated and trained for all Light Motor Vehicle (LMV) transport categories â€” including aggregator cabs, sedan fleets, corporate employee shuttle cabs, SUVs, luxury cars, and EV fleets across Delhi NCR.</p>
         </details>
       </div>
     </div>
@@ -1889,7 +1980,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Driver Saathi. All rights reserved.</span>
+      <span>Â© 2026 Driver Saathi. All rights reserved.</span>
       <span>Built for Delhi NCR fleet &amp; cab operators.</span>
     </div>
   </div>
@@ -2140,3 +2231,4 @@
 
 </body>
 </html>
+
