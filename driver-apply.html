@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drive with Us - Apply as a Driver | Drivers Saathi | Delhi NCR</title>
+<meta name="description" content="Join the Drivers Saathi network. Apply as a verified driver for cab fleets, corporate transport, personal chauffeur and more across Delhi NCR.">
+<link rel="icon" type="image/png" href="images/driver-saathi-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0F172A;--ink-soft:#475569;--paper:#FFFFFF;--paper-alt:#F8FAFC;--gold:#E29B2E;--marigold:#FB8500;--navy:#1D2A44;--verified:#10B981;--line:#E2E8F0;--line-soft:#F1F5F9;--font-display:"Barlow Condensed",sans-serif;--font-body:"IBM Plex Sans",sans-serif;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-body);color:var(--ink);background:var(--paper);line-height:1.6;}
+  h1,h2,h3,h4{font-family:var(--font-display);color:var(--navy);}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+  header{position:sticky;top:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:100;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;}
+  .brand-logo-img{height:52px;width:auto;display:block;transition:transform .2s;}
+  .brandmark:hover .brand-logo-img{transform:scale(1.04);}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;padding:11px 22px;border-radius:6px;text-decoration:none;transition:transform .2s;border:none;cursor:pointer;}
+  .btn-primary{background:var(--marigold);color:#fff;box-shadow:0 4px 14px rgba(251,133,0,0.3);}
+  .btn-primary:hover{background:#D97706;transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--marigold);color:var(--marigold);}
+  .tab-bar{display:flex;overflow-x:auto;white-space:nowrap;gap:4px;padding:6px 24px;border-bottom:1px solid var(--line);background:#fff;scrollbar-width:none;}
+  .tab-bar::-webkit-scrollbar{display:none;}
+  .tab-item{display:inline-flex;align-items:center;padding:8px 16px;border-radius:6px;font-size:14px;font-weight:600;text-decoration:none;color:var(--ink-soft);transition:all .18s;flex:none;}
+  .tab-item.active,
+  .tab-item[aria-selected="true"]{color:#fff !important; background:var(--marigold) !important; border-radius:999px; box-shadow:0 4px 14px rgba(251,133,0,0.35); font-weight:700;}
+  .hero-apply{background:linear-gradient(135deg,#1D2A44 0%,#0F172A 100%);color:#fff;padding:64px 0 48px;position:relative;overflow:hidden;}
+  .hero-apply::before{content:"";position:absolute;inset:0;background:url("images/driver_team_standing.jpg") center/cover no-repeat;opacity:0.12;}
+  .hero-apply .wrap{position:relative;z-index:1;}
+  .hero-apply h1{font-size:clamp(36px,5vw,58px);margin:0 0 16px;color:#fff;line-height:1.08;}
+  .hero-apply .lede{font-size:17px;color:rgba(255,255,255,0.82);max-width:60ch;margin:0 0 20px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(226,155,46,0.2);color:#E29B2E;border:1px solid rgba(226,155,46,0.4);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;margin-bottom:20px;}
+  .perks-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
+  .perk-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;}
+  .perk-chip svg{width:14px;height:14px;stroke:#E29B2E;}
+  .section{padding:64px 0;}
+  .section-alt{background:var(--paper-alt);}
+  .benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px;}
+  .benefit-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px;text-align:center;}
+  .benefit-icon{font-size:36px;margin-bottom:12px;}
+  .benefit-card h3{font-size:20px;margin:0 0 8px;}
+  .benefit-card p{font-size:14.5px;color:var(--ink-soft);margin:0;}
+  .form-section{padding:64px 0;}
+  .form-container{max-width:760px;margin:0 auto;}
+  .section-head{margin-bottom:32px;}
+  .section-head h2{font-size:clamp(28px,3.5vw,42px);margin:0 0 10px;}
+  .section-head p{font-size:16px;color:var(--ink-soft);margin:0;}
+  .form-wrap{background:#fff;border:1px solid var(--line);border-radius:18px;padding:36px 40px;box-shadow:0 4px 32px rgba(15,23,42,0.06);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1/-1;}
+  label{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .req{color:var(--marigold);}
+  input,select,textarea{font-family:var(--font-body);font-size:15px;padding:11px 14px;border:1.5px solid var(--line);border-radius:8px;width:100%;outline:none;transition:border-color .2s;color:var(--ink);background:#fff;}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+  textarea{min-height:110px;resize:vertical;}
+  .form-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line-soft);}
+  .form-note{font-size:13px;color:var(--ink-soft);margin:0;}
+  .submit-btn{background:var(--navy);color:#fff;font-size:16px;padding:13px 32px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-family:var(--font-display);letter-spacing:.3px;transition:all .2s;}
+  .submit-btn:hover{background:var(--gold);transform:translateY(-1px);}
+  .success-box{display:none;text-align:center;padding:48px 32px;}
+  .success-tick{width:64px;height:64px;background:var(--verified);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+  .success-tick svg{width:32px;height:32px;stroke:#fff;}
+  .success-box h3{font-size:28px;margin:0 0 10px;}
+  .success-box p{color:var(--ink-soft);max-width:40ch;margin:0 auto;}
+  footer{background:var(--navy);color:rgba(255,255,255,0.7);padding:32px 0;}
+  .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .footer-inner p{margin:0;font-size:13.5px;}
+  .footer-inner a{color:rgba(255,255,255,0.7);text-decoration:none;}
+  .footer-inner a:hover{color:#fff;}
+  @media(max-width:980px){.benefits-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){
+    .nav-row{padding:10px 16px;}.brand-logo-img{height:40px;}
+    .hero-apply{padding:40px 0 28px;}
+    .benefits-grid{grid-template-columns:1fr;gap:14px;}
+    .form-wrap{padding:22px 18px;border-radius:12px;}
+    .form-grid{grid-template-columns:1fr;gap:14px;}
+    .form-foot{flex-direction:column;align-items:stretch;}
+    .submit-btn{width:100%;}
+    .tab-bar{padding:6px 12px;}.tab-item{font-size:13px;padding:6px 10px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-row wrap">
+    <a href="index.html" class="brandmark" aria-label="Drivers Saathi Home">
+      <img src="images/driver-saathi-logo.png" alt="Drivers Saathi Logo" class="brand-logo-img">
+    </a>
+    <a href="index.html#request" class="btn btn-ghost" style="font-size:14px;">Hire a Driver</a>
+  </div>
+  <nav class="tab-bar" role="tablist">
+    <a href="index.html" class="tab-item" role="tab">How it works</a>
+    <a href="index.html#verification" class="tab-item" role="tab">Verification</a>
+    <a href="index.html#pricing" class="tab-item" role="tab">Pricing</a>
+    <a href="pay-per-hire.html" class="tab-item" role="tab">Pay-Per-Hire</a>
+    <a href="monthly-retainer.html" class="tab-item" role="tab">Monthly Retainer</a>
+    <a href="enterprise-custom.html" class="tab-item" role="tab">Enterprise Custom</a>
+    <a href="index.html#request" class="tab-item" role="tab">Fleet Hire</a>
+    <a href="index.html#request" class="tab-item" role="tab" onclick="sessionStorage.setItem('tab','individual')">Hire Personally</a>
+    <a href="driver-apply.html" class="tab-item" role="tab" aria-selected="true">Drive with Us</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero-apply">
+    <div class="wrap">
+      <div class="badge">Join Our Driver Network</div>
+      <h1>Drive with Drivers Saathi.<br>Get steady, verified work.</h1>
+      <p class="lede">We connect professional drivers with trusted fleet companies and individuals across Delhi NCR. Join our verified network and get matched with the right opportunity.</p>
+      <div class="perks-row">
+        <span class="perk-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Steady income</span>
+        <span class="perk-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Verified employers</span>
+        <span class="perk-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Fair pay</span>
+        <span class="perk-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Delhi NCR wide</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center;margin-left:auto;margin-right:auto;">
+        <h2>Why join our driver network?</h2>
+        <p>We work only with trusted fleet operators and families so you get reliable, professional placements.</p>
+      </div>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128188;</div>
+          <h3>Steady Work</h3>
+          <p>Get matched with full-time and part-time openings from verified companies across Delhi NCR.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">&#9989;</div>
+          <h3>Verified Employers</h3>
+          <p>All our clients are verified businesses or individuals. No fraud, no last-minute cancellations.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128176;</div>
+          <h3>Fair Pay</h3>
+          <p>We negotiate fair salaries on your behalf. No middleman cuts. You get what you earn.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128737;</div>
+          <h3>Safe Work Environment</h3>
+          <p>All placements include clear terms so your rights as a driver are always protected.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128205;</div>
+          <h3>Jobs Near You</h3>
+          <p>Delhi, Gurugram, Noida, Greater Noida, Faridabad, and Ghaziabad. We place locally.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">&#129309;</div>
+          <h3>Ongoing Support</h3>
+          <p>Our team stays in touch after placement to make sure everything is working well for you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section" id="apply">
+    <div class="wrap">
+      <div class="form-container">
+        <div class="section-head">
+          <h2>Apply to join our driver network</h2>
+          <p>Fill in your details and our team will call you within 2 business days.</p>
+        </div>
+        <div class="form-wrap">
+          <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="applyForm">
+            <input type="hidden" name="_subject" value="Driver Job Application - Drivers Saathi">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="Enquiry Type" value="Driver Job Application">
+            <div class="form-grid">
+              <div class="field">
+                <label for="d-name">Full name <span class="req">*</span></label>
+                <input type="text" id="d-name" name="Full Name" placeholder="e.g. Ramesh Sharma" required>
+              </div>
+              <div class="field">
+                <label for="d-phone">Phone number <span class="req">*</span></label>
+                <input type="tel" id="d-phone" name="Phone" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="field">
+                <label for="d-city">City / Area you can work in <span class="req">*</span></label>
+                <select id="d-city" name="City" required>
+                  <option value="">Select a city</option>
+                  <option>Delhi</option><option>Gurugram</option><option>Noida</option>
+                  <option>Greater Noida</option><option>Faridabad</option><option>Ghaziabad</option><option>Other NCR area</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="d-license">License type <span class="req">*</span></label>
+                <select id="d-license" name="License Type" required>
+                  <option value="">Select license type</option>
+                  <option>LMV - Light Motor Vehicle</option>
+                  <option>HMV - Heavy Motor Vehicle</option>
+                  <option>Both LMV and HMV</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="d-exp">Years of driving experience <span class="req">*</span></label>
+                <select id="d-exp" name="Experience" required>
+                  <option value="">Select experience</option>
+                  <option>Less than 1 year</option>
+                  <option>1 to 3 years</option>
+                  <option>3 to 5 years</option>
+                  <option>5 to 10 years</option>
+                  <option>10+ years</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="d-status">Current employment status <span class="req">*</span></label>
+                <select id="d-status" name="Employment Status" required>
+                  <option value="">Select status</option>
+                  <option>Currently employed, looking to switch</option>
+                  <option>Unemployed, looking for work</option>
+                  <option>Freelancing / own vehicle</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="d-jobtype">Type of work preferred <span class="req">*</span></label>
+                <select id="d-jobtype" name="Job Type Preferred" required>
+                  <option value="">Select preference</option>
+                  <option>Cab fleet / aggregator (Ola, Uber etc.)</option>
+                  <option>Corporate employee transport</option>
+                  <option>Personal / Family Chauffeur</option>
+                  <option>Luxury and VIP Chauffeur</option>
+                  <option>On-call / Part-time</option>
+                  <option>Open to all types</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="d-shift">Shift preference</label>
+                <select id="d-shift" name="Shift Preference">
+                  <option value="">Select shift</option>
+                  <option>Day shift (6 AM to 2 PM)</option>
+                  <option>Evening shift (2 PM to 10 PM)</option>
+                  <option>Night shift (10 PM to 6 AM)</option>
+                  <option>Full day</option>
+                  <option>Flexible / any</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="d-vehicles">Vehicle types you have driven</label>
+                <input type="text" id="d-vehicles" name="Vehicle Types" placeholder="e.g. Sedan, Swift Dzire, Innova, SUV, Bus...">
+              </div>
+              <div class="field full">
+                <label for="d-about">Anything else you would like us to know? (optional)</label>
+                <textarea id="d-about" name="About" placeholder="Tell us about your experience, languages you speak, or any special skills..."></textarea>
+              </div>
+            </div>
+            <div class="form-foot">
+              <p class="form-note">Our team will call you within 2 business days.</p>
+              <button type="submit" class="submit-btn">Submit Application</button>
+            </div>
+          </form>
+
+          <div class="success-box" id="successBox">
+            <div class="success-tick">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3>Application received!</h3>
+            <p>Our team will call you within 2 business days. Thank you for applying to the Drivers Saathi network.</p>
+            <a href="driver-apply.html" class="btn btn-ghost" style="margin-top:20px;display:inline-flex;">Submit another</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <p>2025 Drivers Saathi. All rights reserved.</p>
+      <p>
+        <a href="index.html">Home</a> &nbsp;|&nbsp;
+        <a href="index.html#request">Hire a Driver</a> &nbsp;|&nbsp;
+        <a href="mailto:support@driverssaathi.com">support@driverssaathi.com</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  if(window.location.search.includes('success=1')){
+    document.getElementById('applyForm').style.display='none';
+    document.getElementById('successBox').style.display='block';
+  }
+</script>
+
+</body>
+</html>

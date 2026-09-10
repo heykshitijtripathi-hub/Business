@@ -92,10 +92,13 @@
     color: var(--ink);
     background: var(--paper-alt);
   }
+  .tab-item.active,
   .tab-item[aria-selected="true"] {
-    color: var(--marigold-deep);
-    background: rgba(251, 133, 0, 0.08);
-    border-bottom: 2px solid var(--marigold);
+    color: #FFFFFF !important;
+    background: var(--marigold) !important;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(251, 133, 0, 0.35);
+    font-weight: 700;
   }
   .fade-up { opacity:0; transform:translateY(20px); animation: fadeUp .6s ease forwards; }
   @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
@@ -190,6 +193,8 @@
     <a href="pay-per-hire.html" class="tab-item" role="tab" aria-selected="true">Pay‑Per‑Hire</a>
     <a href="monthly-retainer.html" class="tab-item" role="tab">Monthly Retainer</a>
     <a href="enterprise-custom.html" class="tab-item" role="tab">Enterprise Custom</a>
+    <a href="index.html#request" class="tab-item" role="tab">Hire Personally</a>
+    <a href="driver-apply.html" class="tab-item" role="tab">Drive with Us 🚗</a>
   </nav>
 </header>
 
