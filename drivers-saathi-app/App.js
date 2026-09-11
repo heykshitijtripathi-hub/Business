@@ -66,7 +66,7 @@ const C = {
   blueBg:    '#E3F2FD',
 };
 
-// ─── Candidate Database ────────────────────────────────────────────────────────
+// ─── Verified Candidate Pool ──────────────────────────────────────────────────
 const CANDIDATES = [
   {
     id: 'c1', name: 'Rameshwar Dayal', exp: '15 yrs', rating: '4.95',
@@ -100,7 +100,7 @@ const CANDIDATES = [
 // ─── Main Application ─────────────────────────────────────────────────────────
 export default function App() {
   const [portal, setPortal] = useState('landing');
-  // 'landing' | 'customer' | 'driver_login' | 'driver_app' | 'owner_login' | 'owner_app' | 'admin_login' | 'admin_app'
+  // 'landing' | 'customer' | 'driver_login' | 'driver_register' | 'driver_app' | 'owner_login' | 'owner_app' | 'admin_login' | 'admin_app'
 
   // Customer State
   const [custTab, setCustTab] = useState('home'); // 'home' | 'services' | 'calculator' | 'drivers' | 'book' | 'about' | 'contact'
@@ -110,6 +110,21 @@ export default function App() {
   const [form, setForm] = useState({ name: '', phone: '', car: '', location: '', service: 'Personal Chauffeur', trans: 'Automatic' });
   const [loading, setLoading] = useState(false);
   const [successModal, setSuccessModal] = useState({ visible: false, msg: '' });
+
+  // Driver Onboarding & Registration State (Driver Pipeline Builder)
+  const [driverReg, setDriverReg] = useState({
+    name: '',
+    phone: '',
+    area: '',
+    exp: '5-8 Years',
+    trans: 'Both (Manual + Auto)',
+    dl: '',
+  });
+  const [driverRegSuccess, setDriverRegSuccess] = useState(false);
+  const [inboundDriverApplicants, setInboundDriverApplicants] = useState([
+    { id: 'app-1', name: 'Satish Kumar', phone: '+91 98118 77665', area: 'Badarpur & South Delhi', exp: '8 Years', trans: 'Both (Manual + Auto)', dl: 'DL-042016008812', date: 'Today' },
+    { id: 'app-2', name: 'Manoj Yadav', phone: '+91 97112 33441', area: 'Sector 56, Gurugram', exp: '6 Years', trans: 'Automatic & SUVs', dl: 'HR-262019004451', date: 'Yesterday' },
+  ]);
 
   // Driver Credentials & State
   const [drvId, setDrvId] = useState('');
@@ -175,14 +190,16 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const saved = await AsyncStorage.getItem('@ds_logs_v4');
+        const saved = await AsyncStorage.getItem('@ds_logs_v5');
         if (saved) setDutyLogs(JSON.parse(saved));
-        const savedLeaves = await AsyncStorage.getItem('@ds_leaves_v4');
+        const savedLeaves = await AsyncStorage.getItem('@ds_leaves_v5');
         if (savedLeaves) setLeaves(JSON.parse(savedLeaves));
-        const savedAdv = await AsyncStorage.getItem('@ds_advances_v4');
+        const savedAdv = await AsyncStorage.getItem('@ds_advances_v5');
         if (savedAdv) setAdvanceRequests(JSON.parse(savedAdv));
-        const savedPay = await AsyncStorage.getItem('@ds_payments_v4');
+        const savedPay = await AsyncStorage.getItem('@ds_payments_v5');
         if (savedPay) setPayments(JSON.parse(savedPay));
+        const savedApps = await AsyncStorage.getItem('@ds_driver_apps_v5');
+        if (savedApps) setInboundDriverApplicants(JSON.parse(savedApps));
       } catch (_) {}
     })();
   }, []);
@@ -192,6 +209,11 @@ export default function App() {
   const whatsapp = (msg = '') => {
     const t = msg || 'Hello Drivers Saathi, I need a verified driver in Delhi NCR.';
     Linking.openURL(`https://wa.me/918175087004?text=${encodeURIComponent(t)}`);
+  };
+
+  const driverWhatsAppJoin = () => {
+    const text = `नमस्ते ड्राइवर्स साथी, मुझे प्राइवेट कार ड्राइवर की नौकरी चाहिए।\nनाम: ${driverReg.name || 'ड्राइवर साथी'}\nइलाका: ${driverReg.area || 'दिल्ली NCR'}\nअनुभव: ${driverReg.exp}`;
+    Linking.openURL(`https://wa.me/918175087004?text=${encodeURIComponent(text)}`);
   };
 
   const salary = () => {
@@ -236,6 +258,47 @@ export default function App() {
     setLoading(false);
   };
 
+  const handleDriverSelfRegister = async () => {
+    if (!driverReg.name.trim() || !driverReg.phone.trim() || !driverReg.area.trim()) {
+      Alert.alert('कृपया ध्यान दें', 'कृपया अपना नाम, मोबाइल नंबर और इलाका अवश्य भरें।');
+      return;
+    }
+
+    const newApp = {
+      id: `app-${Date.now()}`,
+      name: driverReg.name,
+      phone: driverReg.phone,
+      area: driverReg.area,
+      exp: driverReg.exp,
+      trans: driverReg.trans,
+      dl: driverReg.dl || 'Not Provided',
+      date: 'Just Now',
+    };
+
+    const updated = [newApp, ...inboundDriverApplicants];
+    setInboundDriverApplicants(updated);
+    await AsyncStorage.setItem('@ds_driver_apps_v5', JSON.stringify(updated));
+
+    // Also send email alert to admin behind the scenes
+    try {
+      fetch('https://formsubmit.co/ajax/support@driverssaathi.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `[NEW DRIVER ONBOARDING] ${driverReg.name} (${driverReg.area})`,
+          Name: driverReg.name,
+          Phone: driverReg.phone,
+          Area: driverReg.area,
+          Experience: driverReg.exp,
+          Transmission: driverReg.trans,
+          DL: driverReg.dl,
+        }),
+      });
+    } catch (_) {}
+
+    setDriverRegSuccess(true);
+  };
+
   const loginDriver = () => {
     if ((drvId.trim() === 'DRV-101') && drvPass === '1234') setPortal('driver_app');
     else Alert.alert('Login Failed', 'Demo credentials: DRV-101 / 1234');
@@ -254,7 +317,7 @@ export default function App() {
     const entry = { id: Date.now().toString(), date: logDate, inTime: logIn, outTime: logOut, startKm: logStartKm, endKm: logEndKm, ot: `${logOT} hrs`, approved: false };
     const updated = [entry, ...dutyLogs];
     setDutyLogs(updated);
-    await AsyncStorage.setItem('@ds_logs_v4', JSON.stringify(updated));
+    await AsyncStorage.setItem('@ds_logs_v5', JSON.stringify(updated));
     setLogPhoto(null);
     Alert.alert('Duty Logged', `Duty entry for ${logDate} saved and submitted to owner for verification.`);
   };
@@ -264,7 +327,7 @@ export default function App() {
     const entry = { id: Date.now().toString(), date: lvDate, reason: lvReason, status: 'Pending', sub: 'Pending Assignment' };
     const updated = [entry, ...leaves];
     setLeaves(updated);
-    await AsyncStorage.setItem('@ds_leaves_v4', JSON.stringify(updated));
+    await AsyncStorage.setItem('@ds_leaves_v5', JSON.stringify(updated));
     setLvReason('');
     Alert.alert('Leave Submitted', 'Leave request sent to car owner. Dispatch desk alerted for backup coverage.');
   };
@@ -274,7 +337,7 @@ export default function App() {
     const entry = { id: Date.now().toString(), amount: `Rs. ${advanceAmt}`, reason: advanceReason || 'General expense', status: 'Pending Review', date: 'Today' };
     const updated = [entry, ...advanceRequests];
     setAdvanceRequests(updated);
-    await AsyncStorage.setItem('@ds_advances_v4', JSON.stringify(updated));
+    await AsyncStorage.setItem('@ds_advances_v5', JSON.stringify(updated));
     setAdvanceAmt('');
     setAdvanceReason('');
     Alert.alert('Advance Requested', 'Advance salary request has been forwarded to car owner and dispatch desk.');
@@ -289,14 +352,14 @@ export default function App() {
   const approveLog = async (id) => {
     const updated = dutyLogs.map(l => l.id === id ? { ...l, approved: true } : l);
     setDutyLogs(updated);
-    await AsyncStorage.setItem('@ds_logs_v4', JSON.stringify(updated));
+    await AsyncStorage.setItem('@ds_logs_v5', JSON.stringify(updated));
     Alert.alert('Approved', 'Overtime hours authenticated for payroll calculation.');
   };
 
   const markPaymentPaid = async (pid) => {
     const updated = payments.map(p => p.id === pid ? { ...p, status: 'Paid', date: '11 Sep 2026' } : p);
     setPayments(updated);
-    await AsyncStorage.setItem('@ds_payments_v4', JSON.stringify(updated));
+    await AsyncStorage.setItem('@ds_payments_v5', JSON.stringify(updated));
     Alert.alert('Salary Marked as Paid', 'September 2026 salary marked paid. Notification receipt generated.');
   };
 
@@ -372,27 +435,35 @@ export default function App() {
           <Text style={styles.roleCardArrow}>→</Text>
         </TouchableOpacity>
 
-        {/* Card 2: Driver */}
-        <TouchableOpacity
-          style={[styles.roleCard, { backgroundColor: C.driverPrimary }]}
-          onPress={() => setPortal('driver_login')}
-          activeOpacity={0.9}
-        >
-          <View style={styles.roleCardIconBox}>
-            <Text style={styles.roleCardEmoji}>👤</Text>
-          </View>
-          <View style={styles.roleCardText}>
-            <Text style={styles.roleCardTitle}>I am a Driver</Text>
-            <Text style={styles.roleCardDesc}>View today's duty, log daily odometer, check monthly attendance calendar, apply for leave, and view salary</Text>
-            <View style={styles.roleCardChips}>
-              <Text style={styles.roleCardChip}>Today's Duty</Text>
-              <Text style={styles.roleCardChip}>Logbook</Text>
-              <Text style={styles.roleCardChip}>Attendance</Text>
-              <Text style={styles.roleCardChip}>Salary Slip</Text>
+        {/* Card 2: Driver (With Registration + Login Dual Action) */}
+        <View style={[styles.roleCardWrapper, { backgroundColor: C.driverPrimary }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.roleCardIconBox}>
+              <Text style={styles.roleCardEmoji}>👤</Text>
+            </View>
+            <View style={styles.roleCardText}>
+              <Text style={styles.roleCardTitle}>I am a Driver / मैं ड्राइवर हूँ</Text>
+              <Text style={styles.roleCardDesc}>महीने का ₹20,000 से ₹28,000 कमाएं • प्राइवेट कार में फिक्स्ड ड्यूटी • ड्यूटी लॉगबुक व हाजिरी</Text>
             </View>
           </View>
-          <Text style={styles.roleCardArrow}>→</Text>
-        </TouchableOpacity>
+
+          {/* Dual Action Buttons for Drivers */}
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+            <TouchableOpacity
+              style={styles.driverCardRegBtn}
+              onPress={() => setPortal('driver_register')}
+            >
+              <Text style={styles.driverCardRegBtnText}>ड्राइवर रजिस्ट्रेशन (Join Now)</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.driverCardLoginBtn}
+              onPress={() => setPortal('driver_login')}
+            >
+              <Text style={styles.driverCardLoginBtnText}>ड्राइवर लॉगिन (Sign In)</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Card 3: Car Owner */}
         <TouchableOpacity
@@ -429,6 +500,169 @@ export default function App() {
   );
 
   // ============================================================================
+  // VIEW: DRIVER ONBOARDING & REGISTRATION SCREEN (Hindi-Friendly)
+  // ============================================================================
+  const renderDriverRegister = () => (
+    <View style={{ flex: 1, backgroundColor: C.driverBg }}>
+      {/* Header */}
+      <View style={styles.loginPortalHeader}>
+        <TouchableOpacity onPress={() => setPortal('landing')}>
+          <Text style={[styles.loginBackBtn, { color: C.driverPrimary }]}>← मुख्य पृष्ठ (Back)</Text>
+        </TouchableOpacity>
+        <Text style={styles.loginPortalTitle}>ड्राइवर भर्ती (Join Saathi)</Text>
+        <TouchableOpacity onPress={() => setPortal('driver_login')}>
+          <Text style={{ color: C.driverPrimary, fontWeight: '700', fontSize: 13 }}>लॉगिन</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+
+        {/* Value Pitch Banner */}
+        <View style={styles.driverPitchBanner}>
+          <Text style={styles.driverPitchPre}>प्राइवेट कार ड्राइवर जॉब्स • दिल्ली NCR</Text>
+          <Text style={styles.driverPitchHeadline}>महीने का ₹20,000 से ₹28,000 कमाएं</Text>
+          <Text style={styles.driverPitchSub}>बिना किसी दलाली या कमीशन के • सीधा कार मालिक से वेतन</Text>
+
+          {/* Benefits Grid */}
+          <View style={styles.driverBenefitsGrid}>
+            <View style={styles.driverBenefitItem}>
+              <Text style={styles.driverBenefitDot}>✓</Text>
+              <Text style={styles.driverBenefitText}>मालिक की गाड़ी, मालिक का पेट्रोल</Text>
+            </View>
+            <View style={styles.driverBenefitItem}>
+              <Text style={styles.driverBenefitDot}>✓</Text>
+              <Text style={styles.driverBenefitText}>10 घंटे फिक्स्ड ड्यूटी + ओवर-टाइम अलग से</Text>
+            </View>
+            <View style={styles.driverBenefitItem}>
+              <Text style={styles.driverBenefitDot}>✓</Text>
+              <Text style={styles.driverBenefitText}>रविवार साप्ताहिक अवकाश (Sunday Off)</Text>
+            </View>
+            <View style={styles.driverBenefitItem}>
+              <Text style={styles.driverBenefitDot}>✓</Text>
+              <Text style={styles.driverBenefitText}>100% फ्री रजिस्ट्रेशन • ₹0 चार्ज</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Registration Form Card */}
+        <View style={styles.infoCard}>
+          <Text style={styles.formCardHeader}>ड्राइवर आवेदन पत्र (Registration Form)</Text>
+          <Text style={{ fontSize: 12, color: C.textSub, marginBottom: 14 }}>
+            कृपया अपनी सही जानकारी भरें। हमारी टीम 24 घंटे में आपको कॉल करके ट्रायल शेड्यूल करेगी।
+          </Text>
+
+          <Text style={styles.fieldLabel}>आपका पूरा नाम (Full Name) *</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="उदा. सतीश कुमार / Satish Kumar"
+            value={driverReg.name}
+            onChangeText={v => setDriverReg({ ...driverReg, name: v })}
+          />
+
+          <Text style={styles.fieldLabel}>मोबाइल नंबर (WhatsApp / Phone) *</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="+91 98765 43210"
+            keyboardType="phone-pad"
+            value={driverReg.phone}
+            onChangeText={v => setDriverReg({ ...driverReg, phone: v })}
+          />
+
+          <Text style={styles.fieldLabel}>आप दिल्ली NCR में कहाँ रहते हैं? (Your Area) *</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="उदा. बदरपुर, साउथ दिल्ली / सेक्टर 56 गुड़गांव"
+            value={driverReg.area}
+            onChangeText={v => setDriverReg({ ...driverReg, area: v })}
+          />
+
+          <Text style={styles.fieldLabel}>ड्राइविंग अनुभव (Total Driving Experience)</Text>
+          <View style={styles.pillRow}>
+            {['1-3 साल', '4-7 साल', '8-12 साल', '15+ साल'].map(exp => (
+              <TouchableOpacity
+                key={exp}
+                onPress={() => setDriverReg({ ...driverReg, exp })}
+                style={[styles.pill, driverReg.exp === exp && styles.pillActiveGreen]}
+              >
+                <Text style={[styles.pillText, driverReg.exp === exp && styles.pillTextActive]}>{exp}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.fieldLabel}>कौन सी गाड़ी चलाते हैं? (Transmission)</Text>
+          <View style={styles.pillRow}>
+            {['मैनुअल (Manual)', 'ऑटोमेटिक (Auto)', 'दोनों (Both)', 'लग्जरी (BMW/Audi)'].map(trans => (
+              <TouchableOpacity
+                key={trans}
+                onPress={() => setDriverReg({ ...driverReg, trans })}
+                style={[styles.pill, driverReg.trans === trans && styles.pillActiveGreen]}
+              >
+                <Text style={[styles.pillText, driverReg.trans === trans && styles.pillTextActive]}>{trans}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.fieldLabel}>कमर्शियल ड्राइविंग लाइसेंस नंबर (DL - यदि उपलब्ध हो)</Text>
+          <TextInput
+            style={styles.fieldInput}
+            placeholder="DL-0420180012345"
+            autoCapitalize="characters"
+            value={driverReg.dl}
+            onChangeText={v => setDriverReg({ ...driverReg, dl: v })}
+          />
+
+          {/* Submit Button */}
+          <TouchableOpacity style={styles.driverSubmitBtn} onPress={handleDriverSelfRegister}>
+            <Text style={styles.driverSubmitBtnText}>आवेदन सबमिट करें (Submit Application)</Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.bookOrRow}>
+            <View style={styles.bookOrLine} /><Text style={styles.bookOrText}>या सीधे व्हाट्सएप पर जुड़ें</Text><View style={styles.bookOrLine} />
+          </View>
+
+          {/* WhatsApp Direct */}
+          <TouchableOpacity style={styles.driverWABtn} onPress={driverWhatsAppJoin}>
+            <Text style={styles.driverWABtnText}>व्हाट्सएप पर तुरंत जुड़ें (Join on WhatsApp)</Text>
+          </TouchableOpacity>
+
+          <View style={{ marginTop: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 12, color: C.textMuted }}>
+              हेल्पलाइन नंबर: +91 8175087004 (सोमवार से शनिवार, सुबह 9 से शाम 8)
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Driver Registration Success Modal */}
+      <Modal visible={driverRegSuccess} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={[styles.modalCheckCircle, { backgroundColor: C.greenBg }]}>
+              <Text style={[styles.modalCheck, { color: C.green }]}>✓</Text>
+            </View>
+            <Text style={styles.modalTitle}>बधाई हो, आवेदन प्राप्त हुआ!</Text>
+            <Text style={styles.modalMsg}>
+              {driverReg.name ? `धन्यवाद ${driverReg.name}!` : 'धन्यवाद!'}
+              {'\n\n'}ड्राइवर्स साथी में आपका रजिस्ट्रेशन सुरक्षित दर्ज कर लिया गया है।
+              {'\n\n'}हमारे भर्ती अधिकारी (Recruitment Manager) अगले 24 घंटों में आपके नंबर पर कॉल करके आपके इलाके में प्राइवेट कार मालिक का ट्रायल शेड्यूल करेंगे।
+            </Text>
+            <TouchableOpacity
+              style={[styles.modalBtn, { backgroundColor: C.driverPrimary }]}
+              onPress={() => {
+                setDriverRegSuccess(false);
+                setPortal('landing');
+              }}
+            >
+              <Text style={styles.modalBtnText}>ठीक है (Go to Home)</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+
+  // ============================================================================
   // VIEW: CUSTOMER WEBSITE
   // ============================================================================
   const renderCustomer = () => (
@@ -447,8 +681,8 @@ export default function App() {
             <Text style={styles.custHomeBackText}>← Home</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.custPortalBtn, { backgroundColor: '#1B5E20' }]}
-            onPress={() => { setDrvId('DRV-101'); setDrvPass('1234'); setPortal('driver_login'); }}>
-            <Text style={styles.custPortalBtnText}>Driver Login</Text>
+            onPress={() => setPortal('driver_register')}>
+            <Text style={styles.custPortalBtnText}>ड्राइवर बनें (Join)</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.custPortalBtn, { backgroundColor: '#4A148C' }]}
             onPress={() => { setOwnId('OWN-501'); setOwnPass('1234'); setPortal('owner_login'); }}>
@@ -535,6 +769,19 @@ export default function App() {
                   </View>
                 ))}
               </View>
+            </View>
+
+            {/* Driver Recruitment Callout Banner (Recruits drivers from customer web) */}
+            <View style={styles.driverWebRecruitBanner}>
+              <View style={{ flex: 1, paddingRight: 10 }}>
+                <Text style={styles.driverWebRecruitTitle}>Are you a Driver? / क्या आप ड्राइवर हैं?</Text>
+                <Text style={styles.driverWebRecruitDesc}>
+                  महीने का ₹20,000 से ₹28,000 निश्चित वेतन कमाएं। 100% फ्री रजिस्ट्रेशन, सीधा कार मालिक से वेतन।
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.driverWebRecruitBtn} onPress={() => setPortal('driver_register')}>
+                <Text style={styles.driverWebRecruitBtnText}>रजिस्ट्रेशन करें &rarr;</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Area Coverage Strip */}
@@ -1026,8 +1273,10 @@ export default function App() {
         <TouchableOpacity onPress={() => setPortal('landing')}>
           <Text style={styles.loginBackBtn}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.loginPortalTitle}>Driver Partner Portal</Text>
-        <View style={{ width: 40 }} />
+        <Text style={styles.loginPortalTitle}>Driver Partner Login</Text>
+        <TouchableOpacity onPress={() => setPortal('driver_register')}>
+          <Text style={{ color: C.driverPrimary, fontWeight: '700', fontSize: 12 }}>रजिस्ट्रेशन</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.loginScroll}>
         <View style={styles.loginCard}>
@@ -1053,6 +1302,15 @@ export default function App() {
             onPress={() => { setDrvId('DRV-101'); setDrvPass('1234'); setPortal('driver_app'); }}>
             <Text style={styles.loginDemoBtnText}>Instant Demo Sign In (DRV-101 / 1234)</Text>
           </TouchableOpacity>
+
+          {/* New Driver Register Link */}
+          <View style={{ marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: C.divider, alignItems: 'center' }}>
+            <Text style={{ fontSize: 13, color: C.textSub, marginBottom: 8 }}>नया ड्राइवर हैं? अपना रजिस्ट्रेशन करें:</Text>
+            <TouchableOpacity style={styles.linkRegBtn} onPress={() => setPortal('driver_register')}>
+              <Text style={styles.linkRegBtnText}>ड्राइवर साथी से जुड़ें (New Driver Registration)</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.loginHelpText}>Need login help? Call Helpline: +91 8175087004</Text>
         </View>
       </ScrollView>
@@ -1894,9 +2152,9 @@ export default function App() {
                   { label: 'Active Placements', value: '3', color: C.adminPrimary },
                   { label: 'Drivers on Duty', value: '2', color: C.driverPrimary },
                   { label: 'Pending Approvals', value: '1', color: C.amber },
+                  { label: 'Inbound Driver Apps', value: inboundDriverApplicants.length.toString(), color: C.green },
                   { label: 'New Web Leads', value: '3', color: C.blue },
                   { label: 'Standby Drivers', value: '3', color: C.ownerPrimary },
-                  { label: 'Vehicle Expiries', value: '1', color: C.red },
                 ].map((k, i) => (
                   <View key={i} style={styles.kpiCard}>
                     <Text style={[styles.kpiValue, { color: k.color }]}>{k.value}</Text>
@@ -1962,7 +2220,7 @@ export default function App() {
                 ))}
               </View>
 
-              <Text style={styles.sectionHeading}>Recent Inbound Leads</Text>
+              <Text style={styles.sectionHeading}>Recent Inbound Customer Leads</Text>
               {leads.map(l => (
                 <View key={l.id} style={styles.infoCard}>
                   <View style={styles.infoRow}>
@@ -1990,7 +2248,7 @@ export default function App() {
                       <Text style={[styles.logStatusText, { color: l.status === 'New Lead' ? C.blue : l.status === 'Contacted' ? C.amber : C.green }]}>{l.status}</Text>
                     </View>
                     <TouchableOpacity onPress={() => Linking.openURL(`tel:${l.phone}`)}>
-                      <Text style={{ color: C.blue, fontWeight: '700', fontSize: 13 }}>Call Lead</Text>
+                      <Text style={{ color: C.blue, fontWeight: '700', fontSize: 13 }}>Call Client</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -1998,11 +2256,47 @@ export default function App() {
             </View>
           )}
 
-          {/* ── ADMIN: DRIVER ONBOARDING & STANDBY ── */}
+          {/* ── ADMIN: DRIVER PIPELINE & STANDBY POOL ── */}
           {admTab === 'standby' && (
             <View>
-              {/* Driver Onboarding Form */}
-              <Text style={styles.sectionHeading}>Onboard New Driver to Pool</Text>
+              {/* Inbound Driver Applications from App (Your Driver Pipeline!) */}
+              <Text style={styles.sectionHeading}>Inbound Driver Applicants ({inboundDriverApplicants.length})</Text>
+              <Text style={{ fontSize: 12, color: C.textSub, marginBottom: 10 }}>
+                Drivers who registered themselves through the app. Call them to verify and schedule a trial:
+              </Text>
+              {inboundDriverApplicants.map(app => (
+                <View key={app.id} style={[styles.infoCard, { borderLeftWidth: 4, borderLeftColor: C.driverPrimary }]}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '800', color: C.text }}>{app.name}</Text>
+                    <View style={[styles.logStatusBadge, { backgroundColor: C.greenBg }]}>
+                      <Text style={[styles.logStatusText, { color: C.green }]}>New Applicant</Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: 12, color: C.textSub, marginBottom: 2 }}>Phone: {app.phone} • Area: {app.area}</Text>
+                  <Text style={{ fontSize: 12, color: C.textSub, marginBottom: 2 }}>Exp: {app.exp} • Transmission: {app.trans}</Text>
+                  {app.dl && <Text style={{ fontSize: 11, color: C.textMuted }}>DL No: {app.dl}</Text>}
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.serviceCardBtn, { flex: 1, backgroundColor: C.driverPrimary }]}
+                      onPress={() => Linking.openURL(`tel:${app.phone}`)}
+                    >
+                      <Text style={styles.serviceCardBtnText}>Call Driver: {app.name.split(' ')[0]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.serviceCardBtn, { flex: 1, backgroundColor: C.green }]}
+                      onPress={() => {
+                        const t = `नमस्ते ${app.name} जी, हम ड्राइवर्स साथी से बोल रहे हैं। हमें आपका प्राइवेट ड्राइवर का आवेदन प्राप्त हुआ है। क्या आप अभी बात कर सकते हैं?`;
+                        Linking.openURL(`https://wa.me/${app.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(t)}`);
+                      }}
+                    >
+                      <Text style={styles.serviceCardBtnText}>WhatsApp Chat</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+
+              {/* Manual Onboarding Form */}
+              <Text style={styles.sectionHeading}>Manual Driver Registration</Text>
               <View style={styles.infoCard}>
                 <Text style={styles.fieldLabel}>Driver Full Name *</Text>
                 <TextInput style={styles.fieldInput} placeholder="e.g. Surender Kumar"
@@ -2029,7 +2323,7 @@ export default function App() {
                 </TouchableOpacity>
               </View>
 
-              <Text style={styles.sectionHeading}>Standby Driver Pool</Text>
+              <Text style={styles.sectionHeading}>Verified Standby Pool</Text>
               {CANDIDATES.map(d => (
                 <View key={d.id} style={styles.driverCard}>
                   <View style={styles.driverCardTop}>
@@ -2059,14 +2353,15 @@ export default function App() {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar style="light" />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {portal === 'landing'      && renderLanding()}
-        {portal === 'customer'     && renderCustomer()}
-        {portal === 'driver_login' && renderDriverLogin()}
-        {portal === 'driver_app'   && renderDriverApp()}
-        {portal === 'owner_login'  && renderOwnerLogin()}
-        {portal === 'owner_app'    && renderOwnerApp()}
-        {portal === 'admin_login'  && renderAdminLogin()}
-        {portal === 'admin_app'    && renderAdminApp()}
+        {portal === 'landing'         && renderLanding()}
+        {portal === 'customer'        && renderCustomer()}
+        {portal === 'driver_register' && renderDriverRegister()}
+        {portal === 'driver_login'    && renderDriverLogin()}
+        {portal === 'driver_app'      && renderDriverApp()}
+        {portal === 'owner_login'     && renderOwnerLogin()}
+        {portal === 'owner_app'       && renderOwnerApp()}
+        {portal === 'admin_login'     && renderAdminLogin()}
+        {portal === 'admin_app'       && renderAdminApp()}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -2145,6 +2440,33 @@ const styles = StyleSheet.create({
   featureIconText: { color: C.white, fontWeight: '900', fontSize: 16 },
   featureTitle: { color: C.white, fontWeight: '800', fontSize: 13, marginBottom: 4 },
   featureDesc: { color: '#90CAF9', fontSize: 11, lineHeight: 16 },
+
+  // Driver Recruitment Banners
+  driverWebRecruitBanner: { marginHorizontal: 16, marginVertical: 8, backgroundColor: C.driverPrimary, borderRadius: 14, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  driverWebRecruitTitle: { color: C.white, fontSize: 15, fontWeight: '800', marginBottom: 3 },
+  driverWebRecruitDesc: { color: '#C8E6C9', fontSize: 11, lineHeight: 16 },
+  driverWebRecruitBtn: { backgroundColor: C.accentGold, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 },
+  driverWebRecruitBtnText: { color: C.brandDark, fontWeight: '800', fontSize: 12 },
+
+  // Driver Pitch Banner (in driver_register view)
+  driverPitchBanner: { backgroundColor: C.driverPrimary, borderRadius: 16, padding: 20, marginBottom: 16 },
+  driverPitchPre: { color: '#A5D6A7', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  driverPitchHeadline: { color: C.white, fontSize: 22, fontWeight: '900', marginVertical: 6 },
+  driverPitchSub: { color: '#E8F5E9', fontSize: 12, marginBottom: 14 },
+  driverBenefitsGrid: { gap: 6 },
+  driverBenefitItem: { flexDirection: 'row', alignItems: 'center' },
+  driverBenefitDot: { color: C.accentGold, fontWeight: '900', fontSize: 14, marginRight: 8 },
+  driverBenefitText: { color: C.white, fontSize: 13, fontWeight: '600' },
+  formCardHeader: { fontSize: 17, fontWeight: '800', color: C.text, marginBottom: 4 },
+  pillActiveGreen: { backgroundColor: C.driverPrimary, borderColor: C.driverPrimary },
+
+  // Driver Register Buttons
+  driverSubmitBtn: { backgroundColor: C.driverPrimary, paddingVertical: 14, borderRadius: 8, alignItems: 'center', marginTop: 18 },
+  driverSubmitBtnText: { color: C.white, fontWeight: '800', fontSize: 14 },
+  driverWABtn: { backgroundColor: C.green, paddingVertical: 13, borderRadius: 8, alignItems: 'center' },
+  driverWABtnText: { color: C.white, fontWeight: '800', fontSize: 13 },
+  linkRegBtn: { backgroundColor: C.driverBg, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, borderWidth: 1, borderColor: C.driverAccent },
+  linkRegBtnText: { color: C.driverPrimary, fontWeight: '700', fontSize: 12 },
 
   // CTA Block
   ctaBlock: { margin: 16, backgroundColor: C.accentLight, borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#FFCC80' },
@@ -2362,14 +2684,26 @@ const styles = StyleSheet.create({
     elevation: 4, shadowColor: '#000', shadowOpacity: 0.15,
     shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
   },
+  roleCardWrapper: {
+    borderRadius: 18, padding: 20, marginBottom: 14,
+    elevation: 4, shadowColor: '#000', shadowOpacity: 0.15,
+    shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
+  },
   roleCardIconBox: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   roleCardEmoji: { fontSize: 26 },
   roleCardText: { flex: 1 },
-  roleCardTitle: { fontSize: 18, fontWeight: '900', color: C.white, marginBottom: 4 },
-  roleCardDesc: { fontSize: 12, color: 'rgba(255,255,255,0.85)', lineHeight: 17, marginBottom: 10 },
+  roleCardTitle: { fontSize: 17, fontWeight: '900', color: C.white, marginBottom: 4 },
+  roleCardDesc: { fontSize: 12, color: 'rgba(255,255,255,0.85)', lineHeight: 17, marginBottom: 6 },
   roleCardChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   roleCardChip: { backgroundColor: 'rgba(255,255,255,0.2)', color: C.white, fontSize: 10, fontWeight: '700', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10, overflow: 'hidden' },
   roleCardArrow: { color: 'rgba(255,255,255,0.7)', fontSize: 22, fontWeight: '900', marginLeft: 10 },
+
+  // Landing Driver Sub-buttons
+  driverCardRegBtn: { flex: 1.2, backgroundColor: C.accentGold, paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
+  driverCardRegBtnText: { color: C.brandDark, fontWeight: '800', fontSize: 12 },
+  driverCardLoginBtn: { flex: 0.9, backgroundColor: 'rgba(255,255,255,0.2)', borderWidth: 1, borderColor: C.white, paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
+  driverCardLoginBtnText: { color: C.white, fontWeight: '700', fontSize: 12 },
+
   adminLink: { alignSelf: 'center', paddingVertical: 14, paddingHorizontal: 20 },
   adminLinkText: { color: C.textMuted, fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' },
   landingFooter: { alignItems: 'center', marginTop: 20 },
