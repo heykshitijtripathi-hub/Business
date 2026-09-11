@@ -544,6 +544,36 @@ export default function App() {
           </View>
         </View>
 
+        
+        {/* Driver Code of Conduct & Loyalty Security */}
+        <View style={[styles.infoCard, { borderLeftWidth: 4, borderLeftColor: C.driverPrimary }]}>
+          <Text style={styles.formCardHeader}>ड्राइवर आचार संहिता व सुरक्षा नियम (Code of Conduct)</Text>
+          <Text style={{ fontSize: 12, color: C.textSub, marginTop: 4, marginBottom: 10 }}>
+            ड्राइवर्स साथी से जुड़े रहने पर आपकी नौकरी हमेशा सुरक्षित रहती है:
+          </Text>
+
+          <View style={{ gap: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+              <Text style={{ color: C.green, fontWeight: '900', marginRight: 6 }}>★</Text>
+              <Text style={{ flex: 1, fontSize: 12, color: C.text, lineHeight: 18 }}>
+                <Text style={{ fontWeight: '800' }}>लाइफटाइम नौकरी सुरक्षा:</Text> यदि कार मालिक गाड़ी बेच दे या शहर छोड़ दे, तो ड्राइवर्स साथी आपको 24 घंटे में दूसरी नौकरी दिलाएगा।
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+              <Text style={{ color: C.green, fontWeight: '900', marginRight: 6 }}>★</Text>
+              <Text style={{ flex: 1, fontSize: 12, color: C.text, lineHeight: 18 }}>
+                <Text style={{ fontWeight: '800' }}>इमरजेंसी एडवांस व बोनस:</Text> एजेंसी के रजिस्टर्ड ड्राइवरों को त्योहारों पर बोनस व जरूरत पर बिना ब्याज का सैलरी एडवांस मिलता है।
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+              <Text style={{ color: C.red, fontWeight: '900', marginRight: 6 }}>⚠</Text>
+              <Text style={{ flex: 1, fontSize: 12, color: C.red, lineHeight: 18 }}>
+                <Text style={{ fontWeight: '800' }}>सीधे डील की सख्त मनाही:</Text> यदि कोई ड्राइवर एजेंसी को छुपाकर कार मालिक से सीधे काम करता है, तो उसका ड्राइविंग लाइसेंस दिल्ली NCR ड्राइवर नेटवर्क में हमेशा के लिए ब्लैकलिस्ट कर दिया जाएगा।
+              </Text>
+            </View>
+          </View>
+        </View>
+
         {/* Registration Form Card */}
         <View style={styles.infoCard}>
           <Text style={styles.formCardHeader}>ड्राइवर आवेदन पत्र (Registration Form)</Text>
@@ -782,6 +812,82 @@ export default function App() {
               <TouchableOpacity style={styles.driverWebRecruitBtn} onPress={() => setPortal('driver_register')}>
                 <Text style={styles.driverWebRecruitBtnText}>रजिस्ट्रेशन करें &rarr;</Text>
               </TouchableOpacity>
+            </View>
+
+            
+            {/* Direct Roadside Hiring vs Drivers Saathi Shield (Anti-Bypass Education) */}
+            <View style={[styles.sectionBlock, { backgroundColor: '#F8FAFC' }]}>
+              <Text style={styles.sectionTitle}>Why Never Hire a Driver Directly?</Text>
+              <Text style={styles.sectionSubtitle}>
+                The hidden dangers of hiring roadside or informal drivers without agency backing in Delhi NCR
+              </Text>
+
+              <View style={styles.comparisonGrid}>
+                {/* Roadside / Direct Hiring (Bad) */}
+                <View style={styles.comparisonColBad}>
+                  <View style={styles.comparisonBadgeBad}><Text style={styles.comparisonBadgeTextBad}>Direct / Roadside Hiring</Text></View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCross}>✕</Text>
+                    <Text style={styles.comparisonTextBad}>Zero Police Clearance — unknown criminal or theft history</Text>
+                  </View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCross}>✕</Text>
+                    <Text style={styles.comparisonTextBad}>Leaves after 10 days — you are stranded with NO replacement</Text>
+                  </View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCross}>✕</Text>
+                    <Text style={styles.comparisonTextBad}>No standby backup when driver takes festival/village leave</Text>
+                  </View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCross}>✕</Text>
+                    <Text style={styles.comparisonTextBad}>No legal agreement — high risk to family & luxury car</Text>
+                  </View>
+                </View>
+
+                {/* Drivers Saathi Shield (Good) */}
+                <View style={styles.comparisonColGood}>
+                  <View style={styles.comparisonBadgeGood}><Text style={styles.comparisonBadgeTextGood}>Drivers Saathi Protection</Text></View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCheck}>✓</Text>
+                    <Text style={styles.comparisonTextGood}>100% Police Station Clearance & DL Dossier in your hands</Text>
+                  </View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCheck}>✓</Text>
+                    <Text style={styles.comparisonTextGood}>30-Day Iron-Clad Free Replacement Guarantee</Text>
+                  </View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCheck}>✓</Text>
+                    <Text style={styles.comparisonTextGood}>2-Hour Emergency Standby Substitute Chauffeur pool</Text>
+                  </View>
+                  <View style={styles.comparisonItemRow}>
+                    <Text style={styles.comparisonCheck}>✓</Text>
+                    <Text style={styles.comparisonTextGood}>Legally binding Placement Agreement protecting owner</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* How Trial & Placement Works (Transparent Fair Terms) */}
+            <View style={styles.sectionBlock}>
+              <Text style={styles.sectionTitle}>Our Fair 3-Step Placement Process</Text>
+              <Text style={styles.sectionSubtitle}>Designed for complete transparency and client safety</Text>
+              <View style={styles.trialStepsContainer}>
+                <View style={styles.trialStepCard}>
+                  <View style={styles.trialStepNum}><Text style={styles.trialStepNumText}>1</Text></View>
+                  <Text style={styles.trialStepTitle}>Shortlist & Dossier</Text>
+                  <Text style={styles.trialStepDesc}>We share 3 verified profiles matching your car & shift timings within 4 hours.</Text>
+                </View>
+                <View style={styles.trialStepCard}>
+                  <View style={styles.trialStepNum}><Text style={styles.trialStepNumText}>2</Text></View>
+                  <Text style={styles.trialStepTitle}>1-Day Home Trial</Text>
+                  <Text style={styles.trialStepDesc}>₹500 slot booking token (100% adjusted in final placement fee, or refunded if driver does not report).</Text>
+                </View>
+                <View style={styles.trialStepCard}>
+                  <View style={styles.trialStepNum}><Text style={styles.trialStepNumText}>3</Text></View>
+                  <Text style={styles.trialStepTitle}>Dossier & Warranty</Text>
+                  <Text style={styles.trialStepDesc}>Trial succeeds! Placement fee settled, written agreement & police file released, 30-day warranty starts.</Text>
+                </View>
+              </View>
             </View>
 
             {/* Area Coverage Strip */}
@@ -2708,4 +2814,27 @@ const styles = StyleSheet.create({
   adminLinkText: { color: C.textMuted, fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' },
   landingFooter: { alignItems: 'center', marginTop: 20 },
   landingFooterText: { color: C.textMuted, fontSize: 12, marginTop: 3 },
+
+  // Anti-Bypass Comparison Styles
+  comparisonGrid: { gap: 12 },
+  comparisonColBad: { backgroundColor: C.redBg, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#FECACA' },
+  comparisonBadgeBad: { alignSelf: 'flex-start', backgroundColor: C.red, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginBottom: 12 },
+  comparisonBadgeTextBad: { color: C.white, fontSize: 11, fontWeight: '800' },
+  comparisonColGood: { backgroundColor: C.greenBg, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#A7F3D0' },
+  comparisonBadgeGood: { alignSelf: 'flex-start', backgroundColor: C.green, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginBottom: 12 },
+  comparisonBadgeTextGood: { color: C.white, fontSize: 11, fontWeight: '800' },
+  comparisonItemRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
+  comparisonCross: { color: C.red, fontWeight: '900', fontSize: 14, marginRight: 8, marginTop: 1 },
+  comparisonCheck: { color: C.green, fontWeight: '900', fontSize: 14, marginRight: 8, marginTop: 1 },
+  comparisonTextBad: { flex: 1, fontSize: 12, color: '#7F1D1D', lineHeight: 17 },
+  comparisonTextGood: { flex: 1, fontSize: 12, color: '#064E3B', lineHeight: 17, fontWeight: '600' },
+
+  // Trial Steps Styles
+  trialStepsContainer: { gap: 10 },
+  trialStepCard: { backgroundColor: C.white, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: C.border },
+  trialStepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: C.brand, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
+  trialStepNumText: { color: C.white, fontWeight: '900', fontSize: 13 },
+  trialStepTitle: { fontSize: 14, fontWeight: '800', color: C.text, marginBottom: 3 },
+  trialStepDesc: { fontSize: 12, color: C.textSub, lineHeight: 17 },
+
 });
