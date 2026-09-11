@@ -99,8 +99,8 @@ const CANDIDATES = [
 
 // ─── Main App ────────────────────────────────────────────────────────────────
 export default function App() {
-  const [portal, setPortal] = useState('customer');
-  // 'customer' | 'driver_login' | 'driver_app' | 'owner_login' | 'owner_app' | 'admin_login' | 'admin_app'
+  const [portal, setPortal] = useState('landing');
+  // 'landing' | 'customer' | 'driver_login' | 'driver_app' | 'owner_login' | 'owner_app' | 'admin_login' | 'admin_app'
 
   // Customer tabs
   const [custTab, setCustTab] = useState('home');
@@ -262,6 +262,10 @@ export default function App() {
         </View>
         {/* Portal Access Buttons */}
         <View style={styles.custPortalRow}>
+          <TouchableOpacity style={styles.custHomeBackBtn}
+            onPress={() => setPortal('landing')}>
+            <Text style={styles.custHomeBackText}>← Home</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={[styles.custPortalBtn, { backgroundColor: '#1B5E20' }]}
             onPress={() => { setDrvId('DRV-101'); setDrvPass('1234'); setPortal('driver_login'); }}>
             <Text style={styles.custPortalBtnText}>Driver Login</Text>
@@ -732,7 +736,7 @@ export default function App() {
   const renderDriverLogin = () => (
     <View style={{ flex: 1, backgroundColor: C.driverBg }}>
       <View style={styles.loginPortalHeader}>
-        <TouchableOpacity onPress={() => setPortal('customer')}>
+        <TouchableOpacity onPress={() => setPortal('landing')}>
           <Text style={styles.loginBackBtn}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.loginPortalTitle}>Driver Portal</Text>
@@ -1030,7 +1034,7 @@ export default function App() {
   const renderOwnerLogin = () => (
     <View style={{ flex: 1, backgroundColor: C.ownerBg }}>
       <View style={styles.loginPortalHeader}>
-        <TouchableOpacity onPress={() => setPortal('customer')}>
+        <TouchableOpacity onPress={() => setPortal('landing')}>
           <Text style={styles.loginBackBtn}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.loginPortalTitle}>Owner Portal</Text>
@@ -1502,18 +1506,122 @@ export default function App() {
     );
   };
 
+  // ─── Landing / Role Selection Screen ──────────────────────────────────────────
+  const renderLanding = () => (
+    <View style={{ flex: 1, backgroundColor: C.brandDark }}>
+      {/* Brand Header */}
+      <View style={styles.landingHeader}>
+        <Image
+          source={require('./assets/driver-saathi-logo-light.png')}
+          style={styles.landingLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.landingBrand}>DRIVERS SAATHI</Text>
+        <Text style={styles.landingTagline}>Delhi NCR's Trusted Chauffeur Service</Text>
+        <View style={styles.landingTrustRow}>
+          <Text style={styles.landingTrustPill}>500+ Placements</Text>
+          <Text style={styles.landingTrustPill}>Police Verified</Text>
+          <Text style={styles.landingTrustPill}>4.9 Star Rating</Text>
+        </View>
+      </View>
+
+      {/* Role Cards */}
+      <ScrollView contentContainerStyle={styles.landingScroll} showsVerticalScrollIndicator={false}>
+        <Text style={styles.landingPrompt}>Who are you?</Text>
+        <Text style={styles.landingPromptSub}>Choose your role to continue</Text>
+
+        {/* Card 1 — Customer / Person who wants to hire */}
+        <TouchableOpacity
+          style={[styles.roleCard, { backgroundColor: '#FF6F00' }]}
+          onPress={() => { setCustTab('home'); setPortal('customer'); }}
+          activeOpacity={0.9}
+        >
+          <View style={styles.roleCardIconBox}>
+            <Text style={styles.roleCardEmoji}>🚗</Text>
+          </View>
+          <View style={styles.roleCardText}>
+            <Text style={styles.roleCardTitle}>I want to hire a Driver</Text>
+            <Text style={styles.roleCardDesc}>Find & book a verified, police-cleared chauffeur for your private car in Delhi NCR</Text>
+            <View style={styles.roleCardChips}>
+              <Text style={styles.roleCardChip}>Personal Chauffeur</Text>
+              <Text style={styles.roleCardChip}>Outstation</Text>
+              <Text style={styles.roleCardChip}>Corporate Fleet</Text>
+            </View>
+          </View>
+          <Text style={styles.roleCardArrow}>→</Text>
+        </TouchableOpacity>
+
+        {/* Card 2 — Driver / Person who works as driver */}
+        <TouchableOpacity
+          style={[styles.roleCard, { backgroundColor: C.driverPrimary }]}
+          onPress={() => { setPortal('driver_login'); }}
+          activeOpacity={0.9}
+        >
+          <View style={styles.roleCardIconBox}>
+            <Text style={styles.roleCardEmoji}>👤</Text>
+          </View>
+          <View style={styles.roleCardText}>
+            <Text style={styles.roleCardTitle}>I am a Driver</Text>
+            <Text style={styles.roleCardDesc}>View your today's duty, log daily odometer readings, apply for leave, and check your salary</Text>
+            <View style={styles.roleCardChips}>
+              <Text style={styles.roleCardChip}>Today's Duty</Text>
+              <Text style={styles.roleCardChip}>Logbook</Text>
+              <Text style={styles.roleCardChip}>Salary Slip</Text>
+            </View>
+          </View>
+          <Text style={styles.roleCardArrow}>→</Text>
+        </TouchableOpacity>
+
+        {/* Card 3 — Car Owner / Person who has a placed driver */}
+        <TouchableOpacity
+          style={[styles.roleCard, { backgroundColor: C.ownerPrimary }]}
+          onPress={() => { setPortal('owner_login'); }}
+          activeOpacity={0.9}
+        >
+          <View style={styles.roleCardIconBox}>
+            <Text style={styles.roleCardEmoji}>🏠</Text>
+          </View>
+          <View style={styles.roleCardText}>
+            <Text style={styles.roleCardTitle}>I own a Car</Text>
+            <Text style={styles.roleCardDesc}>Track your placed driver's duty hours, verify documents, approve overtime, and request a backup driver</Text>
+            <View style={styles.roleCardChips}>
+              <Text style={styles.roleCardChip}>Driver Documents</Text>
+              <Text style={styles.roleCardChip}>Duty Approval</Text>
+              <Text style={styles.roleCardChip}>Vehicle Compliance</Text>
+            </View>
+          </View>
+          <Text style={styles.roleCardArrow}>→</Text>
+        </TouchableOpacity>
+
+        {/* Admin — subtle small link */}
+        <TouchableOpacity
+          style={styles.adminLink}
+          onPress={() => setPortal('admin_login')}
+        >
+          <Text style={styles.adminLinkText}>Drivers Saathi Admin Console</Text>
+        </TouchableOpacity>
+
+        <View style={styles.landingFooter}>
+          <Text style={styles.landingFooterText}>Helpline: +91 8175087004</Text>
+          <Text style={styles.landingFooterText}>Mon–Sat, 9 AM – 8 PM  |  WhatsApp 24x7</Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+
   // ─── Root Render ─────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar style={portal === 'customer' ? 'light' : 'light'} />
+      <StatusBar style="light" />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {portal === 'customer'    && renderCustomer()}
+        {portal === 'landing'      && renderLanding()}
+        {portal === 'customer'     && renderCustomer()}
         {portal === 'driver_login' && renderDriverLogin()}
-        {portal === 'driver_app'  && renderDriverApp()}
-        {portal === 'owner_login' && renderOwnerLogin()}
-        {portal === 'owner_app'   && renderOwnerApp()}
-        {portal === 'admin_login' && renderAdminLogin()}
-        {portal === 'admin_app'   && renderAdminApp()}
+        {portal === 'driver_app'   && renderDriverApp()}
+        {portal === 'owner_login'  && renderOwnerLogin()}
+        {portal === 'owner_app'    && renderOwnerApp()}
+        {portal === 'admin_login'  && renderAdminLogin()}
+        {portal === 'admin_app'    && renderAdminApp()}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -1527,7 +1635,9 @@ const styles = StyleSheet.create({
   custLogo: { width: 52, height: 52, borderRadius: 10 },
   custBrandName: { color: C.white, fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
   custBrandTagline: { color: '#90CAF9', fontSize: 11, marginTop: 1 },
-  custPortalRow: { flexDirection: 'row', gap: 6, marginTop: 10 },
+  custPortalRow: { flexDirection: 'row', gap: 6, marginTop: 10, alignItems: 'center' },
+  custHomeBackBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  custHomeBackText: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '600' },
   custPortalBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   custPortalBtnText: { color: C.white, fontSize: 11, fontWeight: '700' },
 
@@ -1778,4 +1888,39 @@ const styles = StyleSheet.create({
 
   // Lead Actions
   leadActionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+
+  // ── Landing / Role Selection ──────────────────────────────────────────────────
+  landingHeader: { backgroundColor: C.brandDark, paddingTop: Platform.OS === 'android' ? 48 : 24, paddingBottom: 24, paddingHorizontal: 20, alignItems: 'center' },
+  landingLogo: { width: 80, height: 80, borderRadius: 16, marginBottom: 12 },
+  landingBrand: { color: C.white, fontSize: 24, fontWeight: '900', letterSpacing: 2, textAlign: 'center' },
+  landingTagline: { color: '#90CAF9', fontSize: 13, marginTop: 4, textAlign: 'center' },
+  landingTrustRow: { flexDirection: 'row', gap: 8, marginTop: 14, flexWrap: 'wrap', justifyContent: 'center' },
+  landingTrustPill: { backgroundColor: 'rgba(255,255,255,0.12)', color: C.white, fontSize: 11, fontWeight: '700', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, overflow: 'hidden' },
+  landingScroll: { padding: 20, paddingTop: 24, paddingBottom: 40, backgroundColor: '#F0F2FA' },
+  landingPrompt: { fontSize: 26, fontWeight: '900', color: C.text, textAlign: 'center' },
+  landingPromptSub: { fontSize: 14, color: C.textSub, textAlign: 'center', marginTop: 4, marginBottom: 20 },
+
+  // Role Cards
+  roleCard: {
+    borderRadius: 18, padding: 20, marginBottom: 14,
+    flexDirection: 'row', alignItems: 'center',
+    elevation: 4, shadowColor: '#000', shadowOpacity: 0.15,
+    shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
+  },
+  roleCardIconBox: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
+  roleCardEmoji: { fontSize: 26 },
+  roleCardText: { flex: 1 },
+  roleCardTitle: { fontSize: 18, fontWeight: '900', color: C.white, marginBottom: 4 },
+  roleCardDesc: { fontSize: 12, color: 'rgba(255,255,255,0.85)', lineHeight: 17, marginBottom: 10 },
+  roleCardChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  roleCardChip: { backgroundColor: 'rgba(255,255,255,0.2)', color: C.white, fontSize: 10, fontWeight: '700', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10, overflow: 'hidden' },
+  roleCardArrow: { color: 'rgba(255,255,255,0.7)', fontSize: 22, fontWeight: '900', marginLeft: 10 },
+
+  // Admin link
+  adminLink: { alignSelf: 'center', paddingVertical: 14, paddingHorizontal: 20 },
+  adminLinkText: { color: C.textMuted, fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' },
+
+  // Footer
+  landingFooter: { alignItems: 'center', marginTop: 20 },
+  landingFooterText: { color: C.textMuted, fontSize: 12, marginTop: 3 },
 });
