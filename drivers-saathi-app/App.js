@@ -16,9 +16,10 @@ import {
   Modal,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// ─── Minimal Executive Palette ────────────────────────────────────────────────
+// ─── Minimal Executive Design System ───────────────────────────────────────────
 const THEME = {
   bg: '#FFFFFF',
   bgSubtle: '#F9FAFB',
@@ -39,7 +40,7 @@ const THEME = {
   redSoft: '#FEF2F2',
 };
 
-// ─── Verified Candidates for Customer View ────────────────────────────────────
+// ─── Candidate Database ────────────────────────────────────────────────────────
 const CANDIDATE_DRIVERS = [
   {
     id: 'c1',
@@ -74,11 +75,15 @@ const CANDIDATE_DRIVERS = [
 ];
 
 export default function App() {
-  // Global Mode: 'customer' | 'driver_login' | 'driver_app' | 'owner_login' | 'owner_app'
+  // Global Mode: 'customer' | 'driver_login' | 'driver_app' | 'owner_login' | 'owner_app' | 'admin_login' | 'admin_app'
   const [currentMode, setCurrentMode] = useState('customer');
 
   // Customer State
-  const [customerTab, setCustomerTab] = useState('services'); // 'services' | 'candidates' | 'book' | 'help'
+  const [customerTab, setCustomerTab] = useState('services'); // 'services' | 'calculator' | 'candidates' | 'book' | 'help'
+  const [calcCity, setCalcCity] = useState('South Delhi');
+  const [calcHours, setCalcHours] = useState('10 Hours (Standard)');
+  const [calcTransmission, setCalcTransmission] = useState('Automatic');
+
   const [bookingForm, setBookingForm] = useState({
     name: '',
     phone: '',
@@ -93,11 +98,10 @@ export default function App() {
   // Driver Credentials & App State
   const [driverLoginId, setDriverLoginId] = useState('');
   const [driverPassword, setDriverPassword] = useState('');
-  const [driverTab, setDriverTab] = useState('duty'); // 'duty' | 'logbook' | 'docs' | 'salary'
-  const [driverDutyStatus, setDriverDutyStatus] = useState('Checked In (08:30 AM)');
+  const [driverTab, setDriverTab] = useState('duty'); // 'duty' | 'logbook' | 'leave' | 'docs' | 'salary'
   const [driverDutyLogs, setDriverDutyLogs] = useState([
-    { id: 'dl1', date: '2026-09-10', inTime: '08:30 AM', outTime: '07:15 PM', startKm: '42,100', endKm: '42,165', km: '65 km', ot: '1.5 hrs', approved: true },
-    { id: 'dl2', date: '2026-09-09', inTime: '08:30 AM', outTime: '07:45 PM', startKm: '42,020', endKm: '42,100', km: '80 km', ot: '2.0 hrs', approved: true },
+    { id: 'dl1', date: '2026-09-10', inTime: '08:30 AM', outTime: '07:15 PM', startKm: '42,100', endKm: '42,165', km: '65 km', ot: '1.5 hrs', approved: true, photoAttached: true },
+    { id: 'dl2', date: '2026-09-09', inTime: '08:30 AM', outTime: '07:45 PM', startKm: '42,020', endKm: '42,100', km: '80 km', ot: '2.0 hrs', approved: true, photoAttached: true },
   ]);
   const [newLogDate, setNewLogDate] = useState(new Date().toISOString().split('T')[0]);
   const [newLogIn, setNewLogIn] = useState('08:30 AM');
@@ -105,18 +109,37 @@ export default function App() {
   const [newStartKm, setNewStartKm] = useState('42,165');
   const [newEndKm, setNewEndKm] = useState('42,220');
   const [newOT, setNewOT] = useState('1.5');
+  const [logPhotoUri, setLogPhotoUri] = useState(null);
+
+  // Driver Leave Management
+  const [driverLeaveRequests, setDriverLeaveRequests] = useState([
+    { id: 'lr1', date: '2026-09-19', reason: 'Family medical visit', status: 'Approved', substituteAssigned: 'Vikramaditya S. (Backup)' },
+  ]);
+  const [leaveDateInput, setLeaveDateInput] = useState('2026-09-24');
+  const [leaveReasonInput, setLeaveReasonInput] = useState('');
 
   // Owner Credentials & App State
   const [ownerLoginId, setOwnerLoginId] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
-  const [ownerTab, setOwnerTab] = useState('overview'); // 'overview' | 'docs' | 'logbook' | 'replacement'
+  const [ownerTab, setOwnerTab] = useState('overview'); // 'overview' | 'substitute' | 'expiry' | 'agreement' | 'logbook'
 
-  // Load Saved Logs
+  // Admin Credentials & State
+  const [adminLoginId, setAdminLoginId] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminTab, setAdminTab] = useState('placements'); // 'placements' | 'substitutes' | 'leads'
+  const [masterPlacements, setMasterPlacements] = useState([
+    { id: 'P-101', owner: 'Mr. Rajesh Agarwal (Vasant Vihar)', car: 'Hyundai Creta', driver: 'Rameshwar Dayal (DRV-101)', status: 'Active Duty', warrantyEnd: '04 Oct 2026' },
+    { id: 'P-102', owner: 'Dr. Sameer Kapoor (DLF Phase 5)', car: 'BMW 5-Series', driver: 'Vikramaditya Singh (DRV-102)', status: 'Active Duty', warrantyEnd: '12 Oct 2026' },
+  ]);
+
+  // Load Persisted Data
   useEffect(() => {
     (async () => {
       try {
-        const saved = await AsyncStorage.getItem('@ds_shared_duty_logs');
-        if (saved) setDriverDutyLogs(JSON.parse(saved));
+        const savedLogs = await AsyncStorage.getItem('@ds_shared_duty_logs_v2');
+        if (savedLogs) setDriverDutyLogs(JSON.parse(savedLogs));
+        const savedLeaves = await AsyncStorage.getItem('@ds_shared_leave_reqs');
+        if (savedLeaves) setDriverLeaveRequests(JSON.parse(savedLeaves));
       } catch (e) {}
     })();
   }, []);
@@ -124,11 +147,42 @@ export default function App() {
   const openCall = () => Linking.openURL('tel:+918175087004');
 
   const openWhatsApp = (msg = '') => {
-    const text = msg || 'Hello Drivers Saathi, I have an inquiry regarding your driver services in Delhi NCR.';
+    const text = msg || 'Hello Drivers Saathi, I have an inquiry regarding driver placements in Delhi NCR.';
     Linking.openURL(`https://wa.me/918175087004?text=${encodeURIComponent(text)}`);
   };
 
-  // ─── CUSTOMER ACTIONS ────────────────────────────────────────────────────────
+  // Salary Calculator Output Helper
+  const calculateBenchmarkSalary = () => {
+    let base = 20000;
+    if (calcCity === 'South Delhi' || calcCity === 'Gurugram') base += 2000;
+    if (calcHours.includes('12 Hours')) base += 3000;
+    if (calcHours.includes('24-Hr Live-in')) base += 6000;
+    if (calcTransmission.includes('Luxury')) base += 3000;
+
+    return {
+      minSalary: base,
+      maxSalary: base + 2500,
+      otRate: base >= 25000 ? 100 : 80,
+      agencyFee: 4500,
+    };
+  };
+
+  // Photo Picker for Driver Logbook
+  const pickSpeedometerPhoto = async () => {
+    try {
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.6,
+      });
+      if (!res.canceled && res.assets[0]) {
+        setLogPhotoUri(res.assets[0].uri);
+        Alert.alert('Attached', 'Odometer photo attached to duty record.');
+      }
+    } catch (e) {}
+  };
+
+  // Customer Lead Submission
   const handleCustomerBookingSubmit = async () => {
     if (!bookingForm.name.trim() || !bookingForm.phone.trim()) {
       Alert.alert('Required', 'Please enter your Full Name and Mobile Number.');
@@ -147,7 +201,7 @@ export default function App() {
       Location: bookingForm.location || 'Delhi NCR',
       Transmission: bookingForm.transmission,
       _subject: `[Website Lead #${bookingId}] ${bookingForm.serviceType} - ${bookingForm.name}`,
-      _autoresponse: `Thank you ${bookingForm.name} for choosing Drivers Saathi! Your inquiry #${bookingId} has been received. Our account manager will connect with you within 4 hours. Helpline: +91 8175087004`,
+      _autoresponse: `Thank you ${bookingForm.name}! Your inquiry #${bookingId} is received. An account manager will contact you within 4 hours. Helpline: +91 8175087004`,
     };
 
     try {
@@ -159,7 +213,7 @@ export default function App() {
 
       setConfirmationModal({
         visible: true,
-        message: `Thank you, ${bookingForm.name}!\n\nYour request for ${bookingForm.serviceType} has been received (Ref #${bookingId}).\n\nOur account manager will contact you within 4 hours to confirm driver candidate availability.`,
+        message: `Thank you, ${bookingForm.name}!\n\nYour request for ${bookingForm.serviceType} has been received (Ref #${bookingId}).\n\nOur account manager will call you within 4 hours to confirm candidate availability.`,
       });
       setBookingForm({ name: '', phone: '', car: '', location: '', serviceType: 'Personal Chauffeur Placement', transmission: 'Automatic' });
     } catch (e) {
@@ -169,15 +223,16 @@ export default function App() {
     }
   };
 
-  // ─── DRIVER ACTIONS ──────────────────────────────────────────────────────────
+  // Driver Login
   const handleDriverLogin = () => {
     if ((driverLoginId.trim() === 'DRV-101' || driverLoginId.trim() === '9876543210') && driverPassword === '1234') {
       setCurrentMode('driver_app');
     } else {
-      Alert.alert('Invalid Credentials', 'Please use Demo Driver ID: DRV-101 and Password: 1234');
+      Alert.alert('Invalid Credentials', 'Use Demo Driver ID: DRV-101 and Password: 1234');
     }
   };
 
+  // Driver Save Duty Log
   const handleSaveDriverLog = async () => {
     const kmTotal = (parseInt(newEndKm.replace(/,/g, '')) || 0) - (parseInt(newStartKm.replace(/,/g, '')) || 0);
     const newEntry = {
@@ -189,300 +244,419 @@ export default function App() {
       endKm: newEndKm,
       km: `${kmTotal > 0 ? kmTotal : 55} km`,
       ot: `${newOT} hrs`,
-      approved: false, // requires owner approval
+      approved: false,
+      photoAttached: !!logPhotoUri,
     };
 
     const updated = [newEntry, ...driverDutyLogs];
     setDriverDutyLogs(updated);
-    await AsyncStorage.setItem('@ds_shared_duty_logs', JSON.stringify(updated));
+    await AsyncStorage.setItem('@ds_shared_duty_logs_v2', JSON.stringify(updated));
+    setLogPhotoUri(null);
     Alert.alert('Timesheet Logged', `Logged duty for ${newLogDate}. Submitted to car owner for overtime approval.`);
   };
 
-  // ─── OWNER ACTIONS ───────────────────────────────────────────────────────────
+  // Driver Submit Leave Request
+  const handleSubmitLeaveRequest = async () => {
+    if (!leaveReasonInput.trim()) {
+      Alert.alert('Required', 'Please enter a reason for leave.');
+      return;
+    }
+    const newLeave = {
+      id: Date.now().toString(),
+      date: leaveDateInput,
+      reason: leaveReasonInput,
+      status: 'Pending Owner Review',
+      substituteAssigned: 'Backup Available on Request',
+    };
+    const updated = [newLeave, ...driverLeaveRequests];
+    setDriverLeaveRequests(updated);
+    await AsyncStorage.setItem('@ds_shared_leave_reqs', JSON.stringify(updated));
+    setLeaveReasonInput('');
+    Alert.alert('Leave Submitted', 'Leave request sent to car owner. Dispatch desk notified to arrange backup driver if required.');
+  };
+
+  // Owner Login
   const handleOwnerLogin = () => {
     if ((ownerLoginId.trim() === 'OWN-501' || ownerLoginId.trim() === '9811023456') && ownerPassword === '1234') {
       setCurrentMode('owner_app');
     } else {
-      Alert.alert('Invalid Credentials', 'Please use Demo Owner ID: OWN-501 and Password: 1234');
+      Alert.alert('Invalid Credentials', 'Use Demo Owner ID: OWN-501 and Password: 1234');
     }
   };
 
+  // Owner Approve Overtime
   const handleApproveLog = async (logId) => {
     const updated = driverDutyLogs.map(l => l.id === logId ? { ...l, approved: true } : l);
     setDriverDutyLogs(updated);
-    await AsyncStorage.setItem('@ds_shared_duty_logs', JSON.stringify(updated));
-    Alert.alert('Timesheet Approved', 'Overtime hours have been authenticated for monthly payroll.');
+    await AsyncStorage.setItem('@ds_shared_duty_logs_v2', JSON.stringify(updated));
+    Alert.alert('Overtime Approved', 'Timesheet authenticated for payroll calculation.');
   };
 
-  // ─── RENDER 1: CUSTOMER APP (WEBSITE STYLE) ─────────────────────────────────
-  const renderCustomerView = () => (
-    <View style={{ flex: 1 }}>
-      {/* Top Navbar with Driver & Owner Login Access */}
-      <View style={styles.topNavbar}>
-        <View style={styles.brandRow}>
-          <Image source={require('./assets/driver-saathi-logo-light.png')} style={styles.navLogo} resizeMode="contain" />
-          <View>
-            <Text style={styles.brandText}>DRIVERS SAATHI</Text>
-            <Text style={styles.brandSub}>Delhi NCR</Text>
+  // Admin Login
+  const handleAdminLogin = () => {
+    if (adminLoginId.trim().toUpperCase() === 'ADMIN' && adminPassword === '1234') {
+      setCurrentMode('admin_app');
+    } else {
+      Alert.alert('Invalid Admin', 'Use Admin ID: ADMIN and Password: 1234');
+    }
+  };
+
+  // ─── VIEW 1: CUSTOMER WEBSITE & BOOKING ──────────────────────────────────────
+  const renderCustomerView = () => {
+    const salaryEst = calculateBenchmarkSalary();
+
+    return (
+      <View style={{ flex: 1 }}>
+        {/* Top Navbar */}
+        <View style={styles.topNavbar}>
+          <View style={styles.brandRow}>
+            <Image source={require('./assets/driver-saathi-logo-light.png')} style={styles.navLogo} resizeMode="contain" />
+            <View>
+              <Text style={styles.brandText}>DRIVERS SAATHI</Text>
+              <Text style={styles.brandSub}>Delhi NCR</Text>
+            </View>
           </View>
-        </View>
 
-        {/* Portal Switching Buttons */}
-        <View style={styles.navRightRow}>
-          <TouchableOpacity
-            style={styles.portalSwitchBtn}
-            onPress={() => {
-              setDriverLoginId('DRV-101');
-              setDriverPassword('1234');
-              setCurrentMode('driver_login');
-            }}
-          >
-            <Text style={styles.portalSwitchText}>Driver Portal</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.portalSwitchBtn, { backgroundColor: THEME.accentWarmSoft, borderColor: THEME.accentWarm }]}
-            onPress={() => {
-              setOwnerLoginId('OWN-501');
-              setOwnerPassword('1234');
-              setCurrentMode('owner_login');
-            }}
-          >
-            <Text style={[styles.portalSwitchText, { color: THEME.accentWarm }]}>Owner Portal</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Editorial Hero */}
-        <View style={styles.heroBlock}>
-          <Text style={styles.heroPreTitle}>DELHI NCR CHAUFFEUR PLACEMENTS</Text>
-          <Text style={styles.heroTitle}>Professional Drivers for Your Personal Car</Text>
-          <Text style={styles.heroSubtitle}>
-            Trained, police-cleared chauffeurs for daily office commute, outstation highway journeys, and corporate fleets. Includes a 30-day replacement warranty.
-          </Text>
-        </View>
-
-        {/* Trust Strip */}
-        <View style={styles.trustStrip}>
-          <Text style={styles.trustItemText}>Police Verified</Text>
-          <Text style={styles.trustBullet}>•</Text>
-          <Text style={styles.trustItemText}>30-Day Free Replacement</Text>
-          <Text style={styles.trustBullet}>•</Text>
-          <Text style={styles.trustItemText}>GST Invoiced</Text>
-        </View>
-
-        {/* Navigation Segments */}
-        <View style={styles.segmentContainer}>
-          {[
-            { key: 'services', label: 'Services' },
-            { key: 'candidates', label: 'Chauffeurs' },
-            { key: 'book', label: 'Hire Driver' },
-            { key: 'help', label: 'Support' },
-          ].map(s => (
+          {/* Portal Switching Actions */}
+          <View style={styles.navRightRow}>
             <TouchableOpacity
-              key={s.key}
-              style={[styles.segmentBtn, customerTab === s.key && styles.segmentBtnActive]}
-              onPress={() => setCustomerTab(s.key)}
+              style={styles.portalSwitchBtn}
+              onPress={() => {
+                setDriverLoginId('DRV-101');
+                setDriverPassword('1234');
+                setCurrentMode('driver_login');
+              }}
             >
-              <Text style={[styles.segmentBtnText, customerTab === s.key && styles.segmentBtnTextActive]}>
-                {s.label}
-              </Text>
+              <Text style={styles.portalSwitchText}>Driver App</Text>
             </TouchableOpacity>
-          ))}
+
+            <TouchableOpacity
+              style={[styles.portalSwitchBtn, { backgroundColor: THEME.accentWarmSoft, borderColor: THEME.accentWarm }]}
+              onPress={() => {
+                setOwnerLoginId('OWN-501');
+                setOwnerPassword('1234');
+                setCurrentMode('owner_login');
+              }}
+            >
+              <Text style={[styles.portalSwitchText, { color: THEME.accentWarm }]}>Owner Portal</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.portalSwitchBtn, { backgroundColor: THEME.bgSubtle }]}
+              onPress={() => {
+                setAdminLoginId('ADMIN');
+                setAdminPassword('1234');
+                setCurrentMode('admin_login');
+              }}
+            >
+              <Text style={[styles.portalSwitchText, { color: THEME.textTertiary }]}>Admin</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Sub-Tab 1: Services */}
-        {customerTab === 'services' && (
-          <View style={styles.servicesStack}>
-            {/* Service 1 */}
-            <View style={styles.cardMinimal}>
-              <Image source={require('./assets/indian_driver_portrait.jpg')} style={styles.cardImage} resizeMode="cover" />
-              <View style={styles.cardBody}>
-                <View style={styles.cardHeaderRow}>
-                  <Text style={styles.cardTitle}>Personal Chauffeur Placement</Text>
-                  <Text style={styles.cardPrice}>₹4,500 One-time</Text>
-                </View>
-                <Text style={styles.cardDesc}>
-                  Full-time dedicated driver for your private car. Route familiar, punctual, with an iron-clad 30-day free driver replacement warranty.
-                </Text>
-                <TouchableOpacity style={styles.btnPrimary} onPress={() => setCustomerTab('book')}>
-                  <Text style={styles.btnPrimaryText}>Request Chauffeur &rarr;</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Service 2 */}
-            <View style={styles.cardMinimal}>
-              <Image source={require('./assets/driver_passenger_service.jpg')} style={styles.cardImage} resizeMode="cover" />
-              <View style={styles.cardBody}>
-                <View style={styles.cardHeaderRow}>
-                  <Text style={styles.cardTitle}>Outstation & Highway Driver</Text>
-                  <Text style={styles.cardPrice}>From ₹1,500/day</Text>
-                </View>
-                <Text style={styles.cardDesc}>
-                  Experienced commercial drivers for expressway travel to Agra, Jaipur, Chandigarh, and Uttarakhand. FASTag and toll assistance included.
-                </Text>
-                <TouchableOpacity style={styles.btnPrimary} onPress={() => setCustomerTab('book')}>
-                  <Text style={styles.btnPrimaryText}>Book Highway Driver &rarr;</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Service 3 */}
-            <View style={styles.cardMinimal}>
-              <Image source={require('./assets/fleet_cabs_delhi.jpg')} style={styles.cardImage} resizeMode="cover" />
-              <View style={styles.cardBody}>
-                <View style={styles.cardHeaderRow}>
-                  <Text style={styles.cardTitle}>Corporate Fleet Retainer</Text>
-                  <Text style={styles.cardPrice}>B2B Contract</Text>
-                </View>
-                <Text style={styles.cardDesc}>
-                  Continuous driver supply for corporate shuttles, travel desks, and logistics. Dedicated backup pool ensures zero vehicle downtime.
-                </Text>
-                <TouchableOpacity style={styles.btnPrimary} onPress={openCall}>
-                  <Text style={styles.btnPrimaryText}>Call Fleet Desk: +91 8175087004</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* Editorial Headline */}
+          <View style={styles.heroBlock}>
+            <Text style={styles.heroPreTitle}>DELHI NCR CHAUFFEUR PLACEMENTS</Text>
+            <Text style={styles.heroTitle}>Professional Drivers for Your Private Car</Text>
+            <Text style={styles.heroSubtitle}>
+              Police-cleared, experienced drivers for daily office commute, outstation highway journeys, and corporate fleets. Includes a 30-day replacement warranty.
+            </Text>
           </View>
-        )}
 
-        {/* Sub-Tab 2: Candidates */}
-        {customerTab === 'candidates' && (
-          <View style={styles.servicesStack}>
-            {CANDIDATE_DRIVERS.map(c => (
-              <View key={c.id} style={styles.candidateCard}>
-                <View style={styles.candidateHeader}>
-                  <Image source={c.photo} style={styles.candidateAvatar} resizeMode="cover" />
-                  <View style={{ flex: 1, marginLeft: 12 }}>
-                    <View style={styles.candidateNameRow}>
-                      <Text style={styles.candidateName}>{c.name}</Text>
-                      <Text style={styles.candidateRating}>★ {c.rating} ({c.trips})</Text>
-                    </View>
-                    <Text style={styles.candidateMeta}>{c.experience} • {c.location}</Text>
-                    <Text style={styles.candidateSkills}>{c.skills}</Text>
+          {/* Trust Strip */}
+          <View style={styles.trustStrip}>
+            <Text style={styles.trustItemText}>Police Verified</Text>
+            <Text style={styles.trustBullet}>•</Text>
+            <Text style={styles.trustItemText}>30-Day Free Replacement</Text>
+            <Text style={styles.trustBullet}>•</Text>
+            <Text style={styles.trustItemText}>GST Invoiced</Text>
+          </View>
+
+          {/* Navigation Segments */}
+          <View style={styles.segmentContainer}>
+            {[
+              { key: 'services', label: 'Services' },
+              { key: 'calculator', label: 'Salary Tool' },
+              { key: 'candidates', label: 'Chauffeurs' },
+              { key: 'book', label: 'Hire Driver' },
+              { key: 'help', label: 'Support' },
+            ].map(s => (
+              <TouchableOpacity
+                key={s.key}
+                style={[styles.segmentBtn, customerTab === s.key && styles.segmentBtnActive]}
+                onPress={() => setCustomerTab(s.key)}
+              >
+                <Text style={[styles.segmentBtnText, customerTab === s.key && styles.segmentBtnTextActive]}>
+                  {s.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Sub-Tab 1: Services */}
+          {customerTab === 'services' && (
+            <View style={styles.servicesStack}>
+              {/* Service 1 */}
+              <View style={styles.cardMinimal}>
+                <Image source={require('./assets/indian_driver_portrait.jpg')} style={styles.cardImage} resizeMode="cover" />
+                <View style={styles.cardBody}>
+                  <View style={styles.cardHeaderRow}>
+                    <Text style={styles.cardTitle}>Personal Chauffeur Placement</Text>
+                    <Text style={styles.cardPrice}>₹4,500 One-time</Text>
                   </View>
+                  <Text style={styles.cardDesc}>
+                    Full-time dedicated driver for your private car. Route familiar, punctual, with an iron-clad 30-day free driver replacement warranty.
+                  </Text>
+                  <TouchableOpacity style={styles.btnPrimary} onPress={() => setCustomerTab('book')}>
+                    <Text style={styles.btnPrimaryText}>Request Chauffeur &rarr;</Text>
+                  </TouchableOpacity>
                 </View>
+              </View>
+
+              {/* Service 2 */}
+              <View style={styles.cardMinimal}>
+                <Image source={require('./assets/driver_passenger_service.jpg')} style={styles.cardImage} resizeMode="cover" />
+                <View style={styles.cardBody}>
+                  <View style={styles.cardHeaderRow}>
+                    <Text style={styles.cardTitle}>Outstation & Highway Driver</Text>
+                    <Text style={styles.cardPrice}>From ₹1,500/day</Text>
+                  </View>
+                  <Text style={styles.cardDesc}>
+                    Experienced commercial drivers for expressway travel to Agra, Jaipur, Chandigarh, and Uttarakhand. FASTag and toll guidance included.
+                  </Text>
+                  <TouchableOpacity style={styles.btnPrimary} onPress={() => setCustomerTab('book')}>
+                    <Text style={styles.btnPrimaryText}>Book Highway Driver &rarr;</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Service 3 */}
+              <View style={styles.cardMinimal}>
+                <Image source={require('./assets/fleet_cabs_delhi.jpg')} style={styles.cardImage} resizeMode="cover" />
+                <View style={styles.cardBody}>
+                  <View style={styles.cardHeaderRow}>
+                    <Text style={styles.cardTitle}>Corporate Fleet Retainer</Text>
+                    <Text style={styles.cardPrice}>B2B Contract</Text>
+                  </View>
+                  <Text style={styles.cardDesc}>
+                    Continuous driver supply for corporate shuttles, travel desks, and logistics. Dedicated backup pool ensures zero vehicle downtime.
+                  </Text>
+                  <TouchableOpacity style={styles.btnPrimary} onPress={openCall}>
+                    <Text style={styles.btnPrimaryText}>Call Fleet Desk: +91 8175087004</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Sub-Tab 2: Interactive Salary Calculator */}
+          {customerTab === 'calculator' && (
+            <View style={styles.bookingFormCard}>
+              <Text style={styles.formTitle}>Delhi NCR Driver Salary Benchmark</Text>
+              <Text style={styles.formSubtitle}>Calculate recommended driver market salary based on location, hours, and vehicle type.</Text>
+
+              <Text style={styles.inputLabel}>Select Area</Text>
+              <View style={styles.choiceRow}>
+                {['South Delhi', 'Gurugram', 'Noida', 'Central / West Delhi'].map(city => (
+                  <TouchableOpacity
+                    key={city}
+                    style={[styles.choicePill, calcCity === city && styles.choicePillActive]}
+                    onPress={() => setCalcCity(city)}
+                  >
+                    <Text style={[styles.choicePillText, calcCity === city && styles.choicePillTextActive]}>{city}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputLabel}>Daily Shift Duration</Text>
+              <View style={styles.choiceRow}>
+                {['8 Hours (Office)', '10 Hours (Standard)', '12 Hours (Long)', '24-Hr Live-in'].map(h => (
+                  <TouchableOpacity
+                    key={h}
+                    style={[styles.choicePill, calcHours === h && styles.choicePillActive]}
+                    onPress={() => setCalcHours(h)}
+                  >
+                    <Text style={[styles.choicePillText, calcHours === h && styles.choicePillTextActive]}>{h}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputLabel}>Vehicle Transmission</Text>
+              <View style={styles.choiceRow}>
+                {['Automatic', 'Manual', 'Luxury German / EV'].map(t => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.choicePill, calcTransmission === t && styles.choicePillActive]}
+                    onPress={() => setCalcTransmission(t)}
+                  >
+                    <Text style={[styles.choicePillText, calcTransmission === t && styles.choicePillTextActive]}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Benchmark Result Card */}
+              <View style={styles.benchmarkResultCard}>
+                <Text style={styles.benchmarkLabel}>RECOMMENDED MONTHLY SALARY</Text>
+                <Text style={styles.benchmarkSalaryText}>₹{salaryEst.minSalary.toLocaleString('en-IN')} – ₹{salaryEst.maxSalary.toLocaleString('en-IN')}</Text>
+                <Text style={styles.benchmarkSub}>For {calcHours} in {calcCity} ({calcTransmission})</Text>
+
+                <View style={styles.divider} />
+
+                <View style={styles.benchmarkRow}>
+                  <Text style={styles.benchmarkItem}>Recommended Overtime Rate:</Text>
+                  <Text style={styles.benchmarkValue}>₹{salaryEst.otRate}/hour</Text>
+                </View>
+                <View style={styles.benchmarkRow}>
+                  <Text style={styles.benchmarkItem}>One-Time Placement Fee:</Text>
+                  <Text style={styles.benchmarkValue}>₹{salaryEst.agencyFee} (30-day warranty)</Text>
+                </View>
+
                 <TouchableOpacity
-                  style={styles.btnPrimary}
+                  style={[styles.btnPrimarySubmit, { marginTop: 12 }]}
                   onPress={() => {
-                    setBookingForm({ ...bookingForm, car: c.skills.split(' ')[0] });
+                    setBookingForm({ ...bookingForm, location: calcCity, transmission: calcTransmission });
                     setCustomerTab('book');
                   }}
                 >
-                  <Text style={styles.btnPrimaryText}>Schedule Trial with {c.name}</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Sub-Tab 3: Booking Form (Website Style) */}
-        {customerTab === 'book' && (
-          <View style={styles.bookingFormCard}>
-            <Text style={styles.formTitle}>Book a Verified Driver</Text>
-            <Text style={styles.formSubtitle}>Submit requirements. Our account manager will call you with candidate profiles.</Text>
-
-            <Text style={styles.inputLabel}>Full Name *</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g. Priya Sharma"
-              value={bookingForm.name}
-              onChangeText={v => setBookingForm({ ...bookingForm, name: v })}
-            />
-
-            <Text style={styles.inputLabel}>Mobile Number *</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="+91 98765 43210"
-              keyboardType="phone-pad"
-              value={bookingForm.phone}
-              onChangeText={v => setBookingForm({ ...bookingForm, phone: v })}
-            />
-
-            <Text style={styles.inputLabel}>Car Model</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g. Hyundai Creta / Honda City"
-              value={bookingForm.car}
-              onChangeText={v => setBookingForm({ ...bookingForm, car: v })}
-            />
-
-            <Text style={styles.inputLabel}>Area in Delhi NCR</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g. South Delhi / DLF Phase 5 Gurugram"
-              value={bookingForm.location}
-              onChangeText={v => setBookingForm({ ...bookingForm, location: v })}
-            />
-
-            <Text style={styles.inputLabel}>Service Requirement</Text>
-            <View style={styles.choiceRow}>
-              {['Personal Chauffeur', 'Outstation Trip', 'Corporate Retainer'].map(st => (
-                <TouchableOpacity
-                  key={st}
-                  style={[styles.choicePill, bookingForm.serviceType.includes(st) && styles.choicePillActive]}
-                  onPress={() => setBookingForm({ ...bookingForm, serviceType: st })}
-                >
-                  <Text style={[styles.choicePillText, bookingForm.serviceType.includes(st) && styles.choicePillTextActive]}>
-                    {st}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.inputLabel}>Transmission</Text>
-            <View style={styles.choiceRow}>
-              {['Automatic', 'Manual', 'Luxury German'].map(t => (
-                <TouchableOpacity
-                  key={t}
-                  style={[styles.choicePill, bookingForm.transmission === t && styles.choicePillActive]}
-                  onPress={() => setBookingForm({ ...bookingForm, transmission: t })}
-                >
-                  <Text style={[styles.choicePillText, bookingForm.transmission === t && styles.choicePillTextActive]}>
-                    {t}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <TouchableOpacity style={styles.btnPrimarySubmit} onPress={handleCustomerBookingSubmit} disabled={loading}>
-              {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.btnPrimarySubmitText}>Submit Driver Request</Text>}
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Sub-Tab 4: Help */}
-        {customerTab === 'help' && (
-          <View style={styles.servicesStack}>
-            <View style={styles.cardMinimal}>
-              <View style={styles.cardBody}>
-                <Text style={styles.cardTitle}>Direct Dispatch Desk</Text>
-                <Text style={styles.cardDesc}>Connect with our client coordination team in Delhi NCR.</Text>
-                <TouchableOpacity style={styles.btnPrimary} onPress={openCall}>
-                  <Text style={styles.btnPrimaryText}>Call +91 8175087004</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.btnSecondary, { marginTop: 8 }]} onPress={() => openWhatsApp()}>
-                  <Text style={styles.btnSecondaryText}>Chat on WhatsApp</Text>
+                  <Text style={styles.btnPrimarySubmitText}>Hire Driver at this Rate &rarr;</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        )}
-      </ScrollView>
-    </View>
-  );
+          )}
 
-  // ─── RENDER 2: DRIVER LOGIN SCREEN ───────────────────────────────────────────
+          {/* Sub-Tab 3: Candidates */}
+          {customerTab === 'candidates' && (
+            <View style={styles.servicesStack}>
+              {CANDIDATE_DRIVERS.map(c => (
+                <View key={c.id} style={styles.candidateCard}>
+                  <View style={styles.candidateHeader}>
+                    <Image source={c.photo} style={styles.candidateAvatar} resizeMode="cover" />
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                      <View style={styles.candidateNameRow}>
+                        <Text style={styles.candidateName}>{c.name}</Text>
+                        <Text style={styles.candidateRating}>★ {c.rating} ({c.trips})</Text>
+                      </View>
+                      <Text style={styles.candidateMeta}>{c.experience} • {c.location}</Text>
+                      <Text style={styles.candidateSkills}>{c.skills}</Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.btnPrimary}
+                    onPress={() => {
+                      setBookingForm({ ...bookingForm, car: c.skills.split(' ')[0] });
+                      setCustomerTab('book');
+                    }}
+                  >
+                    <Text style={styles.btnPrimaryText}>Schedule Trial with {c.name}</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Sub-Tab 4: Booking Form */}
+          {customerTab === 'book' && (
+            <View style={styles.bookingFormCard}>
+              <Text style={styles.formTitle}>Book a Verified Chauffeur</Text>
+              <Text style={styles.formSubtitle}>Submit your car and location. Our account manager will share candidate profiles within 4 hours.</Text>
+
+              <Text style={styles.inputLabel}>Full Name *</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. Priya Sharma"
+                value={bookingForm.name}
+                onChangeText={v => setBookingForm({ ...bookingForm, name: v })}
+              />
+
+              <Text style={styles.inputLabel}>Mobile Number *</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="+91 98765 43210"
+                keyboardType="phone-pad"
+                value={bookingForm.phone}
+                onChangeText={v => setBookingForm({ ...bookingForm, phone: v })}
+              />
+
+              <Text style={styles.inputLabel}>Car Model</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. Hyundai Creta / Honda City"
+                value={bookingForm.car}
+                onChangeText={v => setBookingForm({ ...bookingForm, car: v })}
+              />
+
+              <Text style={styles.inputLabel}>Area in Delhi NCR</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. South Delhi / DLF Phase 5 Gurugram"
+                value={bookingForm.location}
+                onChangeText={v => setBookingForm({ ...bookingForm, location: v })}
+              />
+
+              <Text style={styles.inputLabel}>Service Requirement</Text>
+              <View style={styles.choiceRow}>
+                {['Personal Chauffeur', 'Outstation Trip', 'Corporate Retainer'].map(st => (
+                  <TouchableOpacity
+                    key={st}
+                    style={[styles.choicePill, bookingForm.serviceType.includes(st) && styles.choicePillActive]}
+                    onPress={() => setBookingForm({ ...bookingForm, serviceType: st })}
+                  >
+                    <Text style={[styles.choicePillText, bookingForm.serviceType.includes(st) && styles.choicePillTextActive]}>{st}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputLabel}>Transmission</Text>
+              <View style={styles.choiceRow}>
+                {['Automatic', 'Manual', 'Luxury German'].map(t => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.choicePill, bookingForm.transmission === t && styles.choicePillActive]}
+                    onPress={() => setBookingForm({ ...bookingForm, transmission: t })}
+                  >
+                    <Text style={[styles.choicePillText, bookingForm.transmission === t && styles.choicePillTextActive]}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.btnPrimarySubmit} onPress={handleCustomerBookingSubmit} disabled={loading}>
+                {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.btnPrimarySubmitText}>Submit Driver Request</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Sub-Tab 5: Help */}
+          {customerTab === 'help' && (
+            <View style={styles.servicesStack}>
+              <View style={styles.cardMinimal}>
+                <View style={styles.cardBody}>
+                  <Text style={styles.cardTitle}>Delhi NCR Dispatch Desk</Text>
+                  <Text style={styles.cardDesc}>Connect with our client coordination managers directly.</Text>
+                  <TouchableOpacity style={styles.btnPrimary} onPress={openCall}>
+                    <Text style={styles.btnPrimaryText}>Call +91 8175087004</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.btnSecondary, { marginTop: 8 }]} onPress={() => openWhatsApp()}>
+                    <Text style={styles.btnSecondaryText}>Chat on WhatsApp</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      </View>
+    );
+  };
+
+  // ─── VIEW 2: DRIVER LOGIN ────────────────────────────────────────────────────
   const renderDriverLogin = () => (
     <ScrollView contentContainerStyle={styles.loginContainer} showsVerticalScrollIndicator={false}>
       <TouchableOpacity style={styles.btnBackToPublic} onPress={() => setCurrentMode('customer')}>
-        <Text style={styles.btnBackToPublicText}>&larr; Back to Website</Text>
+        <Text style={styles.btnBackToPublicText}>&larr; Back to Public Website</Text>
       </TouchableOpacity>
 
       <View style={styles.loginCard}>
-        <Text style={styles.loginPreTitle}>DRIVER PARTNER PORTAL</Text>
+        <Text style={styles.loginPreTitle}>DRIVER COMPANION PORTAL</Text>
         <Text style={styles.loginTitle}>Driver Sign In</Text>
         <Text style={styles.loginSub}>Enter your Driver ID and password provided by the dispatch desk.</Text>
 
@@ -508,7 +682,7 @@ export default function App() {
           <Text style={styles.btnPrimarySubmitText}>Sign In to Driver Workspace</Text>
         </TouchableOpacity>
 
-        {/* Quick Demo Fill Button */}
+        {/* Demo Fast Login */}
         <TouchableOpacity
           style={styles.btnQuickDemo}
           onPress={() => {
@@ -523,10 +697,10 @@ export default function App() {
     </ScrollView>
   );
 
-  // ─── RENDER 3: DRIVER COMPANION APP ──────────────────────────────────────────
+  // ─── VIEW 3: DRIVER COMPANION APP ────────────────────────────────────────────
   const renderDriverApp = () => (
     <View style={{ flex: 1 }}>
-      {/* Driver App Header */}
+      {/* Header */}
       <View style={styles.portalHeader}>
         <View>
           <Text style={styles.portalHeaderTitle}>Rameshwar Dayal</Text>
@@ -541,9 +715,10 @@ export default function App() {
       <View style={styles.segmentContainer}>
         {[
           { key: 'duty', label: 'Today Duty' },
-          { key: 'logbook', label: 'Duty Log' },
-          { key: 'docs', label: 'Documents' },
-          { key: 'salary', label: 'Earnings' },
+          { key: 'logbook', label: 'Timesheet' },
+          { key: 'leave', label: 'Leave' },
+          { key: 'docs', label: 'Docs' },
+          { key: 'salary', label: 'Salary' },
         ].map(s => (
           <TouchableOpacity
             key={s.key}
@@ -558,13 +733,13 @@ export default function App() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Sub-Tab 1: Today Duty */}
+        {/* Today Duty */}
         {driverTab === 'duty' && (
           <View>
             <View style={styles.cardMinimal}>
               <View style={styles.cardBody}>
                 <View style={styles.statusRow}>
-                  <Text style={styles.cardTag}>ACTIVE PLACEMENT</Text>
+                  <Text style={styles.cardTag}>ACTIVE ASSIGNMENT</Text>
                   <View style={styles.greenBadge}>
                     <Text style={styles.greenBadgeText}>ON DUTY</Text>
                   </View>
@@ -572,7 +747,7 @@ export default function App() {
 
                 <Text style={styles.cardTitle}>Client: Mr. Rajesh Agarwal</Text>
                 <Text style={styles.cardDesc}>Vehicle: Hyundai Creta 2023 (DL 3C XX 1234) • Automatic</Text>
-                <Text style={styles.cardDesc}>Reporting Hours: 08:30 AM – 06:30 PM (10 Hours)</Text>
+                <Text style={styles.cardDesc}>Duty Hours: 08:30 AM – 06:30 PM (10 Hours)</Text>
                 <Text style={[styles.cardDesc, { marginTop: 4, color: THEME.text }]}>
                   📍 Pickup: Villa 14, Poorvi Marg, Vasant Vihar, South Delhi
                 </Text>
@@ -581,11 +756,11 @@ export default function App() {
 
                 <View style={styles.buttonRow}>
                   <TouchableOpacity style={styles.btnSecondary} onPress={() => Linking.openURL('tel:+919811023456')}>
-                    <Text style={styles.btnSecondaryText}>Call Car Owner</Text>
+                    <Text style={styles.btnSecondaryText}>Call Owner</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.btnPrimary}
-                    onPress={() => Alert.alert('Check-In Confirmed', 'Check-in time recorded at 08:30 AM. Have a safe duty!')}
+                    onPress={() => Alert.alert('Check-In Confirmed', 'Check-in time recorded at 08:30 AM.')}
                   >
                     <Text style={styles.btnPrimaryText}>Record Check-In</Text>
                   </TouchableOpacity>
@@ -595,16 +770,16 @@ export default function App() {
           </View>
         )}
 
-        {/* Sub-Tab 2: Digital Logbook */}
+        {/* Logbook with Odometer Photo */}
         {driverTab === 'logbook' && (
           <View>
             <View style={styles.bookingFormCard}>
-              <Text style={styles.formTitle}>Record Daily Duty & Overtime</Text>
-              <Text style={styles.formSubtitle}>Submit your daily kilometer readings and hours for owner approval.</Text>
+              <Text style={styles.formTitle}>Record Daily Duty & Odometer</Text>
+              <Text style={styles.formSubtitle}>Submit daily hours and attach speedometer reading for owner verification.</Text>
 
               <View style={styles.formRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.inputLabel}>Duty Date</Text>
+                  <Text style={styles.inputLabel}>Date</Text>
                   <TextInput style={styles.textInput} value={newLogDate} onChangeText={setNewLogDate} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -632,8 +807,12 @@ export default function App() {
                 </View>
               </View>
 
+              <TouchableOpacity style={styles.btnAttachPhoto} onPress={pickSpeedometerPhoto}>
+                <Text style={styles.btnAttachPhotoText}>{logPhotoUri ? 'Speedometer Photo Attached ✓' : '📷 Attach Odometer Photo'}</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity style={styles.btnPrimarySubmit} onPress={handleSaveDriverLog}>
-                <Text style={styles.btnPrimarySubmitText}>Submit Duty Entry to Owner</Text>
+                <Text style={styles.btnPrimarySubmitText}>Submit Duty to Car Owner</Text>
               </TouchableOpacity>
             </View>
 
@@ -644,47 +823,83 @@ export default function App() {
                   <Text style={styles.logDate}>{l.date}</Text>
                   <View style={l.approved ? styles.approvedBadge : styles.pendingBadge}>
                     <Text style={l.approved ? styles.approvedBadgeText : styles.pendingBadgeText}>
-                      {l.approved ? 'Approved by Owner' : 'Pending Approval'}
+                      {l.approved ? 'Approved by Owner' : 'Pending Review'}
                     </Text>
                   </View>
                 </View>
                 <Text style={styles.logMeta}>In: {l.inTime} • Out: {l.outTime} • Distance: {l.km}</Text>
                 <Text style={styles.logOT}>Overtime: +{l.ot} (Payable: ₹{Math.round(parseFloat(l.ot || 0) * 80)})</Text>
+                {l.photoAttached && <Text style={styles.photoIndicatorText}>✓ Speedometer Photo Authenticated</Text>}
               </View>
             ))}
           </View>
         )}
 
-        {/* Sub-Tab 3: Verified Documents */}
+        {/* Leave Request Management */}
+        {driverTab === 'leave' && (
+          <View>
+            <View style={styles.bookingFormCard}>
+              <Text style={styles.formTitle}>Request Planned Leave</Text>
+              <Text style={styles.formSubtitle}>Notify your car owner and dispatch desk in advance so backup driver can be scheduled.</Text>
+
+              <Text style={styles.inputLabel}>Date of Leave</Text>
+              <TextInput style={styles.textInput} value={leaveDateInput} onChangeText={setLeaveDateInput} />
+
+              <Text style={styles.inputLabel}>Reason for Leave</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. Family function / urgent native visit"
+                value={leaveReasonInput}
+                onChangeText={setLeaveReasonInput}
+              />
+
+              <TouchableOpacity style={styles.btnPrimarySubmit} onPress={handleSubmitLeaveRequest}>
+                <Text style={styles.btnPrimarySubmitText}>Submit Leave Request</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.subHeading, { marginTop: 16 }]}>Leave Request Status</Text>
+            {driverLeaveRequests.map(r => (
+              <View key={r.id} style={styles.logCard}>
+                <View style={styles.logHeaderRow}>
+                  <Text style={styles.logDate}>{r.date}</Text>
+                  <View style={r.status === 'Approved' ? styles.approvedBadge : styles.pendingBadge}>
+                    <Text style={r.status === 'Approved' ? styles.approvedBadgeText : styles.pendingBadgeText}>
+                      {r.status}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.logMeta}>Reason: {r.reason}</Text>
+                <Text style={[styles.logOT, { color: THEME.blue }]}>Substitute Status: {r.substituteAssigned}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Verified Documents */}
         {driverTab === 'docs' && (
           <View style={styles.servicesStack}>
             <View style={styles.docCard}>
               <Text style={styles.docTitle}>Commercial Driving License (LMV/Transport)</Text>
               <Text style={styles.docMeta}>DL No: DL-042011004821 • Valid till 14 Oct 2028</Text>
-              <View style={styles.verifiedRow}>
-                <Text style={styles.verifiedText}>✓ Parivahan Verified</Text>
-              </View>
+              <Text style={styles.verifiedText}>✓ Parivahan Verified</Text>
             </View>
 
             <View style={styles.docCard}>
               <Text style={styles.docTitle}>Delhi Police Background Clearance</Text>
-              <Text style={styles.docMeta}>Verification Certificate No: PCC-2026-DL-8842</Text>
-              <View style={styles.verifiedRow}>
-                <Text style={styles.verifiedText}>✓ Clear Record (Zero Criminal Filings)</Text>
-              </View>
+              <Text style={styles.docMeta}>PCC Certificate No: PCC-2026-DL-8842</Text>
+              <Text style={styles.verifiedText}>✓ Clear Record (Zero Criminal Filings)</Text>
             </View>
 
             <View style={styles.docCard}>
               <Text style={styles.docTitle}>Aadhaar Identity Verification</Text>
               <Text style={styles.docMeta}>UIDAI Authenticated: XXXX-XXXX-4821</Text>
-              <View style={styles.verifiedRow}>
-                <Text style={styles.verifiedText}>✓ Biometric & Address Authenticated</Text>
-              </View>
+              <Text style={styles.verifiedText}>✓ Biometric & Address Authenticated</Text>
             </View>
           </View>
         )}
 
-        {/* Sub-Tab 4: Salary & Earnings */}
+        {/* Salary & Earnings */}
         {driverTab === 'salary' && (
           <View style={styles.servicesStack}>
             <View style={styles.cardMinimal}>
@@ -707,13 +922,6 @@ export default function App() {
                   <Text style={styles.summaryLabel}>Driver Referral Bonus</Text>
                   <Text style={styles.summaryVal}>₹500</Text>
                 </View>
-
-                <TouchableOpacity
-                  style={[styles.btnPrimary, { marginTop: 14 }]}
-                  onPress={() => Alert.alert('Salary Payout', 'Your salary of ₹24,340 will be credited directly to your bank account on 1st October.')}
-                >
-                  <Text style={styles.btnPrimaryText}>View Bank Account Details</Text>
-                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -722,17 +930,17 @@ export default function App() {
     </View>
   );
 
-  // ─── RENDER 4: OWNER LOGIN SCREEN ────────────────────────────────────────────
+  // ─── VIEW 4: OWNER LOGIN ─────────────────────────────────────────────────────
   const renderOwnerLogin = () => (
     <ScrollView contentContainerStyle={styles.loginContainer} showsVerticalScrollIndicator={false}>
       <TouchableOpacity style={styles.btnBackToPublic} onPress={() => setCurrentMode('customer')}>
-        <Text style={styles.btnBackToPublicText}>&larr; Back to Website</Text>
+        <Text style={styles.btnBackToPublicText}>&larr; Back to Public Website</Text>
       </TouchableOpacity>
 
       <View style={styles.loginCard}>
-        <Text style={[styles.loginPreTitle, { color: THEME.accentWarm }]}>CAR OWNER / FLEET PORTAL</Text>
+        <Text style={[styles.loginPreTitle, { color: THEME.accentWarm }]}>CAR OWNER & FLEET PORTAL</Text>
         <Text style={styles.loginTitle}>Owner Sign In</Text>
-        <Text style={styles.loginSub}>Access your assigned driver's documents, live status, and logbook.</Text>
+        <Text style={styles.loginSub}>Access your assigned driver records, vehicle document expiry, and logbook.</Text>
 
         <Text style={styles.inputLabel}>Owner Account ID or Mobile</Text>
         <TextInput
@@ -756,7 +964,7 @@ export default function App() {
           <Text style={styles.btnPrimarySubmitText}>Sign In to Car Owner Portal</Text>
         </TouchableOpacity>
 
-        {/* Quick Demo Fill Button */}
+        {/* Demo Fast Login */}
         <TouchableOpacity
           style={styles.btnQuickDemo}
           onPress={() => {
@@ -771,11 +979,11 @@ export default function App() {
     </ScrollView>
   );
 
-  // ─── RENDER 5: CAR OWNER / FLEET PORTAL ───────────────────────────────────────
+  // ─── VIEW 5: OWNER PORTAL (MONITORING, EXPIRY, SUBSTITUTE & AGREEMENT) ───────
   const renderOwnerApp = () => (
     <View style={{ flex: 1 }}>
-      {/* Owner App Header */}
-      <View style={[styles.portalHeader, { borderBottomColor: THEME.border }]}>
+      {/* Header */}
+      <View style={styles.portalHeader}>
         <View>
           <Text style={styles.portalHeaderTitle}>Mr. Rajesh Agarwal</Text>
           <Text style={styles.portalHeaderSub}>Owner ID: OWN-501 • Hyundai Creta (DL 3C XX 1234)</Text>
@@ -789,9 +997,10 @@ export default function App() {
       <View style={styles.segmentContainer}>
         {[
           { key: 'overview', label: 'My Driver' },
-          { key: 'docs', label: 'Verification Docs' },
-          { key: 'logbook', label: 'Timesheet & OT' },
-          { key: 'replacement', label: '30-Day SLA' },
+          { key: 'substitute', label: 'Substitute' },
+          { key: 'expiry', label: 'Car Expiry' },
+          { key: 'agreement', label: 'Agreement' },
+          { key: 'logbook', label: 'Logbook' },
         ].map(s => (
           <TouchableOpacity
             key={s.key}
@@ -806,7 +1015,7 @@ export default function App() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Sub-Tab 1: Assigned Driver Overview */}
+        {/* Overview */}
         {ownerTab === 'overview' && (
           <View style={styles.servicesStack}>
             <View style={styles.candidateCard}>
@@ -836,7 +1045,7 @@ export default function App() {
               </View>
             </View>
 
-            {/* Quick Vehicle Stats */}
+            {/* Quick Vehicle Status */}
             <View style={styles.cardMinimal}>
               <View style={styles.cardBody}>
                 <Text style={styles.cardTag}>VEHICLE STATUS</Text>
@@ -848,48 +1057,114 @@ export default function App() {
           </View>
         )}
 
-        {/* Sub-Tab 2: Driver Verification Document Vault */}
-        {ownerTab === 'docs' && (
+        {/* 1-Day Substitute Driver Request */}
+        {ownerTab === 'substitute' && (
+          <View style={styles.bookingFormCard}>
+            <Text style={styles.formTitle}>Request 1-Day Substitute Driver</Text>
+            <Text style={styles.formSubtitle}>
+              Is your regular chauffeur on leave or unwell? Book an agency-verified temporary replacement driver for ₹800/day.
+            </Text>
+
+            <Text style={styles.inputLabel}>Required Date for Substitute</Text>
+            <TextInput style={styles.textInput} placeholder="e.g. Tomorrow or 24 Sep 2026" />
+
+            <Text style={styles.inputLabel}>Required Shift Duration</Text>
+            <View style={styles.choiceRow}>
+              {['8 Hours (₹800)', '10 Hours (₹1,000)', '12 Hours (₹1,200)'].map(subShift => (
+                <TouchableOpacity key={subShift} style={[styles.choicePill, styles.choicePillActive]}>
+                  <Text style={[styles.choicePillText, styles.choicePillTextActive]}>{subShift}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={[styles.btnPrimarySubmit, { backgroundColor: THEME.accentWarm }]}
+              onPress={() => {
+                Alert.alert(
+                  'Substitute Scheduled',
+                  'A verified backup driver from Drivers Saathi has been allocated for your vehicle. Dispatch manager will share candidate details via WhatsApp within 2 hours.'
+                );
+              }}
+            >
+              <Text style={styles.btnPrimarySubmitText}>Book Substitute Chauffeur (₹800/day)</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Car Expiry Tracker (PUC, Insurance, FASTag) */}
+        {ownerTab === 'expiry' && (
           <View style={styles.servicesStack}>
-            <Text style={styles.subHeading}>Authenticated Background Records</Text>
-            <Text style={styles.subText}>Verified documents on file for driver Rameshwar Dayal.</Text>
+            <Text style={styles.subHeading}>Vehicle Compliance & Document Watch</Text>
+            <Text style={styles.subText}>Automated alerts to keep your vehicle legal and roadworthy.</Text>
 
             <View style={styles.docCard}>
               <View style={styles.docHeaderRow}>
-                <Text style={styles.docTitle}>Driving License Authenticity</Text>
-                <Text style={styles.verifiedPill}>PARIVAHAN VERIFIED</Text>
+                <Text style={styles.docTitle}>Pollution Certificate (PUC)</Text>
+                <Text style={[styles.verifiedPill, { color: THEME.accentWarm, backgroundColor: THEME.accentWarmSoft }]}>43 DAYS LEFT</Text>
               </View>
-              <Text style={styles.docMeta}>DL No: DL-042011004821</Text>
-              <Text style={styles.docMeta}>Class: LMV / Transport Badge</Text>
-              <Text style={styles.docMeta}>Validity: Valid till 14 Oct 2028 (Active)</Text>
+              <Text style={styles.docMeta}>Expiry Date: 24 Oct 2026</Text>
+              <Text style={styles.docMeta}>Status: Valid • Alert will trigger 7 days prior</Text>
             </View>
 
             <View style={styles.docCard}>
               <View style={styles.docHeaderRow}>
-                <Text style={styles.docTitle}>Delhi Police Clearance Certificate</Text>
-                <Text style={styles.verifiedPill}>POLICE CLEARED</Text>
+                <Text style={styles.docTitle}>Motor Insurance Policy</Text>
+                <Text style={styles.verifiedPill}>ACTIVE</Text>
               </View>
-              <Text style={styles.docMeta}>Reference: PCC-2026-DL-8842</Text>
-              <Text style={styles.docMeta}>Status: No criminal or traffic record found.</Text>
+              <Text style={styles.docMeta}>Comprehensive Zero-Dep Policy: HDFC ERGO</Text>
+              <Text style={styles.docMeta}>Renewal Date: 18 Nov 2026</Text>
             </View>
 
             <View style={styles.docCard}>
               <View style={styles.docHeaderRow}>
-                <Text style={styles.docTitle}>Aadhaar Identity Verification</Text>
-                <Text style={styles.verifiedPill}>UIDAI MATCHED</Text>
+                <Text style={styles.docTitle}>FASTag Balance</Text>
+                <Text style={styles.verifiedPill}>ADEQUATE</Text>
               </View>
-              <Text style={styles.docMeta}>Aadhaar: XXXX-XXXX-4821</Text>
-              <Text style={styles.docMeta}>Permanent Address: Alwar, Rajasthan (NCR Resident 12 yrs)</Text>
+              <Text style={styles.docMeta}>Linked Bank: ICICI FASTag</Text>
+              <Text style={styles.docMeta}>Current Estimated Balance: ₹840</Text>
             </View>
           </View>
         )}
 
-        {/* Sub-Tab 3: Duty Logbook & Approvals */}
+        {/* View Official Placement Agreement & Timesheet PDF */}
+        {ownerTab === 'agreement' && (
+          <View style={styles.bookingFormCard}>
+            <View style={styles.agreementHeaderRow}>
+              <Text style={styles.agreementBadge}>AGREEMENT #DS-AGREE-4091</Text>
+              <Text style={styles.agreementStatus}>ACTIVE SLA</Text>
+            </View>
+
+            <Text style={styles.formTitle}>Chauffeur Placement Agreement</Text>
+            <Text style={styles.docMeta}>Between: Drivers Saathi Agency & Mr. Rajesh Agarwal</Text>
+            <Text style={styles.docMeta}>Assigned Chauffeur: Rameshwar Dayal (DRV-101)</Text>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.agreementClauseTitle}>1. Replacement Warranty Clause</Text>
+            <Text style={styles.agreementClauseBody}>
+              The car owner is entitled to free replacement of the driver within 30 days of initial placement at zero additional placement fee.
+            </Text>
+
+            <Text style={styles.agreementClauseTitle}>2. Police Verification & Background</Text>
+            <Text style={styles.agreementClauseBody}>
+              The agency certifies that driver Rameshwar Dayal has undergone Parivahan DL verification (DL-042011004821) and police clearance certificate PCC-2026-DL-8842.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.btnPrimarySubmit}
+              onPress={() => {
+                Alert.alert('Agreement Exported', 'Official placement agreement (#DS-AGREE-4091) and September timesheet exported to your downloads folder.');
+              }}
+            >
+              <Text style={styles.btnPrimarySubmitText}>Download Agreement & Timesheet (PDF)</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Logbook Approvals */}
         {ownerTab === 'logbook' && (
           <View style={styles.servicesStack}>
-            <Text style={styles.subHeading}>Daily Timesheets Submitted by Driver</Text>
-            <Text style={styles.subText}>Review hours, kilometers run, and authenticate overtime payouts.</Text>
-
+            <Text style={styles.subHeading}>Timesheets Submitted by Driver</Text>
             {driverDutyLogs.map(l => (
               <View key={l.id} style={styles.logCard}>
                 <View style={styles.logHeaderRow}>
@@ -901,7 +1176,8 @@ export default function App() {
                   </View>
                 </View>
                 <Text style={styles.logMeta}>In: {l.inTime} • Out: {l.outTime} • Distance: {l.km}</Text>
-                <Text style={styles.logOT}>Overtime: +{l.ot} (Amount: ₹{Math.round(parseFloat(l.ot || 0) * 80)})</Text>
+                <Text style={styles.logOT}>Overtime: +{l.ot} (₹{Math.round(parseFloat(l.ot || 0) * 80)})</Text>
+                {l.photoAttached && <Text style={styles.photoIndicatorText}>✓ Speedometer Photo Authenticated</Text>}
 
                 {!l.approved && (
                   <TouchableOpacity style={styles.btnApprove} onPress={() => handleApproveLog(l.id)}>
@@ -912,33 +1188,150 @@ export default function App() {
             ))}
           </View>
         )}
+      </ScrollView>
+    </View>
+  );
 
-        {/* Sub-Tab 4: 30-Day Free Replacement Claim */}
-        {ownerTab === 'replacement' && (
-          <View style={styles.bookingFormCard}>
-            <Text style={styles.formTitle}>30-Day Free Replacement SLA</Text>
-            <Text style={styles.formSubtitle}>
-              You have active warranty coverage for placement #DS-9042 (23 days remaining). Request a replacement at zero extra placement fee.
+  // ─── VIEW 6: ADMIN LOGIN ─────────────────────────────────────────────────────
+  const renderAdminLogin = () => (
+    <ScrollView contentContainerStyle={styles.loginContainer} showsVerticalScrollIndicator={false}>
+      <TouchableOpacity style={styles.btnBackToPublic} onPress={() => setCurrentMode('customer')}>
+        <Text style={styles.btnBackToPublicText}>&larr; Back to Public Website</Text>
+      </TouchableOpacity>
+
+      <View style={styles.loginCard}>
+        <Text style={styles.loginPreTitle}>AGENCY MASTER DISPATCH DESK</Text>
+        <Text style={styles.loginTitle}>Admin Sign In</Text>
+        <Text style={styles.loginSub}>Access master driver allocation, substitute dispatch, and website leads.</Text>
+
+        <Text style={styles.inputLabel}>Admin ID</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="e.g. ADMIN"
+          autoCapitalize="characters"
+          value={adminLoginId}
+          onChangeText={setAdminLoginId}
+        />
+
+        <Text style={styles.inputLabel}>Master Password</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="••••"
+          secureTextEntry
+          value={adminPassword}
+          onChangeText={setAdminPassword}
+        />
+
+        <TouchableOpacity style={styles.btnPrimarySubmit} onPress={handleAdminLogin}>
+          <Text style={styles.btnPrimarySubmitText}>Sign In to Master Dispatch Desk</Text>
+        </TouchableOpacity>
+
+        {/* Demo Fast Login */}
+        <TouchableOpacity
+          style={styles.btnQuickDemo}
+          onPress={() => {
+            setAdminLoginId('ADMIN');
+            setAdminPassword('1234');
+            setCurrentMode('admin_app');
+          }}
+        >
+          <Text style={styles.btnQuickDemoText}>Instant Demo Sign-In (ADMIN / 1234)</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+
+  // ─── VIEW 7: MASTER ADMIN DISPATCH APP ───────────────────────────────────────
+  const renderAdminApp = () => (
+    <View style={{ flex: 1 }}>
+      {/* Header */}
+      <View style={styles.portalHeader}>
+        <View>
+          <Text style={styles.portalHeaderTitle}>Master Dispatch Console</Text>
+          <Text style={styles.portalHeaderSub}>Drivers Saathi Operations Hub</Text>
+        </View>
+        <TouchableOpacity style={styles.btnLogout} onPress={() => setCurrentMode('customer')}>
+          <Text style={styles.btnLogoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Admin Tabs */}
+      <View style={styles.segmentContainer}>
+        {[
+          { key: 'placements', label: 'Active Roster' },
+          { key: 'substitutes', label: 'Substitute Queue' },
+          { key: 'leads', label: 'Web Leads' },
+        ].map(s => (
+          <TouchableOpacity
+            key={s.key}
+            style={[styles.segmentBtn, adminTab === s.key && styles.segmentBtnActive]}
+            onPress={() => setAdminTab(s.key)}
+          >
+            <Text style={[styles.segmentBtnText, adminTab === s.key && styles.segmentBtnTextActive]}>
+              {s.label}
             </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-            <Text style={styles.inputLabel}>Reason for Replacement Claim *</Text>
-            <TextInput
-              style={[styles.textInput, { height: 80, textAlignVertical: 'top' }]}
-              multiline
-              placeholder="e.g. Unpunctuality / route knowledge / personal reasons"
-            />
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Active Placements Table */}
+        {adminTab === 'placements' && (
+          <View style={styles.servicesStack}>
+            <Text style={styles.subHeading}>Active Client-Driver Placements</Text>
+            {masterPlacements.map(p => (
+              <View key={p.id} style={styles.cardMinimal}>
+                <View style={styles.cardBody}>
+                  <View style={styles.statusRow}>
+                    <Text style={styles.cardTag}>{p.id}</Text>
+                    <View style={styles.greenBadge}>
+                      <Text style={styles.greenBadgeText}>{p.status}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.cardTitle}>{p.owner}</Text>
+                  <Text style={styles.cardDesc}>Vehicle: {p.car}</Text>
+                  <Text style={[styles.cardDesc, { color: THEME.text, fontWeight: '700' }]}>Assigned Chauffeur: {p.driver}</Text>
+                  <Text style={styles.cardDesc}>Replacement Warranty Active till: {p.warrantyEnd}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
 
-            <TouchableOpacity
-              style={[styles.btnPrimarySubmit, { backgroundColor: THEME.red }]}
-              onPress={() => {
-                Alert.alert(
-                  'Claim Submitted',
-                  'Your priority replacement claim is registered. Our dispatch manager will call you within 2 hours with 2 new candidate profiles.'
-                );
-              }}
-            >
-              <Text style={styles.btnPrimarySubmitText}>Submit Priority Replacement Claim</Text>
-            </TouchableOpacity>
+        {/* Substitute Queue */}
+        {adminTab === 'substitutes' && (
+          <View style={styles.servicesStack}>
+            <Text style={styles.subHeading}>Substitute Driver Requests</Text>
+            <View style={styles.logCard}>
+              <Text style={styles.logDate}>Date: 24 Sep 2026</Text>
+              <Text style={styles.logMeta}>Client: Mr. Rajesh Agarwal (Vasant Vihar)</Text>
+              <Text style={styles.logMeta}>Reason: Regular driver Rameshwar Dayal on family leave</Text>
+              <Text style={[styles.logOT, { color: THEME.green, fontWeight: '700' }]}>Backup Allocated: Vikramaditya Singh (DRV-102)</Text>
+              <TouchableOpacity
+                style={[styles.btnPrimary, { marginTop: 10 }]}
+                onPress={() => Alert.alert('Dispatched', 'Backup driver Vikramaditya Singh notified for 24 Sep duty.')}
+              >
+                <Text style={styles.btnPrimaryText}>Confirm Substitute Allocation</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* Leads */}
+        {adminTab === 'leads' && (
+          <View style={styles.servicesStack}>
+            <Text style={styles.subHeading}>Recent Website Inquiries</Text>
+            <View style={styles.logCard}>
+              <Text style={styles.logDate}>Priya Sharma (+91 98765 43210)</Text>
+              <Text style={styles.logMeta}>Service: Personal Chauffeur Placement (Automatic Creta)</Text>
+              <Text style={styles.logMeta}>Location: DLF Phase 5, Gurugram</Text>
+              <TouchableOpacity
+                style={[styles.btnPrimary, { marginTop: 8 }]}
+                onPress={() => Linking.openURL('tel:+919876543210')}
+              >
+                <Text style={styles.btnPrimaryText}>Call Lead Directly</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -955,6 +1348,8 @@ export default function App() {
       {currentMode === 'driver_app' && renderDriverApp()}
       {currentMode === 'owner_login' && renderOwnerLogin()}
       {currentMode === 'owner_app' && renderOwnerApp()}
+      {currentMode === 'admin_login' && renderAdminLogin()}
+      {currentMode === 'admin_app' && renderAdminApp()}
 
       {/* Confirmation Modal */}
       <Modal visible={confirmationModal.visible} transparent animationType="fade">
@@ -975,7 +1370,7 @@ export default function App() {
   );
 }
 
-// ─── MINIMAL ENTERPRISE STYLESHEET ────────────────────────────────────────────
+// ─── STYLESHEET ────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
@@ -987,7 +1382,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: THEME.border,
@@ -1004,58 +1399,58 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   brandText: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '800',
     color: THEME.text,
     letterSpacing: 0.5,
   },
   brandSub: {
-    fontSize: 9.5,
+    fontSize: 9,
     color: THEME.textSecondary,
     fontWeight: '500',
   },
   navRightRow: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 5,
   },
   portalSwitchBtn: {
     borderWidth: 1,
     borderColor: THEME.border,
     paddingVertical: 5,
-    paddingHorizontal: 9,
+    paddingHorizontal: 8,
     borderRadius: 6,
     backgroundColor: THEME.bgSubtle,
   },
   portalSwitchText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
     color: THEME.text,
   },
 
-  // Portal Logged-in Headers
+  // Logged-in Headers
   portalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: THEME.border,
     backgroundColor: THEME.bg,
   },
   portalHeaderTitle: {
-    fontSize: 16,
+    fontSize: 15.5,
     fontWeight: '800',
     color: THEME.text,
   },
   portalHeaderSub: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: THEME.textSecondary,
     marginTop: 2,
   },
   btnLogout: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 9,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: THEME.border,
@@ -1068,14 +1463,14 @@ const styles = StyleSheet.create({
 
   // Main Scroll
   scrollContent: {
-    paddingHorizontal: 18,
-    paddingTop: 18,
+    paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 40,
   },
 
   // Hero Block
   heroBlock: {
-    marginBottom: 14,
+    marginBottom: 12,
   },
   heroPreTitle: {
     fontSize: 10,
@@ -1085,37 +1480,37 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   heroTitle: {
-    fontSize: 24,
+    fontSize: 23,
     fontWeight: '800',
     color: THEME.text,
-    lineHeight: 30,
+    lineHeight: 29,
     letterSpacing: -0.4,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   heroSubtitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: THEME.textSecondary,
-    lineHeight: 19,
+    lineHeight: 18,
   },
 
   // Trust Strip
   trustStrip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 9,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: THEME.borderSubtle,
-    marginBottom: 16,
+    marginBottom: 14,
     gap: 8,
   },
   trustItemText: {
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '500',
     color: THEME.textSecondary,
   },
   trustBullet: {
-    fontSize: 10,
+    fontSize: 9,
     color: THEME.textTertiary,
   },
 
@@ -1125,7 +1520,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.bgSubtle,
     borderRadius: 8,
     padding: 3,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   segmentBtn: {
     flex: 1,
@@ -1141,7 +1536,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   segmentBtnText: {
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '500',
     color: THEME.textSecondary,
   },
@@ -1152,7 +1547,7 @@ const styles = StyleSheet.create({
 
   // Services Stack & Cards
   servicesStack: {
-    gap: 16,
+    gap: 14,
   },
   cardMinimal: {
     backgroundColor: THEME.card,
@@ -1175,7 +1570,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardTitle: {
-    fontSize: 15.5,
+    fontSize: 15,
     fontWeight: '700',
     color: THEME.text,
   },
@@ -1191,7 +1586,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardTag: {
-    fontSize: 9.5,
+    fontSize: 9,
     fontWeight: '700',
     color: THEME.textTertiary,
     letterSpacing: 0.8,
@@ -1228,6 +1623,46 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
+  // Benchmark Result
+  benchmarkResultCard: {
+    backgroundColor: THEME.bgSubtle,
+    borderRadius: 10,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    marginTop: 12,
+  },
+  benchmarkLabel: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: THEME.textTertiary,
+    letterSpacing: 0.8,
+  },
+  benchmarkSalaryText: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: THEME.text,
+    marginVertical: 4,
+  },
+  benchmarkSub: {
+    fontSize: 11.5,
+    color: THEME.textSecondary,
+  },
+  benchmarkRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  benchmarkItem: {
+    fontSize: 11.5,
+    color: THEME.textSecondary,
+  },
+  benchmarkValue: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: THEME.text,
+  },
+
   // Candidate Cards
   candidateCard: {
     backgroundColor: THEME.card,
@@ -1235,7 +1670,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderWidth: 1,
     borderColor: THEME.border,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   candidateHeader: {
     flexDirection: 'row',
@@ -1243,9 +1678,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   candidateAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   candidateNameRow: {
     flexDirection: 'row',
@@ -1258,7 +1693,7 @@ const styles = StyleSheet.create({
     color: THEME.text,
   },
   candidateRating: {
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '600',
     color: THEME.textSecondary,
   },
@@ -1282,21 +1717,21 @@ const styles = StyleSheet.create({
     borderColor: THEME.border,
   },
   formTitle: {
-    fontSize: 17,
+    fontSize: 16.5,
     fontWeight: '700',
     color: THEME.text,
     marginBottom: 2,
   },
   formSubtitle: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: THEME.textSecondary,
-    marginBottom: 14,
+    marginBottom: 12,
   },
   inputLabel: {
     fontSize: 11.5,
     fontWeight: '600',
     color: THEME.text,
-    marginTop: 10,
+    marginTop: 8,
     marginBottom: 4,
   },
   textInput: {
@@ -1320,7 +1755,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.border,
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     borderRadius: 6,
   },
   choicePillActive: {
@@ -1328,7 +1763,7 @@ const styles = StyleSheet.create({
     borderColor: THEME.text,
   },
   choicePillText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '500',
     color: THEME.textSecondary,
   },
@@ -1338,10 +1773,10 @@ const styles = StyleSheet.create({
   },
   btnPrimarySubmit: {
     backgroundColor: THEME.accent,
-    paddingVertical: 12,
+    paddingVertical: 11,
     borderRadius: 7,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 14,
   },
   btnPrimarySubmitText: {
     color: '#FFF',
@@ -1351,58 +1786,79 @@ const styles = StyleSheet.create({
 
   // Login Screens
   loginContainer: {
-    padding: 20,
-    paddingTop: 30,
+    padding: 18,
+    paddingTop: 24,
   },
   btnBackToPublic: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   btnBackToPublicText: {
-    fontSize: 12.5,
+    fontSize: 12,
     color: THEME.textSecondary,
     fontWeight: '600',
   },
   loginCard: {
     backgroundColor: THEME.card,
     borderRadius: 14,
-    padding: 20,
+    padding: 18,
     borderWidth: 1,
     borderColor: THEME.border,
   },
   loginPreTitle: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '700',
     color: THEME.textTertiary,
     letterSpacing: 1,
     marginBottom: 4,
   },
   loginTitle: {
-    fontSize: 21,
+    fontSize: 20,
     fontWeight: '800',
     color: THEME.text,
     marginBottom: 4,
   },
   loginSub: {
-    fontSize: 12.5,
+    fontSize: 12,
     color: THEME.textSecondary,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   btnQuickDemo: {
     backgroundColor: THEME.bgSubtle,
     borderWidth: 1,
     borderColor: THEME.border,
-    paddingVertical: 10,
+    paddingVertical: 9,
     borderRadius: 7,
     alignItems: 'center',
     marginTop: 10,
   },
   btnQuickDemoText: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: THEME.textSecondary,
     fontWeight: '600',
   },
 
-  // Logbook Cards
+  // Logbook & Photo Logger
+  btnAttachPhoto: {
+    backgroundColor: THEME.bgSubtle,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: THEME.border,
+    borderRadius: 7,
+    paddingVertical: 9,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  btnAttachPhotoText: {
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: THEME.textSecondary,
+  },
+  photoIndicatorText: {
+    fontSize: 10.5,
+    color: THEME.green,
+    fontWeight: '600',
+    marginTop: 3,
+  },
   logCard: {
     backgroundColor: THEME.card,
     borderRadius: 10,
@@ -1418,29 +1874,29 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   logDate: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: THEME.text,
   },
   approvedBadge: {
     backgroundColor: THEME.greenSoft,
     paddingVertical: 2,
-    paddingHorizontal: 7,
+    paddingHorizontal: 6,
     borderRadius: 4,
   },
   approvedBadgeText: {
-    fontSize: 10,
+    fontSize: 9.5,
     color: THEME.green,
     fontWeight: '600',
   },
   pendingBadge: {
     backgroundColor: THEME.accentWarmSoft,
     paddingVertical: 2,
-    paddingHorizontal: 7,
+    paddingHorizontal: 6,
     borderRadius: 4,
   },
   pendingBadgeText: {
-    fontSize: 10,
+    fontSize: 9.5,
     color: THEME.accentWarm,
     fontWeight: '600',
   },
@@ -1456,25 +1912,25 @@ const styles = StyleSheet.create({
   },
   btnApprove: {
     backgroundColor: THEME.green,
-    paddingVertical: 7,
+    paddingVertical: 6,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   btnApproveText: {
     color: '#FFF',
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: '600',
   },
 
-  // Doc Vault Cards
+  // Document & Agreement Vault
   docCard: {
     backgroundColor: THEME.card,
     borderRadius: 10,
-    padding: 14,
+    padding: 12,
     borderWidth: 1,
     borderColor: THEME.border,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   docHeaderRow: {
     flexDirection: 'row',
@@ -1482,59 +1938,85 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   docTitle: {
-    fontSize: 13.5,
+    fontSize: 13,
     fontWeight: '700',
     color: THEME.text,
   },
   docMeta: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: THEME.textSecondary,
-    marginTop: 3,
+    marginTop: 2,
   },
   verifiedPill: {
-    fontSize: 9.5,
+    fontSize: 9,
     fontWeight: '700',
     color: THEME.green,
     backgroundColor: THEME.greenSoft,
     paddingVertical: 2,
-    paddingHorizontal: 6,
+    paddingHorizontal: 5,
     borderRadius: 4,
   },
-  verifiedRow: {
-    marginTop: 6,
-  },
   verifiedText: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: THEME.green,
     fontWeight: '600',
+    marginTop: 4,
+  },
+  agreementHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  agreementBadge: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: THEME.textTertiary,
+  },
+  agreementStatus: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: THEME.green,
+  },
+  agreementClauseTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: THEME.text,
+    marginTop: 6,
+  },
+  agreementClauseBody: {
+    fontSize: 11,
+    color: THEME.textSecondary,
+    lineHeight: 15,
+    marginTop: 2,
   },
 
-  // Small Utilities
+  // Utilities
   formRow: {
     flexDirection: 'row',
     gap: 6,
   },
   subHeading: {
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: '700',
     color: THEME.text,
     marginBottom: 2,
   },
   subText: {
-    fontSize: 11.5,
+    fontSize: 11,
     color: THEME.textSecondary,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   divider: {
     height: 1,
     backgroundColor: THEME.borderSubtle,
-    marginVertical: 10,
+    marginVertical: 8,
   },
   statusRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   greenBadge: {
     backgroundColor: THEME.greenSoft,
@@ -1543,27 +2025,27 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   greenBadgeText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '700',
     color: THEME.green,
   },
   bigAmount: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '800',
     color: THEME.text,
-    marginVertical: 4,
+    marginVertical: 2,
   },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   summaryLabel: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: THEME.textSecondary,
   },
   summaryVal: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: THEME.text,
   },
@@ -1574,26 +2056,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
   },
   modalCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 22,
+    padding: 20,
     width: '100%',
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 17,
+    fontSize: 16.5,
     fontWeight: '700',
     color: THEME.text,
     marginBottom: 6,
   },
   modalMessage: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: THEME.textSecondary,
     lineHeight: 18,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
 });
