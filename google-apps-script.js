@@ -144,7 +144,7 @@ function recordClientLead(ss, data, timestamp) {
   const row = [
     timestamp,
     name,
-    phone,
+    formatPhone(phone),
     email,
     region,
     address,
@@ -193,7 +193,7 @@ function recordDriverApplication(ss, data, timestamp) {
   const row = [
     timestamp,
     name,
-    phone,
+    formatPhone(phone),
     city,
     trans,
     exp,
@@ -234,7 +234,7 @@ function recordFleetLead(ss, data, timestamp) {
     timestamp,
     company,
     person,
-    phone,
+    formatPhone(phone),
     email,
     fleetSize,
     region,
@@ -244,6 +244,15 @@ function recordFleetLead(ss, data, timestamp) {
 
   sheet.appendRow(row);
   return { type: "Fleet", row: sheet.getLastRow() };
+}
+
+/**
+ * Format phone numbers so Google Sheets never interprets leading '+' as a mathematical formula
+ */
+function formatPhone(phone) {
+  if (!phone) return "";
+  const p = phone.toString().trim();
+  return p.startsWith("'") ? p : "'" + p;
 }
 
 function getOrCreateSheet(ss, name, headers, headerColor) {

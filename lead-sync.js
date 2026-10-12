@@ -23,7 +23,12 @@ var DRIVERS_SAATHI_GOOGLE_SHEET_URL = window.DRIVERS_SAATHI_GOOGLE_SHEET_URL || 
       var formData = new FormData(form);
       var payload = {};
       formData.forEach(function(value, key) {
-        payload[key] = value;
+        var str = (value || "").toString().trim();
+        // Prevent Google Sheets formula parse error if phone starts with +
+        if ((key.toLowerCase().indexOf("phone") !== -1 || key.toLowerCase().indexOf("mobile") !== -1) && str.indexOf("+") === 0) {
+          str = "'" + str;
+        }
+        payload[key] = str;
       });
 
       // Send to Google Apps Script Webhook asynchronously (no-cors prevents browser blocks)
@@ -31,7 +36,7 @@ var DRIVERS_SAATHI_GOOGLE_SHEET_URL = window.DRIVERS_SAATHI_GOOGLE_SHEET_URL || 
         method: "POST",
         mode: "no-cors",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "text/plain;charset=utf-8"
         },
         body: JSON.stringify(payload)
       }).catch(function(err) {
