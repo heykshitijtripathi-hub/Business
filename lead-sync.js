@@ -10,7 +10,7 @@
  * Once you deploy the Google Apps Script, paste your deployed Web App URL below:
  */
 
-var DRIVERS_SAATHI_GOOGLE_SHEET_URL = window.DRIVERS_SAATHI_GOOGLE_SHEET_URL || "";
+var DRIVERS_SAATHI_GOOGLE_SHEET_URL = window.DRIVERS_SAATHI_GOOGLE_SHEET_URL || "https://script.google.com/macros/s/AKfycbwwDzVleh9OZPadFhxHJPUab4q2PO08theLEwVVEY5CuVwswvUvGdsShBMs0mdFXPHZsA/exec";
 
 (function() {
   function syncFormToGoogleSheet(form) {
