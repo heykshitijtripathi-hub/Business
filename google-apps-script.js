@@ -20,6 +20,75 @@ const SPREADSHEET_CONFIG = {
   TIMEZONE: "Asia/Kolkata"
 };
 
+/**
+ * ==============================================================================
+ * RUN THIS FUNCTION ONCE DIRECTLY IN APPS SCRIPT:
+ * Select "setupAllHeaders" from the dropdown next to "Run" and click "Run".
+ * It will instantly create / update all 19 Client columns & 15 Driver columns!
+ * ==============================================================================
+ */
+function setupAllHeaders() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // 1. Client Leads (19 columns)
+  const clientHeaders = [
+    "Timestamp (IST)",
+    "Client Name",
+    "Phone Number",
+    "Email",
+    "NCR Region",
+    "Exact Address & Society",
+    "Car Model",
+    "Transmission Type",
+    "Hiring Purpose",
+    "Driver Salary / Budget",
+    "Duty Tenure & Type",
+    "Preferred Duty Timings / Trip Dates",
+    "Preferred Trial Date",
+    "Driver Experience Required",
+    "Driver Age Preference",
+    "Verification Preference",
+    "Special Requirements",
+    "Lead Status",
+    "Assigned Driver / Notes"
+  ];
+  getOrCreateSheet(ss, SPREADSHEET_CONFIG.CLIENT_SHEET_NAME, clientHeaders, "#0284C7");
+
+  // 2. Driver Applications (15 columns)
+  const driverHeaders = [
+    "Timestamp (IST)",
+    "Full Name",
+    "Phone",
+    "Current Area in NCR",
+    "Native Home State",
+    "Car Transmission Skills",
+    "Driving Experience",
+    "Accommodation / Stay-in",
+    "Duty Type Preference",
+    "Smartphone & Google Maps Knowledge",
+    "Expected Salary / Rate",
+    "DL Number",
+    "1-Day Paid Trial Ready",
+    "Application Status",
+    "Verification / Background Notes"
+  ];
+  getOrCreateSheet(ss, SPREADSHEET_CONFIG.DRIVER_SHEET_NAME, driverHeaders, "#166534");
+
+  // 3. Corporate Leads (9 columns)
+  const fleetHeaders = [
+    "Timestamp (IST)",
+    "Company Name",
+    "Contact Person",
+    "Phone Number",
+    "Email",
+    "Fleet Size",
+    "City / Region",
+    "Requirements",
+    "Lead Status"
+  ];
+  getOrCreateSheet(ss, SPREADSHEET_CONFIG.FLEET_SHEET_NAME, fleetHeaders, "#4338CA");
+}
+
 function doPost(e) {
   try {
     const lock = LockService.getScriptLock();
