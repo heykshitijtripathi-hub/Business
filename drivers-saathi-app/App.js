@@ -222,7 +222,10 @@ export default function App() {
     if (calcHours === '12 Hours') b += 3000;
     if (calcHours === '24-Hr Live-in') b += 6000;
     if (calcTrans === 'Luxury / EV') b += 3500;
-    return { min: b, max: b + 2500, ot: b >= 24000 ? 100 : 80, fee: 4500 };
+    let fee = 3000;
+    if (calcTrans === 'Automatic') fee = 4000;
+    if (calcTrans === 'Luxury / EV') fee = 5500;
+    return { min: b, max: b + 2500, ot: b >= 24000 ? 100 : 80, fee };
   };
 
   const pickPhoto = async () => {
@@ -879,13 +882,13 @@ export default function App() {
                 </View>
                 <View style={styles.trialStepCard}>
                   <View style={styles.trialStepNum}><Text style={styles.trialStepNumText}>2</Text></View>
-                  <Text style={styles.trialStepTitle}>1-Day Home Trial</Text>
-                  <Text style={styles.trialStepDesc}>₹500 slot booking token (100% adjusted in final placement fee, or refunded if driver does not report).</Text>
+                  <Text style={styles.trialStepTitle}>1-Day Home Trial (₹999)</Text>
+                  <Text style={styles.trialStepDesc}>₹999 flat paid trial on doorstep arrival via UPI QR (transferred directly to driver at 7 PM upon completion).</Text>
                 </View>
                 <View style={styles.trialStepCard}>
                   <View style={styles.trialStepNum}><Text style={styles.trialStepNumText}>3</Text></View>
-                  <Text style={styles.trialStepTitle}>Dossier & Warranty</Text>
-                  <Text style={styles.trialStepDesc}>Trial succeeds! Placement fee settled, written agreement & police file released, 30-day warranty starts.</Text>
+                  <Text style={styles.trialStepTitle}>50-50 Dossier & Warranty</Text>
+                  <Text style={styles.trialStepDesc}>Trial succeeds! Pay 50% placement fee (Manual ₹1,500 / Auto ₹2,000 / Luxury ₹2,750), balance after 15 continuous days.</Text>
                 </View>
               </View>
             </View>
@@ -1001,9 +1004,9 @@ export default function App() {
                 tag: 'Most Popular',
                 tagColor: C.accent,
                 title: 'Personal Chauffeur Placement',
-                price: 'One-time Placement Fee: Rs. 4,500',
+                price: 'Placement Fee: From Rs. 3,000 (By Transmission)',
                 desc: 'Dedicated full-time driver for your private car. Route familiar, punctual, with an iron-clad 30-day free replacement warranty. Monthly salary is paid directly to the driver.',
-                highlights: ['30-day free replacement warranty', 'Police clearance certificate provided', 'Salary advice & agreement drafting included'],
+                highlights: ['₹999 1-Day home trial shift', '50-50 trust model (Manual Rs. 3,000 / Auto Rs. 4,000 / Luxury Rs. 5,500)', '30-day free replacement warranty'],
                 cta: 'Request Chauffeur',
                 ctaFn: () => setCustTab('book'),
               },
@@ -1341,7 +1344,7 @@ export default function App() {
               {[
                 { q: 'How quickly can I get a driver?', a: 'We share verified candidate profiles within 4 hours. You can conduct a 1-day trial the following day, with final placement within 48 hours.' },
                 { q: 'What does the 30-day replacement guarantee cover?', a: 'If the placed driver leaves, is consistently late, or does not match your car requirements, we provide a free candidate replacement within 48 hours.' },
-                { q: 'Who pays the driver monthly salary?', a: 'You pay the salary directly to the driver by the 5th of each month. Drivers Saathi only charges a one-time placement fee of Rs. 4,500.' },
+                { q: 'Who pays the driver monthly salary & agency fees?', a: 'You pay the salary directly to the driver by the 5th of each month. Drivers Saathi charges a flat ₹999 for the 1-day home trial and a transparent 50-50 placement fee starting from Rs. 3,000 tiered by transmission (Manual Rs. 3,000, Automatic Rs. 4,000, Luxury Rs. 5,500), payable only after trial satisfaction.' },
                 { q: 'Do you verify police records?', a: 'Yes. Every candidate has a verified local police clearance certificate and commercial driving licence check before we present them.' },
               ].map((f, i) => (
                 <View key={i} style={styles.faqItem}>
