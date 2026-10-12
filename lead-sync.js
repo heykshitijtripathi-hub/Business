@@ -31,6 +31,13 @@ var DRIVERS_SAATHI_GOOGLE_SHEET_URL = window.DRIVERS_SAATHI_GOOGLE_SHEET_URL || 
         payload[key] = str;
       });
 
+      // Validation guard: Do not log empty form clicks to Google Sheets
+      var nameVal = (payload["Client Name"] || payload["Full Name"] || payload["Name"] || payload["Company Name"] || "").trim();
+      var phoneVal = (payload["Phone Number"] || payload["Phone"] || payload["Mobile Number"] || "").trim();
+      if (!nameVal && !phoneVal) {
+        return;
+      }
+
       // Send to Google Apps Script Webhook asynchronously (no-cors prevents browser blocks)
       fetch(DRIVERS_SAATHI_GOOGLE_SHEET_URL, {
         method: "POST",

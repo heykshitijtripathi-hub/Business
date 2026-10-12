@@ -29,6 +29,17 @@ function doPost(e) {
     const data = parseIncomingData(e);
     const timestamp = Utilities.formatDate(new Date(), SPREADSHEET_CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm:ss");
 
+    // Guard: Ignore submissions if both name and phone are empty
+    const checkName = (data["Client Name"] || data["Full Name"] || data["Name"] || data["Company Name"] || "").toString().trim();
+    const checkPhone = (data["Phone Number"] || data["Phone"] || data["Mobile Number"] || "").toString().trim();
+    if (!checkName && !checkPhone) {
+      lock.releaseLock();
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "ignored",
+        message: "Ignored empty submission"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     let result;
     if (isDriverApplication(data)) {
       result = recordDriverApplication(ss, data, timestamp);
