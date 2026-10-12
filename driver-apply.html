@@ -238,13 +238,14 @@
         </div>
         <div class="form-wrap">
           <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="applyForm">
-            <input type="hidden" name="_subject" value="Driver Job Application - Drivers Saathi">
+            <input type="hidden" name="_subject" value="🚗 [NEW DRIVER APPLICATION] Driver Registration - Drivers Saathi">
             <input type="hidden" name="_template" value="table">
             <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="Enquiry Type" value="Driver Job Application">
-            <input type="hidden" name="_autoresponse" value="Dhanyawad! Drivers Saathi network join karne ki aapki application humein mil gayi hai. Humari recruitment team 2 working days ke andar aapko phone/WhatsApp par call karegi document verification aur next steps ke liye.">
+            <input type="hidden" name="Enquiry Type" value="DRIVER_JOB_APPLICATION">
+            <input type="hidden" name="_autoresponse" value="Dhanyawad! Drivers Saathi network join karne ki aapki application humein mil gayi hai. Humari recruitment team 24 ghante ke andar aapko call karegi document verification aur 1-day paid trial ke liye.">
             
             <div class="form-grid">
+              <!-- Basic Details -->
               <div class="field">
                 <label for="d-name">आपका पूरा नाम (Full Name) <span class="req">*</span></label>
                 <input type="text" id="d-name" name="Full Name" placeholder="उदा. सतीश कुमार / Satish Kumar" required>
@@ -254,58 +255,125 @@
                 <input type="tel" id="d-phone" name="Phone" placeholder="+91 98765 43210" required>
               </div>
               <div class="field">
-                <label for="d-city">दिल्ली NCR में आपका इलाका (Your Area / Locality) <span class="req">*</span></label>
-                <input type="text" id="d-city" name="Area" placeholder="उदा. बदरपुर, साउथ दिल्ली / सेक्टर 56 गुड़गांव / नोएडा" required>
+                <label for="d-city">दिल्ली NCR में आपका वर्तमान पता (Current Living Area) <span class="req">*</span></label>
+                <input type="text" id="d-city" name="Current Area in NCR" placeholder="उदा. सेक्टर 56 गुड़गांव / वसंत कुंज / नोएडा सेक्टर 62" required>
               </div>
               <div class="field">
-                <label for="d-exp">कुल ड्राइविंग अनुभव (Driving Experience) <span class="req">*</span></label>
-                <select id="d-exp" name="Experience" required>
+                <label for="d-native">मूल निवासी राज्य (Native Home State) <span class="req">*</span></label>
+                <select id="d-native" name="Native Home State" required>
+                  <option value="">राज्य चुनें (Select State)</option>
+                  <option value="Uttar Pradesh">उत्तर प्रदेश (Uttar Pradesh)</option>
+                  <option value="Bihar">बिहार (Bihar)</option>
+                  <option value="Haryana">हरियाणा (Haryana)</option>
+                  <option value="Rajasthan">राजस्थान (Rajasthan)</option>
+                  <option value="Delhi NCR">दिल्ली मूल निवासी (Delhi Local)</option>
+                  <option value="Uttarakhand">उत्तराखंड (Uttarakhand)</option>
+                  <option value="Other">अन्य राज्य (Other State)</option>
+                </select>
+              </div>
+
+              <!-- Experience & Car Skills -->
+              <div class="field">
+                <label for="d-exp">कुल ड्राइविंग अनुभव (Total Driving Experience) <span class="req">*</span></label>
+                <select id="d-exp" name="Driving Experience" required>
                   <option value="">अनुभव चुनें (Select)</option>
-                  <option>1 से 3 साल (1-3 Years)</option>
-                  <option>4 से 7 साल (4-7 Years)</option>
-                  <option>8 से 12 साल (8-12 Years)</option>
-                  <option>15+ साल (15+ Years)</option>
+                  <option>2 से 4 साल (2-4 Years)</option>
+                  <option>5 से 8 साल (5-8 Years)</option>
+                  <option>9 से 12 साल (9-12 Years)</option>
+                  <option>15+ साल (15+ Years Senior Chauffeur)</option>
                 </select>
               </div>
               <div class="field">
-                <label for="d-license">कौन सी गाड़ी चलाते हैं? (Transmission) <span class="req">*</span></label>
-                <select id="d-license" name="Transmission" required>
+                <label for="d-license">कौन सी गाड़ी चलाने का अनुभव है? (Transmission) <span class="req">*</span></label>
+                <select id="d-license" name="Car Transmission Skills" required>
                   <option value="">गाड़ी का प्रकार चुनें</option>
-                  <option>मैनुअल (Manual Cars Only)</option>
-                  <option>ऑटोमेटिक (Automatic Cars Only)</option>
-                  <option>दोनों (Both Manual + Automatic)</option>
-                  <option>लग्जरी व एसयूवी (Fortuner, BMW, Audi)</option>
+                  <option value="Both Manual and Automatic">दोनों — मैनुअल + ऑटोमैटिक (Manual & Automatic Both)</option>
+                  <option value="Automatic Specialist">ऑटोमैटिक एक्सपर्ट (Automatic Cars Specialist)</option>
+                  <option value="Manual Only">केवल मैनुअल कार (Manual Cars Only)</option>
+                  <option value="Luxury SUV Specialist">लग्जरी व बड़ी SUV (Innova, Fortuner, BMW, Mercedes)</option>
+                </select>
+              </div>
+
+              <!-- Job Type & Stay-in Option -->
+              <div class="field">
+                <label for="d-stayin">क्या रहने की जगह (कमरा) चाहिए? (Accommodation) <span class="req">*</span></label>
+                <select id="d-stayin" name="Accommodation / Stay-in" required>
+                  <option value="">चुनें (Select)</option>
+                  <option value="No, Day Duty Only">नहीं, सिर्फ दिन की ड्यूटी (Day Duty Only - 10 to 12 Hours)</option>
+                  <option value="Yes, 24/7 Stay-in with Room">हाँ, रहने की जगह चाहिए (24/7 Stay-in Driver / कोठी में रहना)</option>
+                  <option value="Flexible for Both">दोनों चलेगा (Flexible for Day Duty or Stay-in)</option>
                 </select>
               </div>
               <div class="field">
-                <label for="d-jobtype">ड्राइविंग लाइसेंस प्रकार (License Type)</label>
-                <select id="d-jobtype" name="License Type">
-                  <option value="LMV-Commercial">कमर्शियल लाइसेंस (LMV-TR Badge)</option>
-                  <option value="LMV-Private">प्राइवेट लाइसेंस (LMV-NT)</option>
-                  <option value="HMV">भारी वाहन (HMV)</option>
-                  <option value="Learning">लर्निंग लाइसेंस (Learning)</option>
+                <label for="d-duty">काम का प्रकार व उपलब्धता (Duty Type & Availability) <span class="req">*</span></label>
+                <select id="d-duty" name="Duty Type Preference" required>
+                  <option value="Permanent Monthly Job (केवल पक्की मासिक नौकरी)">केवल पक्की मासिक नौकरी (Monthly Job - Family / Corporate)</option>
+                  <option value="Outstation Trips (3-5 Days Outstation)">आउटस्टेशन हाईवे ट्रिप (3 से 5 दिन की यात्रा - Outstation Trips)</option>
+                  <option value="15-Days Reliever Duty (15 दिन की रिलेवर ड्यूटी)">15-दिन की रिलेवर ड्यूटी (15 Days Temporary Duty)</option>
+                  <option value="Event / Wedding Chauffeur (1-2 दिन शादी/इवेंट)">शादी व पार्टी ड्राइविंग (Event / Wedding 1-2 Days)</option>
+                  <option value="24-Hour Stay-In Driver (कोठी/फार्महाउस में 24 घंटे)">24 घंटे स्टे-इन (कोठी / फार्महाउस / रूम उपलब्ध)</option>
+                  <option value="Flexible for All (सभी प्रकार के काम के लिए तैयार)">सभी प्रकार के काम के लिए तैयार (Flexible for All)</option>
                 </select>
               </div>
-              <div class="field full">
-                <label for="d-dl">कमर्शियल ड्राइविंग लाइसेंस नंबर (DL Number - यदि उपलब्ध हो)</label>
-                <input type="text" id="d-dl" name="DL Number" placeholder="DL-0420180012345" style="text-transform:uppercase;">
+
+              <!-- Technical & Etiquette Check -->
+              <div class="field">
+                <label for="d-maps">स्मार्टफोन व गूगल मैप्स का इस्तेमाल (Google Maps) <span class="req">*</span></label>
+                <select id="d-maps" name="Smartphone & Google Maps Knowledge" required>
+                  <option value="Fully Fluent with Google Maps">हाँ, स्मार्टफोन व गूगल मैप्स चलाना अच्छी तरह आता है</option>
+                  <option value="Basic Knowledge">बेसिक जानकारी है (सीख सकता हूँ)</option>
+                  <option value="No Smartphone">स्मार्टफोन नहीं चलाता</option>
+                </select>
               </div>
+              <div class="field">
+                <label for="d-salary">अपेक्षित वेतन / रेट (Expected Salary / Daily Rate) <span class="req">*</span></label>
+                <select id="d-salary" name="Expected Salary / Rate" required>
+                  <option value="">वेतन / रेट चुनें (Select Range)</option>
+                  <optgroup label="मासिक वेतन (Monthly Salary)">
+                    <option value="₹20,000 - ₹22,000 / महीना">₹20,000 से ₹22,000 / महीना (10 घंटे ड्यूटी)</option>
+                    <option value="₹22,000 - ₹25,000 / महीना" selected>₹22,000 से ₹25,000 / महीना (अनुभवी / ऑटोमैटिक / 12 घंटे)</option>
+                    <option value="₹25,000 - ₹28,000 / महीना">₹25,000 से ₹28,000 / महीना (लग्जरी कार / स्टे-इन)</option>
+                  </optgroup>
+                  <optgroup label="15-दिन रिलेवर (15 Days Reliever)">
+                    <option value="₹10,000 - ₹12,000 for 15 Days">₹10,000 से ₹12,000 (15 दिन का मानदेय)</option>
+                  </optgroup>
+                  <optgroup label="आउटस्टेशन व इवेंट रेट (Outstation / Event Daily)">
+                    <option value="₹1,200 - ₹1,500 / दिन + भोजन (आउटस्टेशन)">₹1,200 से ₹1,500 / दिन + भोजन (3-5 दिन आउटस्टेशन ट्रिप)</option>
+                    <option value="₹1,000 - ₹1,200 / दिन (शादी / पार्टी)">₹1,000 से ₹1,200 / दिन (शादी / इवेंट ड्यूटी)</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <!-- DL & Background Check -->
+              <div class="field">
+                <label for="d-dl">ड्राइविंग लाइसेंस नंबर (DL Number) <span class="req">*</span></label>
+                <input type="text" id="d-dl" name="DL Number" placeholder="DL-0420180012345" style="text-transform:uppercase;" required>
+              </div>
+              <div class="field">
+                <label for="d-trialready">क्या आप 1-दिन के ट्रायल के लिए तैयार हैं? <span class="req">*</span></label>
+                <select id="d-trialready" name="1-Day Paid Trial Ready" required>
+                  <option value="Yes, Ready for 1-Day Trial (कल ही आ सकता हूँ)">हाँ, कल ही 1-दिन के ट्रायल के लिए तैयार हूँ</option>
+                  <option value="Yes, in 2-3 Days">हाँ, 2-3 दिन में ट्रायल दे सकता हूँ</option>
+                </select>
+              </div>
+
               <div class="field full">
                 <div style="background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:10px; padding:16px;">
-                  <h4 style="margin:0 0 6px; color:#166534; font-size:15px;">ड्राइवर आचार संहिता व सुरक्षा नियम (Code of Conduct)</h4>
+                  <h4 style="margin:0 0 6px; color:#166534; font-size:15px;">🛡️ ड्राइवर आचार संहिता व सुरक्षा नियम (Code of Conduct)</h4>
                   <p style="margin:0; font-size:13px; color:#14532D; line-height:1.6;">
-                    ★ <strong>लाइफटाइम नौकरी सुरक्षा:</strong> यदि कार मालिक गाड़ी हटाए, तो ड्राइवर्स साथी आपको 24 घंटे में दूसरी नौकरी दिलाएगा।<br>
-                    ★ <strong>इमरजेंसी सहायता:</strong> त्योहारों पर बोनस व बिना ब्याज सैलरी एडवांस की सुविधा।<br>
-                    ⚠ <strong>सीधे डील की सख्त मनाही:</strong> यदि कोई ड्राइवर एजेंसी को छुपाकर कार मालिक से सीधे काम करता है, तो उसका ड्राइविंग लाइसेंस दिल्ली NCR ड्राइवर नेटवर्क में हमेशा के लिए ब्लैकलिस्ट कर दिया जाएगा।
+                    ★ <strong>100% फ्री भर्ती:</strong> आपसे नौकरी दिलाने की कोई दलाली या कमीशन नहीं काटा जाता।<br>
+                    ★ <strong>1-दिन के ट्रायल के पैसे:</strong> ट्रायल का मानदेय आपको उसी शाम को मिल जाता है।<br>
+                    ★ <strong>मालिक से सीधे डील की सख्त मनाही:</strong> यदि कोई ड्राइवर एजेंसी को छुपाकर कार मालिक से सीधे काम करता है, तो उसका ड्राइविंग लाइसेंस दिल्ली NCR ड्राइवर नेटवर्क में हमेशा के लिए ब्लैकलिस्ट कर दिया जाएगा।
                   </p>
                 </div>
               </div>
             </div>
+
             <div class="form-foot">
-              <p class="form-note">आवेदन के बाद 24 घंटे में हमारी भर्ती टीम आपको कॉल करेगी।</p>
+              <p class="form-note">आवेदन के बाद 24 घंटे में हमारी भर्ती टीम आपको कॉल करके ट्रायल कन्फर्म करेगी।</p>
               <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                <button type="submit" class="submit-btn" style="background:#1B5E20; padding:14px 28px; font-size:16px;">आवेदन सबमिट करें (Submit)</button>
-                <a href="https://wa.me/918175087004?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20%E0%A4%A1%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%87%E0%A4%B5%E0%A4%B0%E0%A5%8D%E0%A4%B8%20%E0%A4%B8%E0%A4%BE%E0%A4%A5%E0%A5%80%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%87%E0%A4%B5%E0%A5%87%E0%A4%9F%20%E0%A4%95%E0%A4%BE%E0%A4%B0%20%E0%A4%A1%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%87%E0%A4%B5%E0%A4%B0%20%E0%A4%95%E0%A5%80%20%E0%A4%A8%E0%A5%8C%E0%A4%95%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" class="btn" style="background:#25D366; color:#fff; font-size:15px; text-decoration:none; padding:14px 22px;">व्हाट्सएप पर तुरंत जुड़ें &rarr;</a>
+                <button type="submit" class="submit-btn" style="background:#1B5E20; padding:14px 28px; font-size:16px;">आवेदन सबमिट करें (Submit Application)</button>
+                <a href="https://wa.me/918175087004?text=Namaste%20Drivers%20Saathi%2C%20I%20am%20a%20DRIVER%20looking%20for%20a%20private%20car%20job." target="_blank" class="btn" style="background:#25D366; color:#fff; font-size:15px; text-decoration:none; padding:14px 22px;">व्हाट्सएप पर तुरंत जुड़ें &rarr;</a>
               </div>
             </div>
           </form>

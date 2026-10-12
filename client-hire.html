@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hire a Verified Private Car Driver in Delhi NCR | Drivers Saathi</title>
+<meta name="description" content="Request a 100% police-verified personal chauffeur for your private car in Delhi, Gurugram, Noida. 1-Day trial available, 30-day free replacement guarantee.">
+<link rel="icon" type="image/png" href="images/driver-saathi-logo-clean.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d2340;
+    --navy-light: #15325b;
+    --gold: #FFC425;
+    --gold-dark: #D99B00;
+    --green: #10B981;
+    --bg-light: #F8FAFC;
+    --border: #E2E8F0;
+    --text-dark: #0F172A;
+    --text-muted: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    padding-bottom: 60px;
+  }
+  header {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  }
+  .header-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo img { height: 48px; object-fit: contain; }
+  .header-contact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .header-contact a {
+    color: var(--navy);
+    text-decoration: none;
+  }
+  .btn-call {
+    background: #000;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .main-wrap {
+    max-width: 860px;
+    margin: 32px auto;
+    padding: 0 16px;
+  }
+
+  .banner-card {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e3a8a 100%);
+    color: #ffffff;
+    padding: 32px 28px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px rgba(13, 35, 64, 0.15);
+  }
+  .badge-trust {
+    background: rgba(255, 196, 37, 0.2);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .banner-card h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 900;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .banner-card p {
+    font-size: 14.5px;
+    color: #cbd5e1;
+    max-width: 650px;
+  }
+
+  .filter-notice {
+    background: #FFFBEB;
+    border-left: 4px solid #F59E0B;
+    border: 1px solid #FDE68A;
+    border-left-width: 5px;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #92400E;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .filter-notice strong { color: #78350F; }
+
+  .form-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  }
+
+  .section-divider {
+    border-top: 1px solid var(--border);
+    margin: 28px 0 24px;
+    padding-top: 20px;
+  }
+  .section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-num {
+    background: var(--gold);
+    color: #000;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+  .grid-full { margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  label span.req { color: #EF4444; }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(13, 35, 64, 0.08);
+  }
+  textarea { min-height: 90px; resize: vertical; }
+
+  .radio-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .radio-pill {
+    position: relative;
+  }
+  .radio-pill input {
+    position: absolute;
+    opacity: 0;
+  }
+  .radio-pill label {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+    margin: 0;
+  }
+  .radio-pill input:checked + label {
+    border-color: var(--navy);
+    background: #F0F7FF;
+    color: var(--navy);
+    box-shadow: 0 2px 8px rgba(13, 35, 64, 0.08);
+  }
+
+  .benefits-callout {
+    background: #F0FDF4;
+    border: 1.5px solid #86EFAC;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .benefits-callout h4 {
+    font-size: 14px;
+    color: #166534;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .benefits-callout ul {
+    list-style: none;
+    font-size: 13px;
+    color: #15803D;
+    line-height: 1.7;
+  }
+
+  .submit-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #000;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(217, 155, 0, 0.3);
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(217, 155, 0, 0.4);
+  }
+  .whatsapp-direct {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #25D366;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 24px;
+  }
+
+  @media (max-width: 650px) {
+    .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+    .form-card { padding: 24px 18px; }
+    .banner-card { padding: 24px 18px; }
+    .submit-bar { flex-direction: column; align-items: stretch; }
+    .btn-submit { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-wrap">
+    <a href="index.html" class="logo">
+      <img src="images/driver-saathi-logo-clean.png" alt="Drivers Saathi">
+    </a>
+    <div class="header-contact">
+      <span>Helpline:</span>
+      <a href="tel:+918175087004" class="btn-call">📞 +91 8175087004</a>
+    </div>
+  </div>
+</header>
+
+<div class="main-wrap">
+
+  <div class="banner-card">
+    <div class="badge-trust">★ FORM A: CLIENT REQUIREMENT FORM</div>
+    <h1>Hire a Verified Private Car Driver</h1>
+    <p>Please share your requirements below. Our dispatch desk will match you with a police-verified, background-checked personal chauffeur for a <strong>1-Day Trial</strong>.</p>
+  </div>
+
+  <div class="filter-notice">
+    <span style="font-size:20px;">🛡️</span>
+    <div>
+      <strong>Strict Private &amp; Family Chauffeurs Only:</strong> Drivers Saathi specializes exclusively in verified personal car drivers for families and corporate executives. <em>We DO NOT supply commercial Ola/Uber drivers.</em>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <form action="https://formsubmit.co/support@driverssaathi.com" method="POST" id="clientHireForm">
+      <!-- FormSubmit Config -->
+      <input type="hidden" name="_subject" value="🚨 [NEW CLIENT LEAD] Private Driver Hire Request - Drivers Saathi">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="Inquiry Category" value="CLIENT_DRIVER_HIRE">
+      <input type="hidden" name="_autoresponse" value="Thank you for choosing Drivers Saathi! We have received your driver requirement. Our placement desk is matching your car model and location with our verified chauffeurs. We will call you within 30 minutes to schedule your 1-Day Trial.">
+
+      <!-- Section 1: Client Identity -->
+      <div class="section-title">
+        <span class="section-num">1</span>
+        <span>Your Contact Details (आपकी जानकारी)</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="c-name">Full Name (आपका पूरा नाम) <span class="req">*</span></label>
+          <input type="text" id="c-name" name="Client Name" placeholder="e.g. Vikram Bhatia / Rohit Sharma" required>
+        </div>
+        <div>
+          <label for="c-phone">Phone / WhatsApp Number (मोबाइल नंबर) <span class="req">*</span></label>
+          <input type="tel" id="c-phone" name="Phone Number" placeholder="+91 98765 43210" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="c-city">City / Region in Delhi NCR <span class="req">*</span></label>
+          <select id="c-city" name="NCR Region" required>
+            <option value="">Select Region</option>
+            <option value="Gurugram">Gurugram (DLF Phase 1-5, Golf Course Rd, Sohna Rd)</option>
+            <option value="South Delhi">South Delhi (GK, Vasant Kunj, Panchsheel, Hauz Khas)</option>
+            <option value="Central/West Delhi">Central / West / North Delhi</option>
+            <option value="Noida">Noida / Noida Expressway (Sec 128, 137, 150)</option>
+            <option value="Greater Noida">Greater Noida</option>
+            <option value="Faridabad">Faridabad</option>
+            <option value="Ghaziabad">Ghaziabad / Indirapuram</option>
+          </select>
+        </div>
+        <div>
+          <label for="c-locality">Exact Sector / Society / Landmark <span class="req">*</span></label>
+          <input type="text" id="c-locality" name="Exact Address & Society" placeholder="e.g. DLF The Crest, Sector 54 / Vasant Kunj Sec C" required>
+        </div>
+      </div>
+
+      <!-- Section 2: Vehicle Details -->
+      <div class="section-divider"></div>
+      <div class="section-title">
+        <span class="section-num">2</span>
+        <span>Vehicle Details (गाड़ी की जानकारी)</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="c-car">Car Brand &amp; Model (गाड़ी का नाम) <span class="req">*</span></label>
+          <input type="text" id="c-car" name="Car Model" placeholder="e.g. Hyundai Creta / Innova Hycross / Fortuner / BMW 3" required>
+        </div>
+        <div>
+          <label for="c-trans">Car Transmission (गियर प्रकार) <span class="req">*</span></label>
+          <select id="c-trans" name="Transmission Type" required>
+            <option value="">Select Transmission</option>
+            <option value="Automatic">Automatic (AT / CVT / DCT / AMT)</option>
+            <option value="Manual">Manual (मैनुअल गियर)</option>
+            <option value="Electric (EV)">Electric Vehicle (EV - Nexon EV / ZS EV)</option>
+            <option value="Multiple Cars (Manual + Auto)">Multiple Cars (Both Manual &amp; Automatic)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Section 3: Duty Schedule & Duration -->
+      <div class="section-divider"></div>
+      <div class="section-title">
+        <span class="section-num">3</span>
+        <span>Hiring Purpose &amp; Duration (ड्राइवर रखने का उद्देश्य व प्रकार)</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="c-purpose">Hiring Purpose / Category (ड्राइवर किस काम के लिए चाहिए?) <span class="req">*</span></label>
+          <select id="c-purpose" name="Hiring Purpose" required>
+            <option value="">ड्राइवर का उद्देश्य चुनें (Select Purpose)</option>
+            <option value="Monthly Family Driver (मासिक फैमिली कार ड्राइवर)" selected>1. Monthly Driver (पर्सनल / फैमिली कार के लिए मासिक ड्राइवर)</option>
+            <option value="Company / Corporate Driver (कंपनी / ऑफिस गाड़ी)">2. Company Driver (ऑफिस / कंपनी गाड़ी व डायरेक्टर ड्यूटी)</option>
+            <option value="Ola / Uber Commercial Fleet (कमर्शियल टैक्सी)">3. Ola Uber Driver (ओला / उबर / कमर्शियल टैक्सी ड्यूटी)</option>
+            <option value="24 Hours Stay-In Chauffeur (24 घंटे + कमरा/रहना)">4. 24 hrs stay accomadation Provided (24 घंटे + कमरा/रहना)</option>
+          </select>
+        </div>
+        <div>
+          <label for="c-salary">Salary / Remuneration Budget (ड्राइवर वेतन / बजट) <span class="req">*</span></label>
+          <select id="c-salary" name="Driver Salary / Budget" required>
+            <option value="">Select Budget Range</option>
+            <optgroup label="Monthly Basis (मासिक वेतन)">
+              <option value="₹20,000 - ₹22,000 / month (Standard 10h)">₹20,000 – ₹22,000 / Month (Standard 10h Day Duty)</option>
+              <option value="₹22,000 - ₹25,000 / month (12h / SUV / Automatic)" selected>₹22,000 – ₹25,000 / Month (SUV / Automatic / 12h)</option>
+              <option value="₹25,000 - ₹30,000 / month (Stay-in / Luxury)">₹25,000 – ₹30,000 / Month (Luxury Car / 24-Hr Stay-In)</option>
+            </optgroup>
+            <optgroup label="Temporary / 15-Days (रिलेवर ड्यूटी)">
+              <option value="₹10,000 - ₹13,000 for 15 Days">₹10,000 – ₹13,000 for 15 Days Reliever Duty</option>
+            </optgroup>
+            <optgroup label="Daily / Outstation / Events (प्रति दिन)">
+              <option value="₹1,200 - ₹1,500 / day + Food/Stay (Outstation 3-5 Days)">₹1,200 – ₹1,500 / Day + Food/Stay (3 to 5 Days Outstation)</option>
+              <option value="₹1,000 - ₹1,200 / day (Event / Wedding 1-2 Days)">₹1,000 – ₹1,200 / Day (1 to 2 Days Event / Wedding)</option>
+            </optgroup>
+            <option value="Open to Discussion as per Driver Experience">Open to Discussion as per driver caliber</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-full">
+        <label>Service Tenure / Duration Required (ड्राइवर कितने समय के लिए चाहिए?) <span class="req">*</span></label>
+        <div class="radio-group">
+          <div class="radio-pill">
+            <input type="radio" id="duty-monthly" name="Duty Tenure & Type" value="Permanent Monthly Basis (10-12 Hrs/Day)" checked>
+            <label for="duty-monthly"><strong>पक्का मासिक (Monthly Basis)</strong><br><small style="color:var(--text-muted);font-weight:400;">10–12 Hrs/Day, Sunday Off</small></label>
+          </div>
+          <div class="radio-pill">
+            <input type="radio" id="duty-stayin" name="Duty Tenure & Type" value="24/7 Full Stay-In Driver (Room Provided)">
+            <label for="duty-stayin"><strong>24/7 स्टे-इन (Stay-In Chauffeur)</strong><br><small style="color:var(--text-muted);font-weight:400;">Room/Accommodation provided</small></label>
+          </div>
+          <div class="radio-pill">
+            <input type="radio" id="duty-15days" name="Duty Tenure & Type" value="15 Days Temporary / Reliever Duty">
+            <label for="duty-15days"><strong>15-दिन रिलेवर (15 Days Duty)</strong><br><small style="color:var(--text-muted);font-weight:400;">Temporary substitute driver</small></label>
+          </div>
+          <div class="radio-pill">
+            <input type="radio" id="duty-outstation" name="Duty Tenure & Type" value="Short-Term Outstation Highway Trip (3 to 5 Days)">
+            <label for="duty-outstation"><strong>आउटस्टेशन ट्रिप (3 to 5 Days)</strong><br><small style="color:var(--text-muted);font-weight:400;">Long-distance highway trip</small></label>
+          </div>
+          <div class="radio-pill">
+            <input type="radio" id="duty-event" name="Duty Tenure & Type" value="Event / Wedding / Party Chauffeur (1 to 2 Days)">
+            <label for="duty-event"><strong>इवेंट / शादी (1 to 2 Days)</strong><br><small style="color:var(--text-muted);font-weight:400;">Event, wedding or party duty</small></label>
+          </div>
+          <div class="radio-pill">
+            <input type="radio" id="duty-corp" name="Duty Tenure & Type" value="Corporate / Company Executive Duty">
+            <label for="duty-corp"><strong>कॉर्पोरेट (Corporate Duty)</strong><br><small style="color:var(--text-muted);font-weight:400;">Company executive / GST</small></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-full">
+        <label for="c-time">Preferred Daily Timings / Trip Dates (ड्यूटी का समय या ट्रिप की तारीख)</label>
+        <input type="text" id="c-time" name="Preferred Duty Timings / Trip Dates" placeholder="e.g. 9:00 AM to 7:00 PM OR 15 Oct to 19 Oct">
+      </div>
+
+      <!-- Section 4: Trial & Preferences -->
+      <div class="section-divider"></div>
+      <div class="section-title">
+        <span class="section-num">4</span>
+        <span>1-Day Trial &amp; Preferences (ट्रायल विवरण)</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="c-trialdate">When would you like the 1-Day Trial? <span class="req">*</span></label>
+          <select id="c-trialdate" name="Preferred Trial Date" required>
+            <option value="Tomorrow (कल)">Tomorrow Morning (कल सुबह 8:00 AM)</option>
+            <option value="Day after Tomorrow (परसों)">Day after Tomorrow (परसों)</option>
+            <option value="This Weekend (शनिवार/रविवार)">This Weekend (Saturday / Sunday)</option>
+            <option value="Immediate Today">Urgent / Immediate Today</option>
+          </select>
+        </div>
+        <div>
+          <label for="c-exp">Driver Experience Looking For (ड्राइवर अनुभव) <span class="req">*</span></label>
+          <select id="c-exp" name="Driver Experience Required" required>
+            <option value="3 to 5 Years Experience">3 to 5 Years Driving Experience (Standard)</option>
+            <option value="5 to 8 Years Experience" selected>5 to 8 Years Experience (Senior Family Chauffeur)</option>
+            <option value="8+ Years Veteran Experience">8+ Years Veteran Experience (High-End / Luxury VIP)</option>
+            <option value="Any Verified Driver (Min 3 Yrs)">Any Verified Driver (Minimum 3 Years)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="c-age">Driver Age / Profile Preference</label>
+          <select id="c-age" name="Driver Age Preference">
+            <option value="No Specific Preference">Any Mature, Experienced Chauffeur</option>
+            <option value="28 to 38 Years">28 to 38 Years (Energetic, Tech-savvy &amp; Smartphone literate)</option>
+            <option value="38 to 50 Years">38 to 50 Years (Calm, Patient &amp; Senior Family Driver)</option>
+          </select>
+        </div>
+        <div>
+          <label for="c-bg">Driver Verification &amp; Background Standard</label>
+          <select id="c-bg" name="Verification Preference">
+            <option value="Standard Verified (Police + DL + Aadhaar)">Police Record Check + DL + Aadhaar Verified (Included)</option>
+            <option value="Immediate Ready Driver">Immediate Available Driver with Clean Record</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-full">
+        <label for="c-notes">Any Specific Instructions or Preferences</label>
+        <textarea id="c-notes" name="Special Requirements" placeholder="e.g. Must be non-smoker, good with kids school drops, comfortable with highway outstation trips, polished uniform mandatory, etc."></textarea>
+      </div>
+
+      <div class="benefits-callout">
+        <h4>🛡️ The Drivers Saathi Assurance</h4>
+        <ul>
+          <li>✓ <strong>100% Police &amp; Parivahan Verified</strong>: Complete background dossier provided before deployment.</li>
+          <li>✓ <strong>1-Day Paid Trial</strong>: Experience driving etiquette, route knowledge, and soft skills before hiring.</li>
+          <li>✓ <strong>30-Day Free Replacement Guarantee</strong>: If the driver leaves within 30 days, we replace him with zero agency fees.</li>
+        </ul>
+      </div>
+
+      <div class="submit-bar">
+        <button type="submit" class="btn-submit">Schedule 1-Day Trial &rarr;</button>
+        <a href="https://wa.me/918175087004?text=Hi%20Drivers%20Saathi%2C%20I%20want%20to%20HIRE%20a%20private%20driver%20for%20my%20car." target="_blank" class="whatsapp-direct">
+          <span>💬 Book via WhatsApp Directly</span>
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+  <p class="footer-note">Drivers Saathi • +91 8175087004 • support@driverssaathi.com • Delhi NCR</p>
+
+</div>
+
+</body>
+</html>
