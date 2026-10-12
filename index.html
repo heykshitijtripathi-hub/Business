@@ -920,9 +920,9 @@
     height: auto;
   }
 
-  /* Fix nav on small screens - hide Drive With Us pill */
+  /* Fix nav on small screens - keep Driver pill visible and compact */
   @media (max-width: 480px) {
-    .btn-driver-pill { display: none; }
+    .btn-driver-pill { display: inline-flex; font-size: 11px; padding: 6px 10px; }
     .nav-row { padding: 8px 12px; }
     .brand-logo-img { height: 36px; }
     .btn.btn-primary { font-size: 12.5px; padding: 8px 12px; }
@@ -1507,23 +1507,23 @@
               <span class="tab-desc">Cabs, corporate shuttles &amp; bulk staffing</span>
             </span>
           </button>
-          <button type="button" class="form-tab-btn" onclick="switchFormTab('individual')" id="btn-individual" role="tab" aria-selected="false">
+          <a href="client-hire.html" class="form-tab-btn" id="btn-individual" role="tab" aria-selected="false" style="text-decoration:none;">
             <span class="tab-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </span>
             <span class="tab-labels">
               <span class="tab-title">Hire Personally</span>
-              <span class="tab-desc">Private car, chauffeur &amp; daily commute</span>
+              <span class="tab-desc">Private car, chauffeur &amp; daily commute &rarr;</span>
             </span>
-          </button>
-          <button type="button" class="form-tab-btn" onclick="switchFormTab('driver')" id="btn-driver" role="tab" aria-selected="false">
+          </a>
+          <a href="driver-apply.html" class="form-tab-btn" id="btn-driver" role="tab" aria-selected="false" style="text-decoration:none;">
             <span class="tab-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="2"></circle><line x1="12" y1="2" x2="12" y2="10"></line><line x1="4.93" y1="19.07" x2="10.59" y2="13.41"></line><line x1="19.07" y1="19.07" x2="13.41" y2="13.41"></line></svg>
             </span>
             <span class="tab-labels">
-              <span class="tab-title">( I am Driver ) / मैं ड्राइवर हूँ</span><span class="tab-desc">महीने का ₹20,000 से ₹28,000 कमाएं • फ्री रजिस्ट्रेशन</span>
+              <span class="tab-title" style="color:#1B5E20;">( I am Driver ) / मैं ड्राइवर हूँ &rarr;</span><span class="tab-desc">महीने का ₹20,000 से ₹28,000 कमाएं • तुरंत फॉर्म भरें</span>
             </span>
-          </button>
+          </a>
         </div>
       </div>
 
@@ -2190,6 +2190,14 @@
 
   // Tab switcher function for Get In Touch 3-tab forms
   function switchFormTab(tab) {
+    if(tab === 'driver'){
+      window.location.href = 'driver-apply.html';
+      return;
+    }
+    if(tab === 'individual'){
+      window.location.href = 'client-hire.html';
+      return;
+    }
     const tabs = ['fleet', 'individual', 'driver'];
     tabs.forEach(t => {
       const panel = document.getElementById('panel-' + t);
@@ -2200,12 +2208,6 @@
         btn.setAttribute('aria-selected', String(t === tab));
       }
     });
-
-    // Also sync header tab if clicking Hire Personally
-    if(tab === 'individual'){
-      const personalNav = document.querySelector('.tab-item[data-target="request"]');
-      if(personalNav) highlightNavTab(personalNav);
-    }
   }
 
   function resetForm(formId, successId) {
