@@ -2,120 +2,128 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ड्राइवर्स साथी — 1-दिन ट्रायल नियम व आचार संहिता (Driver Trial Rules Reel)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ड्राइवर्स साथी — 1-दिन ट्रायल नियम (Driver Trial Rules Reel)</title>
 <link rel="icon" type="image/png" href="images/driver-saathi-logo-clean.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Noto+Sans+Devanagari:wght@500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Noto+Sans+Devanagari:wght@600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --navy: #0B192C;
-    --navy-deep: #07101E;
+    --navy: #07101E;
     --gold: #FFB703;
     --marigold: #FB8500;
     --green: #10B981;
     --red: #EF4444;
-    --text-light: #F8FAFC;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #050B14;
-    color: #fff;
-    font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    padding: 16px 12px 40px;
-    overflow-x: hidden;
-  }
-
-  /* Reel Player Frame (Instagram 9:16 Full Screen Mobile Aspect) */
-  .player-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 420px;
-    aspect-ratio: 9 / 16;
-    background: var(--navy-deep);
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 0 2px rgba(255, 183, 3, 0.25);
-    margin: 10px auto;
-  }
-
-  /* High-Res Canvas For Native Rendering & Recording */
-  canvas#reelCanvas {
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  html, body {
     width: 100%;
     height: 100%;
-    display: block;
-    object-fit: cover;
+    height: 100dvh;
+    background: #020610;
+    color: #fff;
+    font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Floating Player Overlay Controls */
-  .reel-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
+  /* Full Screen Mobile 9:16 Reel Player Container */
+  .reel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    max-width: min(100vw, calc(100dvh * 9 / 16));
+    background: var(--navy);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 16px 16px 20px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.9);
   }
 
-  /* Progress Bar Segments (Like Instagram Stories / Reels) */
-  .progress-segments {
+  @media (min-width: 600px) {
+    .reel-container {
+      height: 94vh;
+      max-height: 940px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+  }
+
+  /* Canvas (Full HD 1080x1920 Internal Render Resolution) */
+  canvas#reelCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  /* Interactive Story Overlay Layer */
+  .story-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: env(safe-area-inset-top, 16px) 14px env(safe-area-inset-bottom, 16px);
+    pointer-events: none;
+  }
+
+  /* Top Story Progress Segments */
+  .progress-bar-wrap {
     display: flex;
     gap: 4px;
     width: 100%;
+    padding-top: 8px;
     pointer-events: auto;
   }
-  .segment {
+  .progress-segment {
     flex: 1;
-    height: 4px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 4px;
+    height: 3.5px;
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 3px;
     overflow: hidden;
-    position: relative;
   }
-  .segment-fill {
+  .progress-fill {
     height: 100%;
     width: 0%;
     background: #FFB703;
-    border-radius: 4px;
-    transition: width 0.1s linear;
+    border-radius: 3px;
+    transition: width 0.08s linear;
   }
 
-  /* Header Branding Badge in Video */
-  .reel-header {
+  /* Top Header Elements */
+  .story-top-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-top: 10px;
     pointer-events: auto;
   }
-  .reel-brand-pill {
-    background: rgba(11, 25, 44, 0.85);
-    backdrop-filter: blur(8px);
+  .brand-badge {
+    background: rgba(7, 16, 30, 0.75);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 183, 3, 0.4);
-    padding: 6px 12px;
-    border-radius: 30px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #FFB703;
   }
-  .reel-brand-pill img {
-    height: 22px;
-    width: auto;
-  }
-  .audio-indicator {
-    background: rgba(11, 25, 44, 0.85);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.2);
+  .audio-btn {
+    background: rgba(7, 16, 30, 0.75);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -124,326 +132,230 @@
     justify-content: center;
     font-size: 16px;
     cursor: pointer;
-    pointer-events: auto;
+    color: #fff;
   }
 
-  /* Center Play/Pause Touch Target */
-  .center-touch {
+  /* Touch Interaction Zones (Story Navigation) */
+  .touch-zones {
     position: absolute;
-    top: 50px; left: 0; right: 0; bottom: 80px;
+    top: 60px; left: 0; right: 0; bottom: 85px;
+    display: flex;
+    z-index: 5;
     pointer-events: auto;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
-  .play-pause-icon {
-    width: 64px;
-    height: 64px;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(6px);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
+  .zone-left { width: 30%; height: 100%; cursor: pointer; }
+  .zone-mid { width: 40%; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .zone-right { width: 30%; height: 100%; cursor: pointer; }
+
+  .pause-pill {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    padding: 10px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
     color: #fff;
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.2s ease;
     pointer-events: none;
   }
-  .center-touch.show-play .play-pause-icon {
+  .touch-zones.is-paused .pause-pill {
     opacity: 1;
   }
 
-  /* Footer Actions */
-  .reel-footer {
+  /* Bottom Floating Minimal Actions Bar */
+  .story-bottom-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     pointer-events: auto;
-    gap: 10px;
+    z-index: 20;
+    margin-bottom: 6px;
   }
-  .btn-scene-nav {
-    background: rgba(11, 25, 44, 0.85);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    backdrop-filter: blur(6px);
-  }
-
-  /* Outside Controls Container */
-  .controls-panel {
-    width: 100%;
-    max-width: 420px;
-    margin-top: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .btn-action-primary {
+  .btn-download-reel {
+    flex: 1;
     background: linear-gradient(135deg, #FFB703 0%, #FB8500 100%);
     color: #07101E;
     border: none;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 11px 16px;
+    border-radius: 26px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    box-shadow: 0 8px 24px rgba(251, 133, 0, 0.4);
-    transition: all 0.2s ease;
+    gap: 6px;
+    box-shadow: 0 4px 16px rgba(251, 133, 0, 0.35);
   }
-  .btn-action-primary:active {
-    transform: scale(0.98);
-  }
-  .btn-action-secondary {
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-size: 13.5px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-  .btn-action-secondary:hover {
-    background: rgba(255,255,255,0.14);
-  }
+  .btn-download-reel:active { transform: scale(0.97); }
 
-  .recording-indicator {
-    display: none;
-    background: #EF4444;
+  .btn-mini-control {
+    background: rgba(7, 16, 30, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    padding: 8px 14px;
-    border-radius: 20px;
+    padding: 11px 14px;
+    border-radius: 26px;
     font-size: 12px;
     font-weight: 700;
-    text-align: center;
-    animation: pulse 1s infinite alternate;
-  }
-  @keyframes pulse {
-    from { opacity: 0.8; }
-    to { opacity: 1; transform: scale(1.02); }
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
-  .instructions-box {
-    width: 100%;
-    max-width: 420px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 16px;
-    margin-top: 14px;
-    font-size: 12.5px;
-    color: #94A3B8;
-    line-height: 1.6;
+  .rec-banner {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #EF4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    display: none;
+    z-index: 50;
+    animation: blink 1s infinite alternate;
   }
-  .instructions-box strong { color: #fff; }
+  @keyframes blink { from { opacity: 0.7; } to { opacity: 1; } }
 </style>
 </head>
 <body>
 
-  <!-- Top Title Bar -->
-  <div style="text-align:center; margin-bottom:8px; max-width:420px;">
-    <h1 style="font-size:18px; font-weight:800; color:#FFB703; margin-bottom:4px;">ड्राइवर्स साथी — 1-दिन ट्रायल ट्रेनिंग रील</h1>
-    <p style="font-size:12px; color:#94A3B8;">Full-Screen Mobile Reel (1080x1920) for Drivers Before Trial</p>
-  </div>
-
-  <!-- Reel Player Container (9:16 Aspect Ratio) -->
-  <div class="player-wrapper" id="playerWrapper">
+  <!-- Reel Player Container (9:16 Full Screen Mobile Fit) -->
+  <div class="reel-container" id="reelContainer">
     
-    <!-- Canvas for high-fps dynamic animated reel -->
+    <!-- Ultra High-Definition Render Canvas -->
     <canvas id="reelCanvas" width="1080" height="1920"></canvas>
 
-    <!-- UI Overlay for Story/Reel controls -->
-    <div class="reel-overlay">
+    <!-- Recording Indicator -->
+    <div class="rec-banner" id="recBanner">🔴 रिकॉर्डिंग जारी है (Recording Reel...)</div>
+
+    <!-- Interactive Touch Overlay Layer -->
+    <div class="story-overlay">
       
       <!-- Top Progress Bars -->
-      <div class="progress-segments" id="progressSegments">
-        <!-- 6 Segments dynamically rendered -->
-      </div>
-
-      <!-- Top Branding Badge -->
-      <div class="reel-header">
-        <div class="reel-brand-pill">
-          <img src="images/driver-saathi-logo-clean.png" alt="Logo">
-          <span>DRIVERS SAATHI</span>
-        </div>
-        <div class="audio-indicator" id="btnAudioToggle" title="Audio Narration On/Off">
-          🔊
+      <div>
+        <div class="progress-bar-wrap" id="progressBarWrap"></div>
+        <div class="story-top-row">
+          <div class="brand-badge" id="sceneBadge">नियम 1 / 6</div>
+          <button type="button" class="audio-btn" id="audioToggleBtn" title="आवाज़ चालू/बंद (Mute/Unmute)">🔊</button>
         </div>
       </div>
 
-      <!-- Center Touch to Play/Pause -->
-      <div class="center-touch" id="centerTouch">
-        <div class="play-pause-icon" id="playPauseIcon">▶</div>
+      <!-- Touch Zones (Tap Left: Prev, Tap Right: Next, Tap Mid: Pause) -->
+      <div class="touch-zones" id="touchZones">
+        <div class="zone-left" id="zoneLeft" title="पिछला नियम"></div>
+        <div class="zone-mid" id="zoneMid" title="रोकें / चलाएं">
+          <div class="pause-pill" id="pausePill">❚❚ रुका हुआ (Tap to Play)</div>
+        </div>
+        <div class="zone-right" id="zoneRight" title="अगला नियम"></div>
       </div>
 
-      <!-- Bottom Nav Controls -->
-      <div class="reel-footer">
-        <button type="button" class="btn-scene-nav" id="btnPrevScene">◀ पिछला</button>
-        <span id="sceneCounter" style="font-size:12px; font-weight:700; color:#FFB703; text-shadow:0 1px 3px rgba(0,0,0,0.8);">नियम 1 / 6</span>
-        <button type="button" class="btn-scene-nav" id="btnNextScene">अगला ▶</button>
+      <!-- Bottom Floating Minimal Controls -->
+      <div class="story-bottom-bar">
+        <button type="button" class="btn-download-reel" id="btnDownload">
+          <span>🎬</span> रील डाउनलोड (Download Video)
+        </button>
+        <button type="button" class="btn-mini-control" id="btnRestart">↺ रीसेट</button>
       </div>
 
     </div>
-  </div>
 
-  <!-- Control Buttons Below Player -->
-  <div class="controls-panel">
-    <div class="recording-indicator" id="recIndicator">
-      🔴 रील रिकॉर्डिंग जारी है... (Recording 1080x1920 HD Video...)
-    </div>
-
-    <button type="button" class="btn-action-primary" id="btnDownloadVideo">
-      <span>🎬</span> रील वीडियो डाउनलोड करें (Download HD Reel / MP4)
-    </button>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-      <button type="button" class="btn-action-secondary" id="btnRestart">
-        ↺ दोबारा चलाएं (Restart)
-      </button>
-      <a href="https://wa.me/?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87!%20%E0%A4%A1%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%87%E0%A4%B5%E0%A4%B0%E0%A5%8D%E0%A4%B8%20%E0%A4%B8%E0%A4%BE%E0%A4%A5%E0%A5%80%20%E0%A4%95%E0%A5%87%201-%E0%A4%A6%E0%A4%BF%E0%A4%A8%20%E0%A4%9F%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%AF%E0%A4%B2%20%E0%A4%95%E0%A5%87%20%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%AE%20%E0%A4%B5%E0%A5%80%E0%A4%A1%E0%A4%BF%E0%A4%AF%E0%A5%8B%20%E0%A4%A6%E0%A5%87%E0%A4%96%E0%A5%87%E0%A4%82%3A%20https%3A%2F%2Fdriverssaathi.com%2Fdriver-trial-rules-video.html" target="_blank" class="btn-action-secondary">
-        📲 WhatsApp पर शेयर
-      </a>
-    </div>
-  </div>
-
-  <div class="instructions-box">
-    <strong>💡 इस वीडियो के मुख्य नियम:</strong><br>
-    1. <strong>ड्रेसिंग:</strong> साफ़ शर्ट-पैंट व जूते, शेव, बिना गुटखा/तंबाकू।<br>
-    2. <strong>समय:</strong> तय समय से 15 मिनट पहले पहुँचना।<br>
-    3. <strong>कार सफ़ाई:</strong> बैठने से पहले कार की बाहर-अंदर डस्टिंग व शीशे साफ़ करना।<br>
-    4. <strong>व्यवहार:</strong> मालिक से 'सर/मैम', ड्राइविंग के दौरान फ़ोन का इस्तेमाल बंद।<br>
-    5. <strong>सुरक्षित ड्राइविंग:</strong> स्पीड लिमिट, नो रश, सीटबेल्ट अनिवार्य।<br>
-    6. <strong>मानदेय:</strong> ₹800 मानदेय शाम 7 बजे UPI पर, मालिक से सीधी डील सख्त मना।
   </div>
 
 <script>
 /**
- * DRIVERS SAATHI — HIGH RESOLUTION (1080x1920) MOTION REEL ENGINE
+ * DRIVERS SAATHI — REELS ENGINE v2.0 (CLEAN, MINIMAL, MALE VOICE, TRUE LOGO RATIO)
  */
 (function() {
   const canvas = document.getElementById('reelCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Video Scenes Definition (Each scene has duration, Hindi voice speech, visuals & rules)
+  // Minimal, Punchy 6 Rules (No cluttered paragraphs, no 800, no shaam 7 baje)
   const SCENES = [
     {
-      id: 1,
-      tag: "नियम 1: ड्रेसिंग व स्वच्छता (Grooming & Hygiene)",
-      heading: "साफ़ कपड़े, जूते व स्वच्छता",
-      subhead: "First Impression Is Final Impression",
+      ruleNum: "नियम 1",
+      title: "ड्रेसिंग व स्वच्छता",
       points: [
-        "साफ़, इस्त्री की हुई शर्ट या टी-शर्ट और पैंट पहनें।",
-        "जूते अनिवार्य हैं — चप्पल या स्लीपर पहनकर जाना सख्त मना है।",
-        "बाल व्यवस्थित हों, दाढ़ी शेव या सेट की हुई हो।",
-        "मुँह में गुटखा, पान, खैनी या बीड़ी-सिगरेट की सख्त मनाही है!"
+        "साफ़ कपड़े व जूते पहनें (चप्पल सख्त मना)",
+        "मुँह में गुटखा, पान या सिगरेट बिल्कुल नहीं"
       ],
       bgImage: "images/driver_team_standing.jpg",
-      speechText: "नियम नंबर एक: ड्रेसिंग और स्वच्छता। साफ़-सुथरे कपड़े और जूते पहनकर जाएं। चप्पल पहनना सख्त मना है। मुँह में गुटखा, पान या सिगरेट बिल्कुल नहीं होना चाहिए।",
-      duration: 18000 // 18 seconds
+      speechText: "नियम एक: साफ़ कपड़े और जूते पहनें। चप्पल पहनना और मुँह में गुटखा या पान रखना सख्त मना है।",
+      duration: 12000 // 12 seconds
     },
     {
-      id: 2,
-      tag: "नियम 2: समय की पाबंदी (Punctuality)",
-      heading: "15 मिनट पहले पहुँचना अनिवार्य",
-      subhead: "Never Keep The Car Owner Waiting",
+      ruleNum: "नियम 2",
+      title: "समय की पाबंदी",
       points: [
-        "मालिक द्वारा दिए गए समय से ठीक 15 मिनट पहले लोकेशन पर पहुँचें।",
-        "घर के बाहर पहुँचकर आदर से कॉल करें: 'नमस्ते सर, मैं ड्राइवर्स साथी से ट्रायल के लिए आ गया हूँ।'",
-        "रास्ते में कभी लेट हों तो तुरंत एजेंसी व मालिक को सूचित करें।",
-        "समय पर पहुँचना ही आपको नौकरी दिलाने का पहला कदम है।"
+        "तय समय से 15 मिनट पहले पहुँचें",
+        "पहुँचकर आदर से मालिक को सूचित करें"
       ],
       bgImage: "images/indian_driver_portrait.jpg",
-      speechText: "नियम नंबर दो: समय की पाबंदी। दिए गए समय से 15 मिनट पहले मालिक के घर पहुँचें। घर के बाहर आदर से सूचित करें। लेट होने की कोई गुंजाइश नहीं है।",
-      duration: 18000
+      speechText: "नियम दो: तय समय से पंद्रह मिनट पहले पहुँचें और आदर से कार मालिक को सूचित करें।",
+      duration: 12000
     },
     {
-      id: 3,
-      tag: "नियम 3: कार की जाँच व सफ़ाई (Car Care)",
-      heading: "बैठने से पहले कार की सफ़ाई व जाँच",
-      subhead: "Treat The Car Like Your Own",
+      ruleNum: "नियम 3",
+      title: "कार की जाँच व सफ़ाई",
       points: [
-        "मालिक के आने से पहले कपड़े से कार की बाहरी धूल साफ़ करें।",
-        "कार के अंदर की डस्टिंग करें और फुट-मैट झाड़ें।",
-        "कार के चारों शीशे और विंडशील्ड साफ़ करें।",
-        "इंजन चालू करने से पहले डैशबोर्ड, फ्यूल और टायर प्रेशर चेक करें।"
+        "बैठने से पहले कार की डस्टिंग व शीशे साफ़ करें",
+        "टायर प्रेशर, फ्यूल और डैशबोर्ड चेक करें"
       ],
       bgImage: "images/indian_driver_wheel.jpg",
-      speechText: "नियम नंबर तीन: कार की सफ़ाई। मालिक के बैठने से पहले कार के बाहर और अंदर की धूल साफ़ करें, मैट झाड़ें और टायर व फ्यूल चेक करें।",
-      duration: 18000
+      speechText: "नियम तीन: बैठने से पहले कार की बाहर और अंदर की सफ़ाई करें, शीशे साफ़ करें और टायर व फ्यूल चेक करें।",
+      duration: 13000
     },
     {
-      id: 4,
-      tag: "नियम 4: शालीन व्यवहार व आचरण (Etiquette)",
-      heading: "आदरपूर्वक बातचीत व शालीनता",
-      subhead: "Professional Chauffeur Standards",
+      ruleNum: "नियम 4",
+      title: "शालीन व्यवहार",
       points: [
-        "कार मालिक और परिवार से केवल 'सर' या 'मैडम' कहकर बात करें।",
-        "ड्राइविंग के दौरान मोबाइल फ़ोन पर बात करना सख्त मना है!",
-        "मालिक की पारिवारिक या निजी बातों में बिना पूछे दखल न दें।",
-        "गाड़ी में बिना अनुमति के रेडियो या AC न बदलें।"
+        "परिवार से केवल 'सर' या 'मैडम' कहकर बात करें",
+        "ड्राइविंग के दौरान फ़ोन का इस्तेमाल सख्त मना"
       ],
       bgImage: "images/driver_passenger_service.jpg",
-      speechText: "नियम नंबर चार: शालीन व्यवहार। मालिक और परिवार से केवल सर या मैडम कहकर आदर से बात करें। ड्राइविंग के दौरान मोबाइल फ़ोन छूना भी सख्त मना है।",
-      duration: 19000
+      speechText: "नियम चार: केवल सर या मैडम कहकर बात करें। ड्राइविंग के दौरान फ़ोन का इस्तेमाल बंद रखें।",
+      duration: 12000
     },
     {
-      id: 5,
-      tag: "नियम 5: सुरक्षित व शांत ड्राइविंग (Safe Driving)",
-      heading: "स्पीड लिमिट व सुरक्षित नियंत्रण",
-      subhead: "Family Safety Above All",
+      ruleNum: "नियम 5",
+      title: "सुरक्षित ड्राइविंग",
       points: [
-        "सीटबेल्ट लगाना अनिवार्य है — मालिक से पहले खुद सीटबेल्ट लगाएं।",
-        "नो रश ड्राइविंग — अचानक ब्रेक या तेज़ एक्सीलेटर न दबाएं।",
-        "दिल्ली NCR के सभी ट्रैफिक नियमों और रेड लाइट का सख्ती से पालन करें।",
-        "शांत और स्मूथ ड्राइविंग ही अच्छे फैमिली ड्राइवर की पहचान है।"
+        "सीटबेल्ट अनिवार्य • स्पीड लिमिट का पालन करें",
+        "शांत ड्राइविंग — नो रश, नो अचानक ब्रेक"
       ],
       bgImage: "images/fleet_cabs_delhi.jpg",
-      speechText: "नियम नंबर पांच: सुरक्षित ड्राइविंग। सीटबेल्ट अनिवार्य है। कभी भी रश ड्राइविंग या झटके से ब्रेक न लगाएं। परिवार की सुरक्षा सबसे पहले है।",
-      duration: 18000
+      speechText: "नियम पांच: सीटबेल्ट अनिवार्य है। स्पीड लिमिट में रहें और शांत ड्राइविंग करें।",
+      duration: 12000
     },
     {
-      id: 6,
-      tag: "नियम 6: ट्रायल मानदेय व एजेंसी नियम (Rules & Pay)",
-      heading: "₹800 मानदेय शाम 7:00 बजे UPI पर",
-      subhead: "Direct Dealing Strictly Prohibited",
+      ruleNum: "नियम 6",
+      title: "ट्रायल मानदेय व नियम",
       points: [
-        "1-दिन के ट्रायल का ₹800 मानदेय शाम 7:00 बजे एजेंसी सीधे आपके UPI पर भेजेगी।",
-        "मालिक से कभी कोई अतिरिक्त नकद पैसे न मांगें।",
-        "मालिक से सीधे काम करने की सख्त मनाही है — सीधी डील करने पर लाइसेंस हमेशा के लिए ब्लैकलिस्ट होगा।",
-        "ट्रायल पास करें और पाएं ₹20,000 से ₹28,000 की पक्की मासिक नौकरी!"
+        "ट्रायल मानदेय सीधे आपके बैंक खाते / UPI पर",
+        "मालिक से सीधी डील सख्त मना (लाइसेंस ब्लैकलिस्ट)"
       ],
       bgImage: "images/driver_verification_assessment.jpg",
-      speechText: "नियम नंबर छह: ट्रायल मानदेय और नियम। आपके एक दिन के ट्रायल का आठ सौ रुपये मानदेय शाम सात बजे सीधे आपके फोन पे पर आएगा। मालिक से सीधी डील की सख्त मनाही है।",
-      duration: 20000
+      speechText: "नियम छह: ट्रायल मानदेय सीधे आपके खाते में भेजा जाएगा। मालिक से सीधी डील की सख्त मनाही है।",
+      duration: 13000
     }
   ];
 
-  // Preload Assets
+  // Preload Logo & Backgrounds
   const logoImg = new Image();
   logoImg.src = "images/driver-saathi-logo-clean.png";
 
-  const loadedImages = {};
-  SCENES.forEach(scene => {
-    const img = new Image();
-    img.src = scene.bgImage;
-    loadedImages[scene.id] = img;
+  const preloadedImgs = {};
+  SCENES.forEach((sc, i) => {
+    const im = new Image();
+    im.src = sc.bgImage;
+    preloadedImgs[i] = im;
   });
 
   // State
@@ -451,83 +363,98 @@
   let sceneStartTime = performance.now();
   let isPlaying = true;
   let audioEnabled = true;
-  let animationFrameId = null;
+  let animId = null;
 
-  // Build Progress Bar Segments
-  const progressContainer = document.getElementById('progressSegments');
-  progressContainer.innerHTML = '';
-  SCENES.forEach((s, idx) => {
+  // Build Top Progress Bars
+  const progressWrap = document.getElementById('progressBarWrap');
+  progressWrap.innerHTML = '';
+  SCENES.forEach((_, idx) => {
     const seg = document.createElement('div');
-    seg.className = 'segment';
+    seg.className = 'progress-segment';
     const fill = document.createElement('div');
-    fill.className = 'segment-fill';
-    fill.id = 'segFill_' + idx;
+    fill.className = 'progress-fill';
+    fill.id = 'fill_' + idx;
     seg.appendChild(fill);
-    progressContainer.appendChild(seg);
+    progressWrap.appendChild(seg);
   });
 
-  // Text-to-Speech Engine
+  // Deep Male Voice Selection (Web Speech API)
+  function getMaleVoice() {
+    if (!window.speechSynthesis) return null;
+    const voices = window.speechSynthesis.getVoices();
+    // Prioritize Indian English / Hindi male voices
+    const inVoices = voices.filter(v => v.lang.includes('hi') || v.lang.includes('IN') || v.lang.includes('en-IN'));
+    const male = inVoices.find(v => {
+      const n = v.name.toLowerCase();
+      return n.includes('male') || n.includes('madhav') || n.includes('hemant') || n.includes('ravi') || n.includes('google hindi');
+    }) || inVoices[0] || voices[0];
+    return male;
+  }
+
   function speakCurrentScene() {
     if (!audioEnabled || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const scene = SCENES[currentSceneIndex];
-    const utterance = new SpeechSynthesisUtterance(scene.speechText);
-    utterance.lang = 'hi-IN';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    window.speechSynthesis.speak(utterance);
+    const utt = new SpeechSynthesisUtterance(scene.speechText);
+    utt.lang = 'hi-IN';
+    utt.pitch = 0.80; // Deep authoritative male pitch
+    utt.rate = 0.92;  // Clear, confident pace
+    const mVoice = getMaleVoice();
+    if (mVoice) utt.voice = mVoice;
+    window.speechSynthesis.speak(utt);
   }
 
-  function goToScene(index) {
-    if (index < 0) index = 0;
-    if (index >= SCENES.length) index = 0; // Loop or finish
-    currentSceneIndex = index;
+  if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = () => {};
+  }
+
+  function goToScene(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= SCENES.length) idx = 0; // Loop seamlessly
+    currentSceneIndex = idx;
     sceneStartTime = performance.now();
-    document.getElementById('sceneCounter').innerText = `नियम ${currentSceneIndex + 1} / ${SCENES.length}`;
-    
-    // Update progress segments
+    document.getElementById('sceneBadge').innerText = `नियम ${currentSceneIndex + 1} / ${SCENES.length}`;
+
+    // Update progress fills
     for (let i = 0; i < SCENES.length; i++) {
-      const fillEl = document.getElementById('segFill_' + i);
-      if (fillEl) {
-        if (i < currentSceneIndex) fillEl.style.width = '100%';
-        else if (i > currentSceneIndex) fillEl.style.width = '0%';
+      const f = document.getElementById('fill_' + i);
+      if (f) {
+        if (i < currentSceneIndex) f.style.width = '100%';
+        else if (i > currentSceneIndex) f.style.width = '0%';
       }
     }
-
     speakCurrentScene();
   }
 
-  // Draw Frame on 1080x1920 Canvas
-  function drawReelFrame(now) {
+  // Draw High-Definition 1080x1920 Frame
+  function renderFrame(now) {
     const scene = SCENES[currentSceneIndex];
     const elapsed = now - sceneStartTime;
     const progress = Math.min(elapsed / scene.duration, 1.0);
 
-    // Update active segment fill
-    const activeFill = document.getElementById('segFill_' + currentSceneIndex);
+    const activeFill = document.getElementById('fill_' + currentSceneIndex);
     if (activeFill) {
       activeFill.style.width = (progress * 100) + '%';
     }
 
     if (progress >= 1.0 && isPlaying) {
       goToScene(currentSceneIndex + 1);
-      animationFrameId = requestAnimationFrame(drawReelFrame);
+      animId = requestAnimationFrame(renderFrame);
       return;
     }
 
-    // 1. Draw Background (Dark Gradient + Preloaded Image with zoom effect)
+    // 1. Background Fill & Subtle Cinematic Zoom
     ctx.fillStyle = '#07101E';
     ctx.fillRect(0, 0, 1080, 1920);
 
-    const bg = loadedImages[scene.id];
+    const bg = preloadedImgs[currentSceneIndex];
     if (bg && bg.complete && bg.naturalWidth > 0) {
       ctx.save();
-      const zoom = 1.0 + (progress * 0.08); // Subtle cinematic zoom
+      const zoom = 1.0 + (progress * 0.06);
       ctx.translate(540, 960);
       ctx.scale(zoom, zoom);
       ctx.translate(-540, -960);
-      
-      // Calculate aspect fill
+
       const scale = Math.max(1080 / bg.width, 1920 / bg.height);
       const w = bg.width * scale;
       const h = bg.height * scale;
@@ -537,209 +464,168 @@
       ctx.restore();
     }
 
-    // 2. Heavy Cinematic Overlay Gradients
-    const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
-    gradient.addColorStop(0, 'rgba(7, 16, 30, 0.92)');
-    gradient.addColorStop(0.25, 'rgba(7, 16, 30, 0.65)');
-    gradient.addColorStop(0.60, 'rgba(7, 16, 30, 0.85)');
-    gradient.addColorStop(1, 'rgba(7, 16, 30, 0.98)');
-    ctx.fillStyle = gradient;
+    // 2. Sleek Dark Gradient Overlay (Cinematic contrast)
+    const grad = ctx.createLinearGradient(0, 0, 0, 1920);
+    grad.addColorStop(0, 'rgba(7, 16, 30, 0.90)');
+    grad.addColorStop(0.30, 'rgba(7, 16, 30, 0.70)');
+    grad.addColorStop(0.70, 'rgba(7, 16, 30, 0.88)');
+    grad.addColorStop(1, 'rgba(7, 16, 30, 0.98)');
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    // 3. Header Branding Bar
+    // 3. Top Branding Header (PRESERVE EXACT LOGO NATURAL ASPECT RATIO!)
     ctx.save();
-    // Top Gold Strip
-    ctx.fillStyle = '#FFB703';
-    ctx.fillRect(60, 160, 960, 6);
-
-    // Draw Logo
     if (logoImg.complete && logoImg.naturalWidth > 0) {
-      ctx.drawImage(logoImg, 60, 200, 240, 90);
+      // Natural ratio: width 980, height 848 (approx 1.15 : 1)
+      const targetH = 95;
+      const targetW = targetH * (logoImg.naturalWidth / logoImg.naturalHeight); // ~110px, perfectly proportional!
+      ctx.drawImage(logoImg, 70, 180, targetW, targetH);
+
+      // Text Brand Next to Logo
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '800 42px Montserrat';
+      ctx.fillText('DRIVERS SAATHI', 70 + targetW + 24, 235);
+
+      ctx.fillStyle = '#FFB703';
+      ctx.font = '700 22px Montserrat';
+      ctx.fillText('1-DAY TRIAL TRAINING', 70 + targetW + 26, 268);
     } else {
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '800 48px Montserrat';
-      ctx.fillText('DRIVERS SAATHI', 60, 260);
+      ctx.font = '800 46px Montserrat';
+      ctx.fillText('DRIVERS SAATHI', 70, 240);
     }
-
-    // Top Right Verified Badge
-    ctx.fillStyle = 'rgba(255, 183, 3, 0.15)';
-    ctx.beginPath();
-    ctx.roundRect(660, 215, 360, 64, 32);
-    ctx.fill();
-    ctx.strokeStyle = '#FFB703';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.fillStyle = '#FFB703';
-    ctx.font = '700 24px Montserrat';
-    ctx.textAlign = 'center';
-    ctx.fillText('1-DAY TRIAL TRAINING', 840, 255);
     ctx.restore();
 
-    // 4. Scene Tag Badge (e.g. "नियम 1: ड्रेसिंग व स्वच्छता")
+    // 4. Rule Tag Pill (e.g. "नियम 1")
     ctx.save();
     ctx.fillStyle = '#FB8500';
     ctx.beginPath();
-    ctx.roundRect(60, 360, 960, 70, 16);
+    ctx.roundRect(70, 420, 180, 56, 28);
     ctx.fill();
 
     ctx.fillStyle = '#07101E';
-    ctx.font = '800 32px "Noto Sans Devanagari"';
-    ctx.textAlign = 'left';
-    ctx.fillText(scene.tag, 90, 408);
+    ctx.font = '800 30px "Noto Sans Devanagari"';
+    ctx.textAlign = 'center';
+    ctx.fillText(scene.ruleNum, 160, 458);
     ctx.restore();
 
-    // 5. Main Scene Heading
+    // 5. Main Title (Clean, Bold, Minimal)
     ctx.save();
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '900 64px "Noto Sans Devanagari"';
+    ctx.font = '900 68px "Noto Sans Devanagari"';
     ctx.textAlign = 'left';
-    ctx.fillText(scene.heading, 60, 500);
+    ctx.fillText(scene.title, 70, 555);
 
-    ctx.fillStyle = '#94A3B8';
-    ctx.font = '600 30px Poppins';
-    ctx.fillText(scene.subhead, 60, 560);
+    // Subtle Gold Accent Line Under Title
+    ctx.fillStyle = '#FFB703';
+    ctx.fillRect(70, 585, 120, 6);
     ctx.restore();
 
-    // 6. Rule Bullet Points (Card Container)
+    // 6. Minimal Bullet Points (Spaced, Clean, Legible in 2 seconds)
     ctx.save();
-    const cardTop = 620;
-    const cardHeight = 780;
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-    ctx.beginPath();
-    ctx.roundRect(60, cardTop, 960, cardHeight, 28);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 183, 3, 0.3)';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // Draw 4 Detailed Rules with Custom Tick Markers
-    let pointY = cardTop + 90;
+    let pointY = 740;
     scene.points.forEach((pt, pIdx) => {
-      // Fade in bullet points progressively as elapsed time passes
-      const pointDelay = (pIdx * 0.22);
-      const pointAlpha = Math.min(Math.max((progress - pointDelay) / 0.15, 0), 1.0);
+      const delay = pIdx * 0.25;
+      const alpha = Math.min(Math.max((progress - delay) / 0.15, 0), 1.0);
 
       ctx.save();
-      ctx.globalAlpha = pointAlpha;
+      ctx.globalAlpha = alpha;
 
-      // Circle icon
+      // Card Container for each point
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.beginPath();
+      ctx.roundRect(70, pointY - 60, 940, 160, 24);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 183, 3, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Golden Tick Icon
       ctx.fillStyle = '#FFB703';
       ctx.beginPath();
-      ctx.arc(120, pointY - 10, 22, 0, Math.PI * 2);
+      ctx.arc(130, pointY + 20, 24, 0, Math.PI * 2);
       ctx.fill();
 
-      // Checkmark icon
       ctx.fillStyle = '#07101E';
-      ctx.font = '800 24px Montserrat';
+      ctx.font = '800 26px Montserrat';
       ctx.textAlign = 'center';
-      ctx.fillText('✓', 120, pointY - 2);
+      ctx.fillText('✓', 130, pointY + 29);
 
-      // Rule Text (Word wrapped if needed)
+      // Clean Text
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '700 34px "Noto Sans Devanagari"';
+      ctx.font = '700 36px "Noto Sans Devanagari"';
       ctx.textAlign = 'left';
-      
-      // Auto-wrap long lines
-      const maxWidth = 800;
-      const words = pt.split(' ');
-      let line = '';
-      let currentLineY = pointY;
+      ctx.fillText(pt, 180, pointY + 32);
 
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && n > 0) {
-          ctx.fillText(line, 165, currentLineY);
-          line = words[n] + ' ';
-          currentLineY += 46;
-        } else {
-          line = testLine;
-        }
-      }
-      ctx.fillText(line, 165, currentLineY);
-
-      pointY += 155;
+      pointY += 210;
       ctx.restore();
     });
     ctx.restore();
 
-    // 7. Bottom Agency Trust & Honorarium Banner
+    // 7. Minimal Bottom Trust Bar (Clean, uncluttered, no 800 or 7 baje)
     ctx.save();
-    const footerCardTop = 1440;
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+    const bottomY = 1580;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
     ctx.beginPath();
-    ctx.roundRect(60, footerCardTop, 960, 280, 24);
+    ctx.roundRect(70, bottomY, 940, 180, 24);
     ctx.fill();
-    ctx.strokeStyle = '#10B981';
-    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     ctx.fillStyle = '#10B981';
-    ctx.font = '800 32px "Noto Sans Devanagari"';
-    ctx.textAlign = 'left';
-    ctx.fillText('★ 1-दिन ट्रायल का ₹800 मानदेय शाम 7:00 बजे सीधे UPI पर', 95, footerCardTop + 60);
+    ctx.font = '800 30px "Noto Sans Devanagari"';
+    ctx.textAlign = 'center';
+    ctx.fillText('100% फ्री ड्राइवर भर्ती • कोई दलाली या कमीशन नहीं', 540, bottomY + 65);
 
-    ctx.fillStyle = '#E2E8F0';
-    ctx.font = '600 28px "Noto Sans Devanagari"';
-    ctx.fillText('मालिक से सीधी डील न करें — 100% फ्री भर्ती व ₹20,000-₹28,000 पक्की सैलरी', 95, footerCardTop + 120);
-
-    // Bottom Contact & Brand URL
     ctx.fillStyle = '#FFB703';
     ctx.font = '800 34px Montserrat';
-    ctx.fillText('📞 +91 8175087004  •  driverssaathi.com', 95, footerCardTop + 200);
-
-    ctx.fillStyle = '#94A3B8';
-    ctx.font = '600 22px Poppins';
-    ctx.fillText('Govt. of India MSME Registered Enterprise • Palam Vihar, Gurugram', 95, footerCardTop + 245);
+    ctx.fillText('📞 +91 8175087004  •  driverssaathi.com', 540, bottomY + 125);
     ctx.restore();
 
-    // Next frame loop
     if (isPlaying) {
-      animationFrameId = requestAnimationFrame(drawReelFrame);
+      animId = requestAnimationFrame(renderFrame);
     }
   }
 
-  // Play / Pause Logic
-  const centerTouch = document.getElementById('centerTouch');
-  const playPauseIcon = document.getElementById('playPauseIcon');
+  // Story Tap Navigation (Left: Prev, Right: Next, Mid: Pause/Play)
+  const touchZones = document.getElementById('touchZones');
+  const pausePill = document.getElementById('pausePill');
 
-  function togglePlay() {
-    isPlaying = !isPlaying;
-    if (isPlaying) {
-      centerTouch.classList.remove('show-play');
-      sceneStartTime = performance.now();
-      animationFrameId = requestAnimationFrame(drawReelFrame);
-      speakCurrentScene();
-    } else {
-      centerTouch.classList.add('show-play');
-      playPauseIcon.innerText = '❚❚';
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
-    }
-  }
-
-  centerTouch.addEventListener('click', togglePlay);
-
-  // Nav Buttons
-  document.getElementById('btnNextScene').addEventListener('click', function(e) {
-    e.stopPropagation();
-    goToScene(currentSceneIndex + 1);
-  });
-  document.getElementById('btnPrevScene').addEventListener('click', function(e) {
+  document.getElementById('zoneLeft').addEventListener('click', (e) => {
     e.stopPropagation();
     goToScene(currentSceneIndex - 1);
   });
-  document.getElementById('btnRestart').addEventListener('click', function() {
+
+  document.getElementById('zoneRight').addEventListener('click', (e) => {
+    e.stopPropagation();
+    goToScene(currentSceneIndex + 1);
+  });
+
+  document.getElementById('zoneMid').addEventListener('click', (e) => {
+    e.stopPropagation();
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      touchZones.classList.remove('is-paused');
+      sceneStartTime = performance.now();
+      animId = requestAnimationFrame(renderFrame);
+      speakCurrentScene();
+    } else {
+      touchZones.classList.add('is-paused');
+      if (animId) cancelAnimationFrame(animId);
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  });
+
+  document.getElementById('btnRestart').addEventListener('click', () => {
     goToScene(0);
   });
 
   // Audio Toggle
-  const btnAudioToggle = document.getElementById('btnAudioToggle');
-  btnAudioToggle.addEventListener('click', function(e) {
-    e.stopPropagation();
+  const audioBtn = document.getElementById('audioToggleBtn');
+  audioBtn.addEventListener('click', () => {
     audioEnabled = !audioEnabled;
-    btnAudioToggle.innerText = audioEnabled ? '🔊' : '🔇';
+    audioBtn.innerText = audioEnabled ? '🔊' : '🔇';
     if (!audioEnabled && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     } else {
@@ -747,86 +633,71 @@
     }
   });
 
-  // Start Engine
+  // Start Playback
   goToScene(0);
-  animationFrameId = requestAnimationFrame(drawReelFrame);
+  animId = requestAnimationFrame(renderFrame);
 
-  // ─── Native High-Def Video Recorder & MP4/WebM Downloader ───
-  const btnDownload = document.getElementById('btnDownloadVideo');
-  const recIndicator = document.getElementById('recIndicator');
+  // 1-Click HD Reel Video Downloader (MediaRecorder Stream)
+  const btnDownload = document.getElementById('btnDownload');
+  const recBanner = document.getElementById('recBanner');
 
-  btnDownload.addEventListener('click', function() {
+  btnDownload.addEventListener('click', () => {
     if (!window.MediaRecorder) {
-      alert("MediaRecorder आपके ब्राउज़र में सपोर्टेड नहीं है। कृपया Chrome या Edge में चलाएं।");
+      alert("MediaRecorder आपके ब्राउज़र में उपलब्ध नहीं है।");
       return;
     }
 
     btnDownload.disabled = true;
-    recIndicator.style.display = 'block';
-    btnDownload.innerText = '⏳ वीडियो रील तैयार हो रही है... (Recording in progress)';
+    recBanner.style.display = 'block';
+    btnDownload.innerText = '⏳ वीडियो तैयार हो रहा है...';
 
-    // Reset to beginning for full recording
     goToScene(0);
 
-    // Capture 30fps canvas stream
     const stream = canvas.captureStream(30);
-    const mimeTypes = [
-      'video/mp4;codecs=avc1',
-      'video/webm;codecs=vp9',
-      'video/webm;codecs=vp8',
-      'video/webm'
-    ];
-    let selectedMime = 'video/webm';
+    const mimeTypes = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm'];
+    let selMime = 'video/webm';
     for (let m of mimeTypes) {
       if (MediaRecorder.isTypeSupported(m)) {
-        selectedMime = m;
+        selMime = m;
         break;
       }
     }
 
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: selectedMime,
-      videoBitsPerSecond: 6000000 // 6 Mbps High Quality 1080p
+    const mr = new MediaRecorder(stream, {
+      mimeType: selMime,
+      videoBitsPerSecond: 6000000 // 6 Mbps High Definition 1080p
     });
 
-    const recordedChunks = [];
-    mediaRecorder.ondataavailable = function(e) {
-      if (e.data && e.data.size > 0) {
-        recordedChunks.push(e.data);
-      }
+    const chunks = [];
+    mr.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
     };
 
-    mediaRecorder.onstop = function() {
-      recIndicator.style.display = 'none';
+    mr.onstop = () => {
+      recBanner.style.display = 'none';
       btnDownload.disabled = false;
-      btnDownload.innerHTML = '<span>🎬</span> रील वीडियो डाउनलोड करें (Download HD Reel / MP4)';
+      btnDownload.innerHTML = '<span>🎬</span> रील डाउनलोड (Download Video)';
 
-      const blob = new Blob(recordedChunks, { type: selectedMime });
+      const blob = new Blob(chunks, { type: selMime });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.style.display = 'none';
       a.href = url;
-      const ext = selectedMime.includes('mp4') ? 'mp4' : 'webm';
-      a.download = `Drivers_Saathi_Trial_Rules_Reel_${Date.now()}.${ext}`;
+      const ext = selMime.includes('mp4') ? 'mp4' : 'webm';
+      a.download = `Drivers_Saathi_Trial_Reel_${Date.now()}.${ext}`;
       document.body.appendChild(a);
       a.click();
-      setTimeout(function() {
+      setTimeout(() => {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       }, 100);
     };
 
-    // Calculate total duration across all scenes
-    const totalDuration = SCENES.reduce((sum, sc) => sum + sc.duration, 0);
+    const totalDur = SCENES.reduce((s, sc) => s + sc.duration, 0);
+    mr.start();
 
-    mediaRecorder.start();
-
-    // Auto stop after full video plays or allow user stop
-    setTimeout(function() {
-      if (mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-      }
-    }, totalDuration + 1000);
+    setTimeout(() => {
+      if (mr.state === 'recording') mr.stop();
+    }, totalDur + 800);
   });
 
 })();
