@@ -362,6 +362,10 @@
 
       <div class="grid-2">
         <div>
+          <label for="c-email">Email Address (Optional / ईमेल)</label>
+          <input type="email" id="c-email" name="Email" placeholder="e.g. vikram@example.com">
+        </div>
+        <div>
           <label for="c-city">City / Region in Delhi NCR <span class="req">*</span></label>
           <select id="c-city" name="NCR Region" required>
             <option value="">Select Region</option>
@@ -374,10 +378,11 @@
             <option value="Ghaziabad">Ghaziabad / Indirapuram</option>
           </select>
         </div>
-        <div>
-          <label for="c-locality">Exact Sector / Society / Landmark <span class="req">*</span></label>
-          <input type="text" id="c-locality" name="Exact Address & Society" placeholder="e.g. DLF The Crest, Sector 54 / Vasant Kunj Sec C" required>
-        </div>
+      </div>
+
+      <div class="grid-full">
+        <label for="c-locality">Exact Sector / Society / Landmark <span class="req">*</span></label>
+        <input type="text" id="c-locality" name="Exact Address & Society" placeholder="e.g. DLF The Crest, Sector 54 / Vasant Kunj Sec C" required>
       </div>
 
       <!-- Section 2: Vehicle Details -->

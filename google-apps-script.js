@@ -209,7 +209,7 @@ function recordClientLead(ss, data, timestamp) {
 
   const name = data["Client Name"] || data["Full Name"] || data["Name"] || data["c-name"] || data["i-name"] || "";
   const phone = data["Phone Number"] || data["Phone"] || data["c-phone"] || data["i-phone"] || "";
-  const email = data["Email"] || data["i-email"] || "";
+  const email = data["Email"] || data["c-email"] || data["i-email"] || "";
   const region = data["NCR Region"] || data["City / Area"] || data["c-city"] || data["i-city"] || "";
   const address = data["Exact Address & Society"] || data["c-locality"] || "";
   const car = data["Car Model"] || data["Vehicle Model"] || data["Car"] || data["c-car"] || data["i-vehicle"] || "";
@@ -225,31 +225,31 @@ function recordClientLead(ss, data, timestamp) {
   const notes = data["Special Requirements"] || data["Additional Details"] || data["c-notes"] || data["i-details"] || "";
   const source = data["Lead Source"] || data["How did you hear about us?"] || data["c-source"] || data["Source"] || "";
 
-  const row = [
-    timestamp,
-    name,
-    formatPhone(phone),
-    email,
-    region,
-    address,
-    car,
-    trans,
-    purpose,
-    salary,
-    tenure,
-    timings,
-    trialDate,
-    exp,
-    age,
-    verification,
-    notes,
-    source,
-    "New Lead",
-    ""
-  ];
+  const dataMap = {
+    "Timestamp (IST)": timestamp,
+    "Client Name": name,
+    "Phone Number": formatPhone(phone),
+    "Email": email,
+    "NCR Region": region,
+    "Exact Address & Society": address,
+    "Car Model": car,
+    "Transmission Type": trans,
+    "Hiring Purpose": purpose,
+    "Driver Salary / Budget": salary,
+    "Duty Tenure & Type": tenure,
+    "Preferred Duty Timings / Trip Dates": timings,
+    "Preferred Trial Date": trialDate,
+    "Driver Experience Required": exp,
+    "Driver Age Preference": age,
+    "Verification Preference": verification,
+    "Special Requirements": notes,
+    "Lead Source": source,
+    "Lead Status": "New Lead",
+    "Assigned Driver / Notes": ""
+  };
 
-  sheet.appendRow(row);
-  return { type: "Client", row: sheet.getLastRow() };
+  const newRow = appendRowSmart(sheet, headers, dataMap, "New Lead", "#0284C7");
+  return { type: "Client", row: newRow };
 }
 
 /**
@@ -291,27 +291,27 @@ function recordDriverApplication(ss, data, timestamp) {
   const trialReady = data["1-Day Paid Trial Ready"] || data["d-trialready"] || "Yes, Ready for 1-Day Trial";
   const source = data["Lead Source"] || data["How did you hear about us?"] || data["d-source"] || data["Source"] || "";
 
-  const row = [
-    timestamp,
-    name,
-    formatPhone(phone),
-    area,
-    nativeState,
-    trans,
-    exp,
-    stayin,
-    duty,
-    maps,
-    salary,
-    dl,
-    trialReady,
-    source,
-    "Pending Verification",
-    ""
-  ];
+  const dataMap = {
+    "Timestamp (IST)": timestamp,
+    "Full Name": name,
+    "Phone": formatPhone(phone),
+    "Current Area in NCR": area,
+    "Native Home State": nativeState,
+    "Car Transmission Skills": trans,
+    "Driving Experience": exp,
+    "Accommodation / Stay-in": stayin,
+    "Duty Type Preference": duty,
+    "Smartphone & Google Maps Knowledge": maps,
+    "Expected Salary / Rate": salary,
+    "DL Number": dl,
+    "1-Day Paid Trial Ready": trialReady,
+    "Lead Source": source,
+    "Application Status": "Pending Verification",
+    "Verification / Background Notes": ""
+  };
 
-  sheet.appendRow(row);
-  return { type: "Driver", row: sheet.getLastRow() };
+  const newRow = appendRowSmart(sheet, headers, dataMap, "Pending Verification", "#166534");
+  return { type: "Driver", row: newRow };
 }
 
 /**
@@ -340,20 +340,20 @@ function recordFleetLead(ss, data, timestamp) {
   const region = data["City / Region"] || data["f-city"] || "";
   const notes = data["Requirements"] || data["Details"] || data["f-notes"] || "";
 
-  const row = [
-    timestamp,
-    company,
-    person,
-    formatPhone(phone),
-    email,
-    fleetSize,
-    region,
-    notes,
-    "New Lead"
-  ];
+  const dataMap = {
+    "Timestamp (IST)": timestamp,
+    "Company Name": company,
+    "Contact Person": person,
+    "Phone Number": formatPhone(phone),
+    "Email": email,
+    "Fleet Size": fleetSize,
+    "City / Region": region,
+    "Requirements": notes,
+    "Lead Status": "New Lead"
+  };
 
-  sheet.appendRow(row);
-  return { type: "Fleet", row: sheet.getLastRow() };
+  const newRow = appendRowSmart(sheet, headers, dataMap, "New Lead", "#4338CA");
+  return { type: "Fleet", row: newRow };
 }
 
 /**
@@ -366,25 +366,66 @@ function formatPhone(phone) {
 }
 
 /**
- * Get or create sheet and ensure Row 1 has complete formatted headers
+ * Intelligent Row Appender:
+ * Maps incoming data strictly to Row 1 headers.
+ * If any standard header (like "Lead Source" or "Email") is missing, it dynamically adds it to Row 1.
+ */
+function appendRowSmart(sheet, standardHeaders, dataMap, defaultStatus, headerColor) {
+  ensureSheetHeaders(sheet, standardHeaders, headerColor);
+
+  const numCols = sheet.getLastColumn();
+  const existingHeaders = sheet.getRange(1, 1, 1, numCols).getValues()[0];
+
+  const row = [];
+  for (let i = 0; i < existingHeaders.length; i++) {
+    const colName = (existingHeaders[i] || "").toString().trim();
+    if (dataMap.hasOwnProperty(colName)) {
+      row.push(dataMap[colName]);
+    } else if (colName === "Lead Status" || colName === "Application Status") {
+      row.push(defaultStatus);
+    } else {
+      row.push("");
+    }
+  }
+
+  sheet.appendRow(row);
+  return sheet.getLastRow();
+}
+
+/**
+ * Checks and ensures all required headers exist in Row 1 without overwriting user data
+ */
+function ensureSheetHeaders(sheet, standardHeaders, headerColor) {
+  if (sheet.getLastRow() === 0 || sheet.getLastColumn() === 0) {
+    const range = sheet.getRange(1, 1, 1, standardHeaders.length);
+    range.setValues([standardHeaders]);
+    range.setFontWeight("bold").setBackground(headerColor).setFontColor("#FFFFFF").setHorizontalAlignment("center").setVerticalAlignment("middle");
+    sheet.setRowHeight(1, 38);
+    sheet.setFrozenRows(1);
+    return;
+  }
+
+  const currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  standardHeaders.forEach(function(h) {
+    if (currentHeaders.indexOf(h) === -1) {
+      const nextCol = sheet.getLastColumn() + 1;
+      const cell = sheet.getRange(1, nextCol);
+      cell.setValue(h);
+      cell.setFontWeight("bold").setBackground(headerColor).setFontColor("#FFFFFF").setHorizontalAlignment("center").setVerticalAlignment("middle");
+      currentHeaders.push(h);
+    }
+  });
+}
+
+/**
+ * Get or create sheet
  */
 function getOrCreateSheet(ss, name, headers, headerColor) {
   let sheet = ss.getSheetByName(name);
   if (!sheet) {
     sheet = ss.insertSheet(name);
+    ensureSheetHeaders(sheet, headers, headerColor);
   }
-  
-  // Set headers in Row 1
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange.setValues([headers]);
-  headerRange.setFontWeight("bold");
-  headerRange.setBackground(headerColor);
-  headerRange.setFontColor("#FFFFFF");
-  headerRange.setHorizontalAlignment("center");
-  headerRange.setVerticalAlignment("middle");
-  sheet.setRowHeight(1, 38);
-  sheet.setFrozenRows(1);
-
   return sheet;
 }
 
