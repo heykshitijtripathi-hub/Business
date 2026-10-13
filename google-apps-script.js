@@ -182,6 +182,9 @@ function isFleetRequest(data) {
  * CLIENT LEADS: 1-to-1 Column Mapping with client-hire.html & index.html
  */
 function recordClientLead(ss, data, timestamp) {
+  if (!ss) {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
   const headers = [
     "Timestamp (IST)",
     "Client Name",
@@ -256,6 +259,9 @@ function recordClientLead(ss, data, timestamp) {
  * DRIVER APPLICATIONS: 1-to-1 Column Mapping with driver-apply.html & index.html
  */
 function recordDriverApplication(ss, data, timestamp) {
+  if (!ss) {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
   const headers = [
     "Timestamp (IST)",
     "Full Name",
@@ -318,6 +324,9 @@ function recordDriverApplication(ss, data, timestamp) {
  * FLEET LEADS: 1-to-1 Column Mapping with Corporate Fleet Panel
  */
 function recordFleetLead(ss, data, timestamp) {
+  if (!ss) {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
   const headers = [
     "Timestamp (IST)",
     "Company Name",
@@ -421,14 +430,17 @@ function ensureSheetHeaders(sheet, standardHeaders, headerColor) {
  * Get or create sheet
  */
 function getOrCreateSheet(ss, name, headers, headerColor) {
+  if (!ss) {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
   let sheet = ss.getSheetByName(name);
   if (!sheet) {
     sheet = ss.insertSheet(name);
-    ensureSheetHeaders(sheet, headers, headerColor);
   }
+  ensureSheetHeaders(sheet, headers, headerColor);
   return sheet;
 }
 
 function refreshAllHeaders(ss) {
-  recordClientLead(ss, {}, Utilities.formatDate(new Date(), SPREADSHEET_CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm:ss"));
+  setupAllHeaders();
 }
