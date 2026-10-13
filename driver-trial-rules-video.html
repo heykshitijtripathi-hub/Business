@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ड्राइवर्स साथी — 1-दिन ट्रायल नियम व आचार संहिता (Driver Trial Rules Reel)</title>
+<link rel="icon" type="image/png" href="images/driver-saathi-logo-clean.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Noto+Sans+Devanagari:wght@500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #0B192C;
+    --navy-deep: #07101E;
+    --gold: #FFB703;
+    --marigold: #FB8500;
+    --green: #10B981;
+    --red: #EF4444;
+    --text-light: #F8FAFC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050B14;
+    color: #fff;
+    font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 16px 12px 40px;
+    overflow-x: hidden;
+  }
+
+  /* Reel Player Frame (Instagram 9:16 Full Screen Mobile Aspect) */
+  .player-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 9 / 16;
+    background: var(--navy-deep);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 0 2px rgba(255, 183, 3, 0.25);
+    margin: 10px auto;
+  }
+
+  /* High-Res Canvas For Native Rendering & Recording */
+  canvas#reelCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* Floating Player Overlay Controls */
+  .reel-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 16px 20px;
+  }
+
+  /* Progress Bar Segments (Like Instagram Stories / Reels) */
+  .progress-segments {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    pointer-events: auto;
+  }
+  .segment {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .segment-fill {
+    height: 100%;
+    width: 0%;
+    background: #FFB703;
+    border-radius: 4px;
+    transition: width 0.1s linear;
+  }
+
+  /* Header Branding Badge in Video */
+  .reel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    pointer-events: auto;
+  }
+  .reel-brand-pill {
+    background: rgba(11, 25, 44, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 183, 3, 0.4);
+    padding: 6px 12px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .reel-brand-pill img {
+    height: 22px;
+    width: auto;
+  }
+  .audio-indicator {
+    background: rgba(11, 25, 44, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  /* Center Play/Pause Touch Target */
+  .center-touch {
+    position: absolute;
+    top: 50px; left: 0; right: 0; bottom: 80px;
+    pointer-events: auto;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .play-pause-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(6px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+  .center-touch.show-play .play-pause-icon {
+    opacity: 1;
+  }
+
+  /* Footer Actions */
+  .reel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: auto;
+    gap: 10px;
+  }
+  .btn-scene-nav {
+    background: rgba(11, 25, 44, 0.85);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+  }
+
+  /* Outside Controls Container */
+  .controls-panel {
+    width: 100%;
+    max-width: 420px;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-action-primary {
+    background: linear-gradient(135deg, #FFB703 0%, #FB8500 100%);
+    color: #07101E;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(251, 133, 0, 0.4);
+    transition: all 0.2s ease;
+  }
+  .btn-action-primary:active {
+    transform: scale(0.98);
+  }
+  .btn-action-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-action-secondary:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  .recording-indicator {
+    display: none;
+    background: #EF4444;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    animation: pulse 1s infinite alternate;
+  }
+  @keyframes pulse {
+    from { opacity: 0.8; }
+    to { opacity: 1; transform: scale(1.02); }
+  }
+
+  .instructions-box {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: #94A3B8;
+    line-height: 1.6;
+  }
+  .instructions-box strong { color: #fff; }
+</style>
+</head>
+<body>
+
+  <!-- Top Title Bar -->
+  <div style="text-align:center; margin-bottom:8px; max-width:420px;">
+    <h1 style="font-size:18px; font-weight:800; color:#FFB703; margin-bottom:4px;">ड्राइवर्स साथी — 1-दिन ट्रायल ट्रेनिंग रील</h1>
+    <p style="font-size:12px; color:#94A3B8;">Full-Screen Mobile Reel (1080x1920) for Drivers Before Trial</p>
+  </div>
+
+  <!-- Reel Player Container (9:16 Aspect Ratio) -->
+  <div class="player-wrapper" id="playerWrapper">
+    
+    <!-- Canvas for high-fps dynamic animated reel -->
+    <canvas id="reelCanvas" width="1080" height="1920"></canvas>
+
+    <!-- UI Overlay for Story/Reel controls -->
+    <div class="reel-overlay">
+      
+      <!-- Top Progress Bars -->
+      <div class="progress-segments" id="progressSegments">
+        <!-- 6 Segments dynamically rendered -->
+      </div>
+
+      <!-- Top Branding Badge -->
+      <div class="reel-header">
+        <div class="reel-brand-pill">
+          <img src="images/driver-saathi-logo-clean.png" alt="Logo">
+          <span>DRIVERS SAATHI</span>
+        </div>
+        <div class="audio-indicator" id="btnAudioToggle" title="Audio Narration On/Off">
+          🔊
+        </div>
+      </div>
+
+      <!-- Center Touch to Play/Pause -->
+      <div class="center-touch" id="centerTouch">
+        <div class="play-pause-icon" id="playPauseIcon">▶</div>
+      </div>
+
+      <!-- Bottom Nav Controls -->
+      <div class="reel-footer">
+        <button type="button" class="btn-scene-nav" id="btnPrevScene">◀ पिछला</button>
+        <span id="sceneCounter" style="font-size:12px; font-weight:700; color:#FFB703; text-shadow:0 1px 3px rgba(0,0,0,0.8);">नियम 1 / 6</span>
+        <button type="button" class="btn-scene-nav" id="btnNextScene">अगला ▶</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Control Buttons Below Player -->
+  <div class="controls-panel">
+    <div class="recording-indicator" id="recIndicator">
+      🔴 रील रिकॉर्डिंग जारी है... (Recording 1080x1920 HD Video...)
+    </div>
+
+    <button type="button" class="btn-action-primary" id="btnDownloadVideo">
+      <span>🎬</span> रील वीडियो डाउनलोड करें (Download HD Reel / MP4)
+    </button>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+      <button type="button" class="btn-action-secondary" id="btnRestart">
+        ↺ दोबारा चलाएं (Restart)
+      </button>
+      <a href="https://wa.me/?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87!%20%E0%A4%A1%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%87%E0%A4%B5%E0%A4%B0%E0%A5%8D%E0%A4%B8%20%E0%A4%B8%E0%A4%BE%E0%A4%A5%E0%A5%80%20%E0%A4%95%E0%A5%87%201-%E0%A4%A6%E0%A4%BF%E0%A4%A8%20%E0%A4%9F%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%AF%E0%A4%B2%20%E0%A4%95%E0%A5%87%20%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%AE%20%E0%A4%B5%E0%A5%80%E0%A4%A1%E0%A4%BF%E0%A4%AF%E0%A5%8B%20%E0%A4%A6%E0%A5%87%E0%A4%96%E0%A5%87%E0%A4%82%3A%20https%3A%2F%2Fdriverssaathi.com%2Fdriver-trial-rules-video.html" target="_blank" class="btn-action-secondary">
+        📲 WhatsApp पर शेयर
+      </a>
+    </div>
+  </div>
+
+  <div class="instructions-box">
+    <strong>💡 इस वीडियो के मुख्य नियम:</strong><br>
+    1. <strong>ड्रेसिंग:</strong> साफ़ शर्ट-पैंट व जूते, शेव, बिना गुटखा/तंबाकू।<br>
+    2. <strong>समय:</strong> तय समय से 15 मिनट पहले पहुँचना।<br>
+    3. <strong>कार सफ़ाई:</strong> बैठने से पहले कार की बाहर-अंदर डस्टिंग व शीशे साफ़ करना।<br>
+    4. <strong>व्यवहार:</strong> मालिक से 'सर/मैम', ड्राइविंग के दौरान फ़ोन का इस्तेमाल बंद।<br>
+    5. <strong>सुरक्षित ड्राइविंग:</strong> स्पीड लिमिट, नो रश, सीटबेल्ट अनिवार्य।<br>
+    6. <strong>मानदेय:</strong> ₹800 मानदेय शाम 7 बजे UPI पर, मालिक से सीधी डील सख्त मना।
+  </div>
+
+<script>
+/**
+ * DRIVERS SAATHI — HIGH RESOLUTION (1080x1920) MOTION REEL ENGINE
+ */
+(function() {
+  const canvas = document.getElementById('reelCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Video Scenes Definition (Each scene has duration, Hindi voice speech, visuals & rules)
+  const SCENES = [
+    {
+      id: 1,
+      tag: "नियम 1: ड्रेसिंग व स्वच्छता (Grooming & Hygiene)",
+      heading: "साफ़ कपड़े, जूते व स्वच्छता",
+      subhead: "First Impression Is Final Impression",
+      points: [
+        "साफ़, इस्त्री की हुई शर्ट या टी-शर्ट और पैंट पहनें।",
+        "जूते अनिवार्य हैं — चप्पल या स्लीपर पहनकर जाना सख्त मना है।",
+        "बाल व्यवस्थित हों, दाढ़ी शेव या सेट की हुई हो।",
+        "मुँह में गुटखा, पान, खैनी या बीड़ी-सिगरेट की सख्त मनाही है!"
+      ],
+      bgImage: "images/driver_team_standing.jpg",
+      speechText: "नियम नंबर एक: ड्रेसिंग और स्वच्छता। साफ़-सुथरे कपड़े और जूते पहनकर जाएं। चप्पल पहनना सख्त मना है। मुँह में गुटखा, पान या सिगरेट बिल्कुल नहीं होना चाहिए।",
+      duration: 18000 // 18 seconds
+    },
+    {
+      id: 2,
+      tag: "नियम 2: समय की पाबंदी (Punctuality)",
+      heading: "15 मिनट पहले पहुँचना अनिवार्य",
+      subhead: "Never Keep The Car Owner Waiting",
+      points: [
+        "मालिक द्वारा दिए गए समय से ठीक 15 मिनट पहले लोकेशन पर पहुँचें।",
+        "घर के बाहर पहुँचकर आदर से कॉल करें: 'नमस्ते सर, मैं ड्राइवर्स साथी से ट्रायल के लिए आ गया हूँ।'",
+        "रास्ते में कभी लेट हों तो तुरंत एजेंसी व मालिक को सूचित करें।",
+        "समय पर पहुँचना ही आपको नौकरी दिलाने का पहला कदम है।"
+      ],
+      bgImage: "images/indian_driver_portrait.jpg",
+      speechText: "नियम नंबर दो: समय की पाबंदी। दिए गए समय से 15 मिनट पहले मालिक के घर पहुँचें। घर के बाहर आदर से सूचित करें। लेट होने की कोई गुंजाइश नहीं है।",
+      duration: 18000
+    },
+    {
+      id: 3,
+      tag: "नियम 3: कार की जाँच व सफ़ाई (Car Care)",
+      heading: "बैठने से पहले कार की सफ़ाई व जाँच",
+      subhead: "Treat The Car Like Your Own",
+      points: [
+        "मालिक के आने से पहले कपड़े से कार की बाहरी धूल साफ़ करें।",
+        "कार के अंदर की डस्टिंग करें और फुट-मैट झाड़ें।",
+        "कार के चारों शीशे और विंडशील्ड साफ़ करें।",
+        "इंजन चालू करने से पहले डैशबोर्ड, फ्यूल और टायर प्रेशर चेक करें।"
+      ],
+      bgImage: "images/indian_driver_wheel.jpg",
+      speechText: "नियम नंबर तीन: कार की सफ़ाई। मालिक के बैठने से पहले कार के बाहर और अंदर की धूल साफ़ करें, मैट झाड़ें और टायर व फ्यूल चेक करें।",
+      duration: 18000
+    },
+    {
+      id: 4,
+      tag: "नियम 4: शालीन व्यवहार व आचरण (Etiquette)",
+      heading: "आदरपूर्वक बातचीत व शालीनता",
+      subhead: "Professional Chauffeur Standards",
+      points: [
+        "कार मालिक और परिवार से केवल 'सर' या 'मैडम' कहकर बात करें।",
+        "ड्राइविंग के दौरान मोबाइल फ़ोन पर बात करना सख्त मना है!",
+        "मालिक की पारिवारिक या निजी बातों में बिना पूछे दखल न दें।",
+        "गाड़ी में बिना अनुमति के रेडियो या AC न बदलें।"
+      ],
+      bgImage: "images/driver_passenger_service.jpg",
+      speechText: "नियम नंबर चार: शालीन व्यवहार। मालिक और परिवार से केवल सर या मैडम कहकर आदर से बात करें। ड्राइविंग के दौरान मोबाइल फ़ोन छूना भी सख्त मना है।",
+      duration: 19000
+    },
+    {
+      id: 5,
+      tag: "नियम 5: सुरक्षित व शांत ड्राइविंग (Safe Driving)",
+      heading: "स्पीड लिमिट व सुरक्षित नियंत्रण",
+      subhead: "Family Safety Above All",
+      points: [
+        "सीटबेल्ट लगाना अनिवार्य है — मालिक से पहले खुद सीटबेल्ट लगाएं।",
+        "नो रश ड्राइविंग — अचानक ब्रेक या तेज़ एक्सीलेटर न दबाएं।",
+        "दिल्ली NCR के सभी ट्रैफिक नियमों और रेड लाइट का सख्ती से पालन करें।",
+        "शांत और स्मूथ ड्राइविंग ही अच्छे फैमिली ड्राइवर की पहचान है।"
+      ],
+      bgImage: "images/fleet_cabs_delhi.jpg",
+      speechText: "नियम नंबर पांच: सुरक्षित ड्राइविंग। सीटबेल्ट अनिवार्य है। कभी भी रश ड्राइविंग या झटके से ब्रेक न लगाएं। परिवार की सुरक्षा सबसे पहले है।",
+      duration: 18000
+    },
+    {
+      id: 6,
+      tag: "नियम 6: ट्रायल मानदेय व एजेंसी नियम (Rules & Pay)",
+      heading: "₹800 मानदेय शाम 7:00 बजे UPI पर",
+      subhead: "Direct Dealing Strictly Prohibited",
+      points: [
+        "1-दिन के ट्रायल का ₹800 मानदेय शाम 7:00 बजे एजेंसी सीधे आपके UPI पर भेजेगी।",
+        "मालिक से कभी कोई अतिरिक्त नकद पैसे न मांगें।",
+        "मालिक से सीधे काम करने की सख्त मनाही है — सीधी डील करने पर लाइसेंस हमेशा के लिए ब्लैकलिस्ट होगा।",
+        "ट्रायल पास करें और पाएं ₹20,000 से ₹28,000 की पक्की मासिक नौकरी!"
+      ],
+      bgImage: "images/driver_verification_assessment.jpg",
+      speechText: "नियम नंबर छह: ट्रायल मानदेय और नियम। आपके एक दिन के ट्रायल का आठ सौ रुपये मानदेय शाम सात बजे सीधे आपके फोन पे पर आएगा। मालिक से सीधी डील की सख्त मनाही है।",
+      duration: 20000
+    }
+  ];
+
+  // Preload Assets
+  const logoImg = new Image();
+  logoImg.src = "images/driver-saathi-logo-clean.png";
+
+  const loadedImages = {};
+  SCENES.forEach(scene => {
+    const img = new Image();
+    img.src = scene.bgImage;
+    loadedImages[scene.id] = img;
+  });
+
+  // State
+  let currentSceneIndex = 0;
+  let sceneStartTime = performance.now();
+  let isPlaying = true;
+  let audioEnabled = true;
+  let animationFrameId = null;
+
+  // Build Progress Bar Segments
+  const progressContainer = document.getElementById('progressSegments');
+  progressContainer.innerHTML = '';
+  SCENES.forEach((s, idx) => {
+    const seg = document.createElement('div');
+    seg.className = 'segment';
+    const fill = document.createElement('div');
+    fill.className = 'segment-fill';
+    fill.id = 'segFill_' + idx;
+    seg.appendChild(fill);
+    progressContainer.appendChild(seg);
+  });
+
+  // Text-to-Speech Engine
+  function speakCurrentScene() {
+    if (!audioEnabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const scene = SCENES[currentSceneIndex];
+    const utterance = new SpeechSynthesisUtterance(scene.speechText);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function goToScene(index) {
+    if (index < 0) index = 0;
+    if (index >= SCENES.length) index = 0; // Loop or finish
+    currentSceneIndex = index;
+    sceneStartTime = performance.now();
+    document.getElementById('sceneCounter').innerText = `नियम ${currentSceneIndex + 1} / ${SCENES.length}`;
+    
+    // Update progress segments
+    for (let i = 0; i < SCENES.length; i++) {
+      const fillEl = document.getElementById('segFill_' + i);
+      if (fillEl) {
+        if (i < currentSceneIndex) fillEl.style.width = '100%';
+        else if (i > currentSceneIndex) fillEl.style.width = '0%';
+      }
+    }
+
+    speakCurrentScene();
+  }
+
+  // Draw Frame on 1080x1920 Canvas
+  function drawReelFrame(now) {
+    const scene = SCENES[currentSceneIndex];
+    const elapsed = now - sceneStartTime;
+    const progress = Math.min(elapsed / scene.duration, 1.0);
+
+    // Update active segment fill
+    const activeFill = document.getElementById('segFill_' + currentSceneIndex);
+    if (activeFill) {
+      activeFill.style.width = (progress * 100) + '%';
+    }
+
+    if (progress >= 1.0 && isPlaying) {
+      goToScene(currentSceneIndex + 1);
+      animationFrameId = requestAnimationFrame(drawReelFrame);
+      return;
+    }
+
+    // 1. Draw Background (Dark Gradient + Preloaded Image with zoom effect)
+    ctx.fillStyle = '#07101E';
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    const bg = loadedImages[scene.id];
+    if (bg && bg.complete && bg.naturalWidth > 0) {
+      ctx.save();
+      const zoom = 1.0 + (progress * 0.08); // Subtle cinematic zoom
+      ctx.translate(540, 960);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-540, -960);
+      
+      // Calculate aspect fill
+      const scale = Math.max(1080 / bg.width, 1920 / bg.height);
+      const w = bg.width * scale;
+      const h = bg.height * scale;
+      const x = (1080 - w) / 2;
+      const y = (1920 - h) / 2;
+      ctx.drawImage(bg, x, y, w, h);
+      ctx.restore();
+    }
+
+    // 2. Heavy Cinematic Overlay Gradients
+    const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+    gradient.addColorStop(0, 'rgba(7, 16, 30, 0.92)');
+    gradient.addColorStop(0.25, 'rgba(7, 16, 30, 0.65)');
+    gradient.addColorStop(0.60, 'rgba(7, 16, 30, 0.85)');
+    gradient.addColorStop(1, 'rgba(7, 16, 30, 0.98)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // 3. Header Branding Bar
+    ctx.save();
+    // Top Gold Strip
+    ctx.fillStyle = '#FFB703';
+    ctx.fillRect(60, 160, 960, 6);
+
+    // Draw Logo
+    if (logoImg.complete && logoImg.naturalWidth > 0) {
+      ctx.drawImage(logoImg, 60, 200, 240, 90);
+    } else {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '800 48px Montserrat';
+      ctx.fillText('DRIVERS SAATHI', 60, 260);
+    }
+
+    // Top Right Verified Badge
+    ctx.fillStyle = 'rgba(255, 183, 3, 0.15)';
+    ctx.beginPath();
+    ctx.roundRect(660, 215, 360, 64, 32);
+    ctx.fill();
+    ctx.strokeStyle = '#FFB703';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#FFB703';
+    ctx.font = '700 24px Montserrat';
+    ctx.textAlign = 'center';
+    ctx.fillText('1-DAY TRIAL TRAINING', 840, 255);
+    ctx.restore();
+
+    // 4. Scene Tag Badge (e.g. "नियम 1: ड्रेसिंग व स्वच्छता")
+    ctx.save();
+    ctx.fillStyle = '#FB8500';
+    ctx.beginPath();
+    ctx.roundRect(60, 360, 960, 70, 16);
+    ctx.fill();
+
+    ctx.fillStyle = '#07101E';
+    ctx.font = '800 32px "Noto Sans Devanagari"';
+    ctx.textAlign = 'left';
+    ctx.fillText(scene.tag, 90, 408);
+    ctx.restore();
+
+    // 5. Main Scene Heading
+    ctx.save();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 64px "Noto Sans Devanagari"';
+    ctx.textAlign = 'left';
+    ctx.fillText(scene.heading, 60, 500);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '600 30px Poppins';
+    ctx.fillText(scene.subhead, 60, 560);
+    ctx.restore();
+
+    // 6. Rule Bullet Points (Card Container)
+    ctx.save();
+    const cardTop = 620;
+    const cardHeight = 780;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+    ctx.beginPath();
+    ctx.roundRect(60, cardTop, 960, cardHeight, 28);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 183, 3, 0.3)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Draw 4 Detailed Rules with Custom Tick Markers
+    let pointY = cardTop + 90;
+    scene.points.forEach((pt, pIdx) => {
+      // Fade in bullet points progressively as elapsed time passes
+      const pointDelay = (pIdx * 0.22);
+      const pointAlpha = Math.min(Math.max((progress - pointDelay) / 0.15, 0), 1.0);
+
+      ctx.save();
+      ctx.globalAlpha = pointAlpha;
+
+      // Circle icon
+      ctx.fillStyle = '#FFB703';
+      ctx.beginPath();
+      ctx.arc(120, pointY - 10, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Checkmark icon
+      ctx.fillStyle = '#07101E';
+      ctx.font = '800 24px Montserrat';
+      ctx.textAlign = 'center';
+      ctx.fillText('✓', 120, pointY - 2);
+
+      // Rule Text (Word wrapped if needed)
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '700 34px "Noto Sans Devanagari"';
+      ctx.textAlign = 'left';
+      
+      // Auto-wrap long lines
+      const maxWidth = 800;
+      const words = pt.split(' ');
+      let line = '';
+      let currentLineY = pointY;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, 165, currentLineY);
+          line = words[n] + ' ';
+          currentLineY += 46;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, 165, currentLineY);
+
+      pointY += 155;
+      ctx.restore();
+    });
+    ctx.restore();
+
+    // 7. Bottom Agency Trust & Honorarium Banner
+    ctx.save();
+    const footerCardTop = 1440;
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+    ctx.beginPath();
+    ctx.roundRect(60, footerCardTop, 960, 280, 24);
+    ctx.fill();
+    ctx.strokeStyle = '#10B981';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#10B981';
+    ctx.font = '800 32px "Noto Sans Devanagari"';
+    ctx.textAlign = 'left';
+    ctx.fillText('★ 1-दिन ट्रायल का ₹800 मानदेय शाम 7:00 बजे सीधे UPI पर', 95, footerCardTop + 60);
+
+    ctx.fillStyle = '#E2E8F0';
+    ctx.font = '600 28px "Noto Sans Devanagari"';
+    ctx.fillText('मालिक से सीधी डील न करें — 100% फ्री भर्ती व ₹20,000-₹28,000 पक्की सैलरी', 95, footerCardTop + 120);
+
+    // Bottom Contact & Brand URL
+    ctx.fillStyle = '#FFB703';
+    ctx.font = '800 34px Montserrat';
+    ctx.fillText('📞 +91 8175087004  •  driverssaathi.com', 95, footerCardTop + 200);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '600 22px Poppins';
+    ctx.fillText('Govt. of India MSME Registered Enterprise • Palam Vihar, Gurugram', 95, footerCardTop + 245);
+    ctx.restore();
+
+    // Next frame loop
+    if (isPlaying) {
+      animationFrameId = requestAnimationFrame(drawReelFrame);
+    }
+  }
+
+  // Play / Pause Logic
+  const centerTouch = document.getElementById('centerTouch');
+  const playPauseIcon = document.getElementById('playPauseIcon');
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      centerTouch.classList.remove('show-play');
+      sceneStartTime = performance.now();
+      animationFrameId = requestAnimationFrame(drawReelFrame);
+      speakCurrentScene();
+    } else {
+      centerTouch.classList.add('show-play');
+      playPauseIcon.innerText = '❚❚';
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  }
+
+  centerTouch.addEventListener('click', togglePlay);
+
+  // Nav Buttons
+  document.getElementById('btnNextScene').addEventListener('click', function(e) {
+    e.stopPropagation();
+    goToScene(currentSceneIndex + 1);
+  });
+  document.getElementById('btnPrevScene').addEventListener('click', function(e) {
+    e.stopPropagation();
+    goToScene(currentSceneIndex - 1);
+  });
+  document.getElementById('btnRestart').addEventListener('click', function() {
+    goToScene(0);
+  });
+
+  // Audio Toggle
+  const btnAudioToggle = document.getElementById('btnAudioToggle');
+  btnAudioToggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    audioEnabled = !audioEnabled;
+    btnAudioToggle.innerText = audioEnabled ? '🔊' : '🔇';
+    if (!audioEnabled && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    } else {
+      speakCurrentScene();
+    }
+  });
+
+  // Start Engine
+  goToScene(0);
+  animationFrameId = requestAnimationFrame(drawReelFrame);
+
+  // ─── Native High-Def Video Recorder & MP4/WebM Downloader ───
+  const btnDownload = document.getElementById('btnDownloadVideo');
+  const recIndicator = document.getElementById('recIndicator');
+
+  btnDownload.addEventListener('click', function() {
+    if (!window.MediaRecorder) {
+      alert("MediaRecorder आपके ब्राउज़र में सपोर्टेड नहीं है। कृपया Chrome या Edge में चलाएं।");
+      return;
+    }
+
+    btnDownload.disabled = true;
+    recIndicator.style.display = 'block';
+    btnDownload.innerText = '⏳ वीडियो रील तैयार हो रही है... (Recording in progress)';
+
+    // Reset to beginning for full recording
+    goToScene(0);
+
+    // Capture 30fps canvas stream
+    const stream = canvas.captureStream(30);
+    const mimeTypes = [
+      'video/mp4;codecs=avc1',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm'
+    ];
+    let selectedMime = 'video/webm';
+    for (let m of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(m)) {
+        selectedMime = m;
+        break;
+      }
+    }
+
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: selectedMime,
+      videoBitsPerSecond: 6000000 // 6 Mbps High Quality 1080p
+    });
+
+    const recordedChunks = [];
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) {
+        recordedChunks.push(e.data);
+      }
+    };
+
+    mediaRecorder.onstop = function() {
+      recIndicator.style.display = 'none';
+      btnDownload.disabled = false;
+      btnDownload.innerHTML = '<span>🎬</span> रील वीडियो डाउनलोड करें (Download HD Reel / MP4)';
+
+      const blob = new Blob(recordedChunks, { type: selectedMime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      const ext = selectedMime.includes('mp4') ? 'mp4' : 'webm';
+      a.download = `Drivers_Saathi_Trial_Rules_Reel_${Date.now()}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    };
+
+    // Calculate total duration across all scenes
+    const totalDuration = SCENES.reduce((sum, sc) => sum + sc.duration, 0);
+
+    mediaRecorder.start();
+
+    // Auto stop after full video plays or allow user stop
+    setTimeout(function() {
+      if (mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+    }, totalDuration + 1000);
+  });
+
+})();
+</script>
+</body>
+</html>
