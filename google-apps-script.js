@@ -49,12 +49,13 @@ function setupAllHeaders() {
     "Driver Age Preference",
     "Verification Preference",
     "Special Requirements",
+    "Lead Source",
     "Lead Status",
     "Assigned Driver / Notes"
   ];
   getOrCreateSheet(ss, SPREADSHEET_CONFIG.CLIENT_SHEET_NAME, clientHeaders, "#0284C7");
 
-  // 2. Driver Applications (15 columns)
+  // 2. Driver Applications (16 columns)
   const driverHeaders = [
     "Timestamp (IST)",
     "Full Name",
@@ -69,6 +70,7 @@ function setupAllHeaders() {
     "Expected Salary / Rate",
     "DL Number",
     "1-Day Paid Trial Ready",
+    "Lead Source",
     "Application Status",
     "Verification / Background Notes"
   ];
@@ -198,6 +200,7 @@ function recordClientLead(ss, data, timestamp) {
     "Driver Age Preference",
     "Verification Preference",
     "Special Requirements",
+    "Lead Source",
     "Lead Status",
     "Assigned Driver / Notes"
   ];
@@ -220,6 +223,7 @@ function recordClientLead(ss, data, timestamp) {
   const age = data["Driver Age Preference"] || data["c-age"] || "No Specific Preference";
   const verification = data["Verification Preference"] || data["c-bg"] || "Standard Verified (Police + DL + Aadhaar)";
   const notes = data["Special Requirements"] || data["Additional Details"] || data["c-notes"] || data["i-details"] || "";
+  const source = data["Lead Source"] || data["How did you hear about us?"] || data["c-source"] || data["Source"] || "";
 
   const row = [
     timestamp,
@@ -239,6 +243,7 @@ function recordClientLead(ss, data, timestamp) {
     age,
     verification,
     notes,
+    source,
     "New Lead",
     ""
   ];
@@ -265,6 +270,7 @@ function recordDriverApplication(ss, data, timestamp) {
     "Expected Salary / Rate",
     "DL Number",
     "1-Day Paid Trial Ready",
+    "Lead Source",
     "Application Status",
     "Verification / Background Notes"
   ];
@@ -283,6 +289,7 @@ function recordDriverApplication(ss, data, timestamp) {
   const salary = data["Expected Salary / Rate"] || data["Expected Salary"] || data["Salary"] || data["d-salary"] || data["d-salaryexp"] || "";
   const dl = data["DL Number"] || data["d-dl"] || data["d-dl-num"] || "";
   const trialReady = data["1-Day Paid Trial Ready"] || data["d-trialready"] || "Yes, Ready for 1-Day Trial";
+  const source = data["Lead Source"] || data["How did you hear about us?"] || data["d-source"] || data["Source"] || "";
 
   const row = [
     timestamp,
@@ -298,6 +305,7 @@ function recordDriverApplication(ss, data, timestamp) {
     salary,
     dl,
     trialReady,
+    source,
     "Pending Verification",
     ""
   ];
