@@ -1133,25 +1133,29 @@
     // Brand Name & Enterprise Tag
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text('DRIVERS SAATHI', textLeftMargin, 16);
+    doc.setFontSize(17);
+    doc.text('DRIVERS SAATHI', textLeftMargin, 15);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(7.5);
     doc.setTextColor(255, 183, 3);
-    doc.text('GOVT. MSME REGISTERED ENTERPRISE  |  DELHI-NCR CHAUFFEUR PLACEMENT', textLeftMargin, 23);
+    doc.text('GOVT. MSME REGISTERED ENTERPRISE', textLeftMargin, 21.5);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Delhi-NCR Chauffeur Placement Firm', textLeftMargin, 26.5);
 
     // Document Type Header (Right Side)
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(9.5);
     doc.setTextColor(255, 255, 255);
-    doc.text('VERIFIED CHAUFFEUR DOSSIER', pageW - margin, 16, { align: 'right' });
+    doc.text('VERIFIED CHAUFFEUR DOSSIER', pageW - margin, 15, { align: 'right' });
 
     const refId = 'DS-' + Math.floor(100000 + Math.random() * 900000);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(203, 213, 225);
-    doc.text('Candidate ID: ' + refId, pageW - margin, 23, { align: 'right' });
+    doc.setFontSize(8);
+    doc.setTextColor(255, 183, 3);
+    doc.text('Ref ID: ' + refId, pageW - margin, 21.5, { align: 'right' });
+    doc.setTextColor(148, 163, 184);
+    doc.text('Confidential Dossier', pageW - margin, 26.5, { align: 'right' });
 
     let y = 47;
 
@@ -1277,29 +1281,49 @@
       nameLabel.textContent = data.fullName + ' — बायोडाटा तैयार है';
     }
 
-    // Build WhatsApp message for Drivers Saathi admin (+91 8175087004)
-    const waText = encodeURIComponent(
-      '🚗 *[NEW DRIVER DOSSIER / BIO-DATA]*\n' +
-      '-----------------------------------\n' +
-      '👤 *नाम:* ' + (data.fullName || '') + '\n' +
-      '📞 *मोबाइल:* ' + (data.phone || '') + '\n' +
-      '🎂 *उम्र:* ' + (data.age || '') + '\n' +
-      '📍 *वर्तमान इलाका:* ' + (data.currentArea || '') + ' (' + (data.subRegion || '') + ')\n' +
-      '🏠 *मूल राज्य:* ' + (data.nativeState || '') + '\n' +
-      '⭐ *अनुभव:* ' + (data.experience || '') + '\n' +
-      '🚗 *गाड़ियां:* ' + (data.transmission || '') + '\n' +
-      '💼 *काम का प्रकार:* ' + (data.dutyType || '') + '\n' +
-      '💰 *अपेक्षित वेतन:* ' + (data.salary || '') + '\n' +
-      '🆔 *DL नंबर:* ' + (data.dlNumber || '') + '\n' +
-      '📝 *विशेष नोट:* ' + (data.notes || 'None') + '\n' +
-      '-----------------------------------\n' +
-      '✅ *मैंने Drivers Saathi पर फॉर्म भर दिया है और अपना PDF बायोडाटा डाउनलोड कर लिया है। कृपया मेरा 1-दिन का ट्रायल शेड्यूल करें।*'
-    );
+    // Build clean WhatsApp message for Drivers Saathi admin (+91 8175087004) without diamond question marks
+    const waLines = [
+      '*[NEW DRIVER DOSSIER / BIO-DATA]*',
+      '-----------------------------------',
+      '*नाम:* ' + (data.fullName || '-'),
+      '*मोबाइल:* ' + (data.phone || '-'),
+      '*उम्र:* ' + (data.age || '-'),
+      '*वर्तमान इलाका:* ' + (data.currentArea || '-') + ' (' + (data.subRegion || '-') + ')',
+      '*मूल राज्य:* ' + (data.nativeState || '-'),
+      '*अनुभव:* ' + (data.experience || '-'),
+      '*गाड़ियां:* ' + (data.transmission || '-'),
+      '*काम का प्रकार:* ' + (data.dutyType || '-'),
+      '*अपेक्षित वेतन:* ' + (data.salary || '-'),
+      '*DL नंबर:* ' + (data.dlNumber || '-'),
+      '*विशेष नोट:* ' + (data.notes || 'None'),
+      '-----------------------------------',
+      ' *मैंने Drivers Saathi पर फॉर्म भर दिया है और अपना PDF बायोडाटा डाउनलोड कर लिया है। कृपया मेरा 1-दिन का ट्रायल शेड्यूल करें।*'
+    ];
+
+    const waText = encodeURIComponent(waLines.join('\n'));
 
     const waLinkUrl = 'https://wa.me/918175087004?text=' + waText;
     const waBtn = document.getElementById('btnShareWhatsAppDossier');
     if (waBtn) {
       waBtn.href = waLinkUrl;
+    }
+
+    // Save profile to local Vault so you can view all saved dossiers in driver-dossiers.html
+    try {
+      const vaultKey = 'drivers_saathi_vault';
+      let vault = [];
+      const stored = localStorage.getItem(vaultKey);
+      if (stored) vault = JSON.parse(stored);
+      
+      const record = Object.assign({}, data, {
+        id: 'ds_' + Date.now(),
+        refId: 'DS-' + Math.floor(100000 + Math.random() * 900000),
+        savedAt: new Date().toLocaleString()
+      });
+      vault.unshift(record);
+      localStorage.setItem(vaultKey, JSON.stringify(vault.slice(0, 500))); // keep up to 500 records
+    } catch (err) {
+      console.warn('Vault storage err:', err);
     }
 
     // 1. Instant Auto-download PDF

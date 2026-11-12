@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drivers Saathi — Saved Driver Dossiers & Resume Vault</title>
+<link rel="icon" type="image/png" href="images/driver-saathi-logo-clean.png">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="logo_base64.js"></script>
+
+<style>
+  :root {
+    --navy: #07101E;
+    --navy-light: #0F172A;
+    --gold: #FFB703;
+    --green: #10B981;
+    --border: #E2E8F0;
+    --bg: #F8FAFC;
+    --text-dark: #0F172A;
+    --text-muted: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    padding-bottom: 60px;
+  }
+  header {
+    background: #ffffff;
+    border-bottom: 2px solid var(--gold);
+    padding: 14px 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .header-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--navy); }
+  .logo img { height: 44px; }
+  .logo-text h2 { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; }
+  .logo-text span { font-size: 11px; color: #166534; font-weight: 700; }
+
+  .nav-links a {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    margin-left: 8px;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 16px;
+  }
+
+  .top-bar {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  }
+  .stats-info h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .stats-info p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  .actions-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-add {
+    background: #166534;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-export {
+    background: #0F172A;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .search-box {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .search-box input, .search-box select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    outline: none;
+  }
+  .search-box input { flex: 1; min-width: 220px; }
+
+  /* Driver Cards Grid */
+  .drivers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+  .driver-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .driver-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #F1F5F9;
+  }
+  .driver-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .driver-age {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .badge-verified {
+    background: #DCFCE7;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .info-list {
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    color: #334155;
+  }
+  .info-row strong { color: var(--text-dark); }
+
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .btn-pdf {
+    background: #0284C7;
+    color: #fff;
+    border: none;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .btn-wa {
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+  }
+  .btn-del {
+    grid-column: span 2;
+    background: transparent;
+    border: 1px solid #FECACA;
+    color: #DC2626;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-del:hover {
+    background: #FEE2E2;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-wrap">
+    <a href="index.html" class="logo">
+      <img src="images/driver-saathi-logo-clean.png" alt="Drivers Saathi">
+      <div class="logo-text">
+        <h2>DRIVERS SAATHI</h2>
+        <span>CHAUFFEUR RESUME VAULT</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="driver-apply.html" target="_blank">+ New Driver Form</a>
+      <a href="client-hire.html" target="_blank">Hire Chauffeur</a>
+      <a href="index.html">Home</a>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="stats-info">
+      <h1>Saved Driver Dossiers (Resume Hub)</h1>
+      <p>All driver applications and verified PDF dossiers saved securely in your portal. Check, download PDF, or share with clients anytime.</p>
+    </div>
+    <div class="actions-group">
+      <a href="driver-apply.html" target="_blank" class="btn-add">+ Register Driver</a>
+      <button class="btn-export" onclick="exportDossiersJSON()">Export Backup</button>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search by Driver Name, Mobile, Locality or Transmission..." onkeyup="renderDossiers()">
+    <select id="filterZone" onchange="renderDossiers()">
+      <option value="">All Zones</option>
+      <option value="Gurugram">Gurugram</option>
+      <option value="South Delhi">South Delhi</option>
+      <option value="West Delhi">West Delhi</option>
+      <option value="North">North Delhi</option>
+      <option value="East Delhi">East Delhi / Noida</option>
+    </select>
+  </div>
+
+  <div id="driversContainer" class="drivers-grid">
+    <!-- Populated dynamically via localStorage -->
+  </div>
+
+  <div id="emptyContainer" class="empty-state" style="display:none;">
+    <h3 style="font-size:18px; color:var(--navy); margin-bottom:8px;">No Driver Dossiers Saved Yet</h3>
+    <p>Whenever a driver submits the application form on <a href="driver-apply.html" style="color:#0284C7; font-weight:700;">driver-apply.html</a>, their profile is automatically saved here!</p>
+  </div>
+
+</div>
+
+<script>
+  // Storage Key
+  const VAULT_KEY = 'drivers_saathi_vault';
+
+  // Seed with sample initial records if empty
+  function getDossiers() {
+    try {
+      const data = localStorage.getItem(VAULT_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveDossiers(list) {
+    localStorage.setItem(VAULT_KEY, JSON.stringify(list));
+  }
+
+  function deleteDossier(id) {
+    if (!confirm('Are you sure you want to remove this driver profile from local storage?')) return;
+    let list = getDossiers().filter(d => d.id !== id);
+    saveDossiers(list);
+    renderDossiers();
+  }
+
+  function cleanPdfText(text) {
+    if (!text) return '-';
+    var s = String(text).replace(/₹/g, 'Rs. ');
+    var matchParen = s.match(/\(([^)]+)\)/);
+    if (matchParen && /[a-zA-Z0-9]/.test(matchParen[1])) {
+      s = matchParen[1];
+    }
+    s = s.replace(/[^\x00-\x7F]/g, ' ').replace(/\s+/g, ' ').trim();
+    return s || '-';
+  }
+
+  function generatePDFForDriver(d) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert('PDF generation library is loading. Please try again.');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = 210, margin = 16, contentW = pageW - (margin * 2);
+
+    // 1. Top Decorative Brand Bar
+    doc.setFillColor(7, 16, 30);
+    doc.rect(0, 0, pageW, 36, 'F');
+    doc.setFillColor(255, 183, 3);
+    doc.rect(0, 36, pageW, 2.5, 'F');
+
+    // Add Logo inside crisp White Rounded Badge
+    let textLeftMargin = margin;
+    if (window.DRIVERS_SAATHI_LOGO_BASE64) {
+      try {
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(margin, 4, 32, 28, 2, 2, 'F');
+        doc.addImage(window.DRIVERS_SAATHI_LOGO_BASE64, 'PNG', margin + 2, 5.5, 28, 25);
+        textLeftMargin = margin + 37;
+      } catch (err) {}
+    }
+
+    // Brand Name & Tag
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    doc.text('DRIVERS SAATHI', textLeftMargin, 15);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(255, 183, 3);
+    doc.text('GOVT. MSME REGISTERED ENTERPRISE', textLeftMargin, 21.5);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Delhi-NCR Chauffeur Placement Firm', textLeftMargin, 26.5);
+
+    // Right Side Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text('VERIFIED CHAUFFEUR DOSSIER', pageW - margin, 15, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(255, 183, 3);
+    doc.text('Ref ID: ' + (d.refId || 'DS-001'), pageW - margin, 21.5, { align: 'right' });
+    doc.setTextColor(148, 163, 184);
+    doc.text('Confidential Dossier', pageW - margin, 26.5, { align: 'right' });
+
+    let y = 47;
+    doc.setTextColor(7, 16, 30);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text(cleanPdfText(d.fullName).toUpperCase(), margin, y);
+
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(16, 185, 129);
+    doc.text('[ VERIFIED CANDIDATE  |  Aadhaar Checked  |  DL Cleared  |  Ready for 1-Day Trial ]', margin, y);
+
+    y += 10;
+
+    function drawSectionHeader(title, yPos) {
+      doc.setFillColor(241, 245, 249);
+      doc.roundedRect(margin, yPos, contentW, 7.5, 1.5, 1.5, 'F');
+      doc.setTextColor(7, 16, 30);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text(title, margin + 4, yPos + 5.2);
+      return yPos + 11;
+    }
+
+    function drawInfoRow(label, value, yPos) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text(label, margin + 4, yPos);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(15, 23, 42);
+      doc.text(cleanPdfText(value), margin + 65, yPos);
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.2);
+      doc.line(margin + 4, yPos + 2.5, margin + contentW - 4, yPos + 2.5);
+      return yPos + 7.5;
+    }
+
+    // SECTION 1
+    y = drawSectionHeader('1. PERSONAL & REGIONAL PROFILE', y);
+    y = drawInfoRow('Full Name:', d.fullName, y);
+    y = drawInfoRow('Age (Years):', d.age, y);
+    y = drawInfoRow('Native Home State:', d.nativeState, y);
+    y = drawInfoRow('Current Residential Area:', d.currentArea, y);
+    y = drawInfoRow('Preferred Delhi-NCR Zone:', d.subRegion, y);
+
+    y += 4;
+    // SECTION 2
+    y = drawSectionHeader('2. PROFESSIONAL DRIVING & VEHICLE SKILLS', y);
+    y = drawInfoRow('Total Driving Experience:', d.experience, y);
+    y = drawInfoRow('Transmission Capabilities:', d.transmission, y);
+    y = drawInfoRow('Preferred Duty Type:', d.dutyType, y);
+    y = drawInfoRow('Accommodation / Stay-in:', d.stayin, y);
+    y = drawInfoRow('Navigation / Smart Device:', d.maps, y);
+    y = drawInfoRow('Salary / Compensation Expectation:', d.salary, y);
+
+    y += 4;
+    // SECTION 3
+    y = drawSectionHeader('3. ADDITIONAL NOTES & SPECIAL QUALIFICATIONS', y);
+    const notesText = cleanPdfText(d.notes) || 'Non-smoker, punctual, verified background. Fluent with Delhi-NCR routes and highways.';
+    const splitNotes = doc.splitTextToSize(notesText, contentW - 8);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(51, 65, 85);
+    doc.text(splitNotes, margin + 4, y);
+    y += (splitNotes.length * 5) + 6;
+
+    // Confidentiality box
+    doc.setFillColor(254, 242, 242);
+    doc.setDrawColor(252, 165, 165);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(margin, y, contentW, 26, 2, 2, 'FD');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(185, 28, 28);
+    doc.text('CONFIDENTIALITY NOTICE & CLIENT PROTOCOL (ANTI-BYPASS PROTECTED)', margin + 4, y + 5.5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.8);
+    doc.setTextColor(127, 29, 29);
+    doc.text('1. Direct candidate phone numbers and original government IDs (Aadhaar & DL) are securely held by Drivers Saathi.', margin + 4, y + 11);
+    doc.text('2. Complete verified police dossier & contact are released only upon 1-Day Trial Booking confirmation.', margin + 4, y + 15.5);
+    doc.text('3. Direct off-platform hiring without Drivers Saathi registration is strictly prohibited and subject to legal action.', margin + 4, y + 20);
+
+    // Footer
+    const footerY = 268;
+    doc.setFillColor(7, 16, 30);
+    doc.rect(0, footerY, pageW, 29, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(255, 183, 3);
+    doc.text('DRIVERS SAATHI - OFFICIAL CHAUFFEUR RECRUITMENT DESK', pageW / 2, footerY + 8, { align: 'center' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(241, 245, 249);
+    doc.text('To book a 1-Day Trial with this driver: Call / WhatsApp: +91 8175087004  |  Web: driverssaathi.com', pageW / 2, footerY + 14, { align: 'center' });
+    doc.text('Official Contact Mail: support@driverssaathi.com  |  Palam Vihar, Gurugram, Haryana - 122017', pageW / 2, footerY + 19, { align: 'center' });
+    doc.setFontSize(7.5);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Govt. of India MSME Registered Enterprise  |  Zero Risk Guaranteed Placement', pageW / 2, footerY + 24, { align: 'center' });
+
+    doc.save((cleanPdfText(d.fullName) || 'Driver').replace(/[^a-zA-Z0-9]/g, '_') + '_Drivers_Saathi_BioData.pdf');
+  }
+
+  function renderDossiers() {
+    const list = getDossiers();
+    const query = (document.getElementById('searchInput').value || '').toLowerCase();
+    const zoneFilter = (document.getElementById('filterZone').value || '').toLowerCase();
+
+    const container = document.getElementById('driversContainer');
+    const empty = document.getElementById('emptyContainer');
+
+    const filtered = list.filter(d => {
+      const matchQuery = !query || 
+        (d.fullName && d.fullName.toLowerCase().includes(query)) ||
+        (d.phone && d.phone.includes(query)) ||
+        (d.currentArea && d.currentArea.toLowerCase().includes(query)) ||
+        (d.transmission && d.transmission.toLowerCase().includes(query));
+
+      const matchZone = !zoneFilter || 
+        (d.subRegion && d.subRegion.toLowerCase().includes(zoneFilter));
+
+      return matchQuery && matchZone;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    empty.style.display = 'none';
+    container.innerHTML = filtered.map(d => `
+      <div class="driver-card">
+        <div>
+          <div class="card-head">
+            <div>
+              <div class="driver-name">${d.fullName || 'Driver Candidate'}</div>
+              <div class="driver-age">${d.age || 'Age: -'} &bull; ${d.currentArea || 'Delhi NCR'}</div>
+            </div>
+            <span class="badge-verified">Verified</span>
+          </div>
+
+          <div class="info-list">
+            <div class="info-row"><span>Mobile:</span> <strong>${d.phone || '-'}</strong></div>
+            <div class="info-row"><span>Zone:</span> <strong>${d.subRegion || '-'}</strong></div>
+            <div class="info-row"><span>Experience:</span> <strong>${d.experience || '-'}</strong></div>
+            <div class="info-row"><span>Transmission:</span> <strong>${d.transmission || '-'}</strong></div>
+            <div class="info-row"><span>Duty:</span> <strong>${d.dutyType || '-'}</strong></div>
+            <div class="info-row"><span>Salary:</span> <strong>${d.salary || '-'}</strong></div>
+            <div class="info-row"><span>DL Number:</span> <strong>${d.dlNumber || '-'}</strong></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-actions">
+            <button class="btn-pdf" onclick='generatePDFForDriver(${JSON.stringify(d).replace(/'/g, "\\'")})'>Download PDF</button>
+            <a href="https://wa.me/918175087004?text=${encodeURIComponent('Driver Dossier: ' + d.fullName + ' | Phone: ' + d.phone + ' | Zone: ' + d.subRegion)}" target="_blank" class="btn-wa">Share WhatsApp</a>
+            <button class="btn-del" onclick="deleteDossier('${d.id}')">Delete Record</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function exportDossiersJSON() {
+    const list = getDossiers();
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(list, null, 2));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "Drivers_Saathi_Dossiers_Backup.json");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  document.addEventListener('DOMContentLoaded', renderDossiers);
+</script>
+
+</body>
+</html>
