@@ -15,6 +15,7 @@
 
 <!-- jsPDF Library for Auto-Generating Driver Resume PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="logo_base64.js"></script>
 
 <!-- Google for Jobs Schema: JobPosting -->
 <script type="application/ld+json">
@@ -1081,21 +1082,34 @@
 
     // 1. Top Decorative Brand Bar
     doc.setFillColor(7, 16, 30); // Navy #07101E
-    doc.rect(0, 0, pageW, 28, 'F');
+    doc.rect(0, 0, pageW, 30, 'F');
 
     doc.setFillColor(255, 183, 3); // Gold #FFB703
-    doc.rect(0, 28, pageW, 2.5, 'F');
+    doc.rect(0, 30, pageW, 2.5, 'F');
+
+    // Add Original Drivers Saathi Logo if available
+    let textLeftMargin = margin;
+    if (window.DRIVERS_SAATHI_LOGO_BASE64) {
+      try {
+        // Logo natural aspect ratio ~ 1.15 : 1 (width : height)
+        // Draw 24mm wide, 21mm tall logo on dark bar
+        doc.addImage(window.DRIVERS_SAATHI_LOGO_BASE64, 'PNG', margin, 4.5, 24, 21);
+        textLeftMargin = margin + 28;
+      } catch (err) {
+        console.warn('PDF Logo render notice:', err);
+      }
+    }
 
     // Brand Name & Enterprise Tag
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(19);
-    doc.text('DRIVERS SAATHI', margin, 14);
+    doc.setFontSize(18);
+    doc.text('DRIVERS SAATHI', textLeftMargin, 15);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(8);
     doc.setTextColor(255, 183, 3);
-    doc.text('GOVT. MSME REGISTERED ENTERPRISE  |  DELHI-NCR CHAUFFEUR PLACEMENT FIRM', margin, 21);
+    doc.text('GOVT. MSME REGISTERED ENTERPRISE  |  DELHI-NCR CHAUFFEUR PLACEMENT', textLeftMargin, 22);
 
     // Document Type Header (Right Side)
     doc.setFont('helvetica', 'bold');
@@ -1109,7 +1123,7 @@
     doc.setTextColor(203, 213, 225);
     doc.text('Candidate ID: ' + refId, pageW - margin, 21, { align: 'right' });
 
-    let y = 40;
+    let y = 42;
 
     // 2. Candidate Hero Title & Badges
     doc.setTextColor(7, 16, 30);
@@ -1119,7 +1133,7 @@
 
     y += 6;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(10);
     doc.setTextColor(16, 185, 129); // Emerald Green #10B981
     doc.text('[ VERIFIED CANDIDATE  |  Aadhaar Checked  |  DL Cleared  |  Ready for 1-Day Trial ]', margin, y);
 
@@ -1202,9 +1216,9 @@
     doc.text('3. Direct off-platform hiring without Drivers Saathi registration is strictly prohibited and subject to legal action.', margin + 4, y + 22);
 
     // 5. Official Agency Placement Footer
-    const footerY = 270;
+    const footerY = 268;
     doc.setFillColor(7, 16, 30);
-    doc.rect(0, footerY, pageW, 27, 'F');
+    doc.rect(0, footerY, pageW, 29, 'F');
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
@@ -1215,7 +1229,10 @@
     doc.setFontSize(8);
     doc.setTextColor(241, 245, 249);
     doc.text('To book a 1-Day Trial with this driver: Call / WhatsApp: +91 8175087004  |  Web: driverssaathi.com', pageW / 2, footerY + 14, { align: 'center' });
-    doc.text('Office: Palam Vihar, Gurugram, Haryana - 122017  |  Govt. MSME Regd. Enterprise', pageW / 2, footerY + 19, { align: 'center' });
+    doc.text('Official Contact Mail: support@driverssaathi.com  |  Palam Vihar, Gurugram, Haryana - 122017', pageW / 2, footerY + 19, { align: 'center' });
+    doc.setFontSize(7.5);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Govt. of India MSME Registered Enterprise  |  Zero Risk Guaranteed Placement', pageW / 2, footerY + 24, { align: 'center' });
 
     // Download PDF
     const cleanFileName = (d.fullName || 'Driver').replace(/[^a-zA-Z0-9]/g, '_') + '_Drivers_Saathi_BioData.pdf';
