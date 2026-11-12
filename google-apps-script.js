@@ -55,12 +55,14 @@ function setupAllHeaders() {
   ];
   getOrCreateSheet(ss, SPREADSHEET_CONFIG.CLIENT_SHEET_NAME, clientHeaders, "#0284C7");
 
-  // 2. Driver Applications (16 columns)
+  // 2. Driver Applications (19 columns)
   const driverHeaders = [
     "Timestamp (IST)",
     "Full Name",
     "Phone",
+    "Driver Age",
     "Current Area in NCR",
+    "Preferred Sub-Region",
     "Native Home State",
     "Car Transmission Skills",
     "Driving Experience",
@@ -70,6 +72,7 @@ function setupAllHeaders() {
     "Expected Salary / Rate",
     "DL Number",
     "1-Day Paid Trial Ready",
+    "Special Skills & Notes",
     "Lead Source",
     "Application Status",
     "Verification / Background Notes"
@@ -266,7 +269,9 @@ function recordDriverApplication(ss, data, timestamp) {
     "Timestamp (IST)",
     "Full Name",
     "Phone",
+    "Driver Age",
     "Current Area in NCR",
+    "Preferred Sub-Region",
     "Native Home State",
     "Car Transmission Skills",
     "Driving Experience",
@@ -276,6 +281,7 @@ function recordDriverApplication(ss, data, timestamp) {
     "Expected Salary / Rate",
     "DL Number",
     "1-Day Paid Trial Ready",
+    "Special Skills & Notes",
     "Lead Source",
     "Application Status",
     "Verification / Background Notes"
@@ -285,7 +291,9 @@ function recordDriverApplication(ss, data, timestamp) {
 
   const name = data["Full Name"] || data["Driver Name"] || data["Name"] || data["d-name"] || "";
   const phone = data["Phone"] || data["Phone Number"] || data["d-phone"] || "";
+  const age = data["Driver Age"] || data["Age"] || data["d-age"] || "";
   const area = data["Current Area in NCR"] || data["City / Area"] || data["Area"] || data["d-city"] || "";
+  const subRegion = data["Preferred Sub-Region"] || data["Zone"] || data["d-subregion"] || "";
   const nativeState = data["Native Home State"] || data["d-native"] || "Delhi NCR";
   const trans = data["Car Transmission Skills"] || data["Transmission"] || data["d-license"] || "";
   const exp = data["Driving Experience"] || data["Experience"] || data["d-exp"] || "";
@@ -295,13 +303,16 @@ function recordDriverApplication(ss, data, timestamp) {
   const salary = data["Expected Salary / Rate"] || data["Expected Salary"] || data["Salary"] || data["d-salary"] || data["d-salaryexp"] || "";
   const dl = data["DL Number"] || data["d-dl"] || data["d-dl-num"] || "";
   const trialReady = data["1-Day Paid Trial Ready"] || data["d-trialready"] || "Yes, Ready for 1-Day Trial";
+  const notes = data["Special Skills & Notes"] || data["Special Skills"] || data["Notes"] || data["d-notes"] || "";
   const source = data["Lead Source"] || data["How did you hear about us?"] || data["d-source"] || data["Source"] || "";
 
   const dataMap = {
     "Timestamp (IST)": timestamp,
     "Full Name": name,
     "Phone": formatPhone(phone),
+    "Driver Age": age,
     "Current Area in NCR": area,
+    "Preferred Sub-Region": subRegion,
     "Native Home State": nativeState,
     "Car Transmission Skills": trans,
     "Driving Experience": exp,
@@ -311,6 +322,7 @@ function recordDriverApplication(ss, data, timestamp) {
     "Expected Salary / Rate": salary,
     "DL Number": dl,
     "1-Day Paid Trial Ready": trialReady,
+    "Special Skills & Notes": notes,
     "Lead Source": source,
     "Application Status": "Pending Verification",
     "Verification / Background Notes": ""

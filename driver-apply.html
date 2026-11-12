@@ -13,6 +13,9 @@
 <meta property="og:url" content="https://driverssaathi.com/driver-apply.html">
 <meta property="og:type" content="website">
 
+<!-- jsPDF Library for Auto-Generating Driver Resume PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <!-- Google for Jobs Schema: JobPosting -->
 <script type="application/ld+json">
 {
@@ -684,6 +687,35 @@
           <input type="text" id="d-city" name="Current Area in NCR" placeholder="उदा. सेक्टर 56 गुड़गांव / वसंत कुंज / नोएडा सेक्टर 62" required>
         </div>
         <div>
+          <label for="d-subregion">पसंदीदा NCR ज़ोन / क्षेत्र (Preferred Sub-Region) <span class="req">*</span></label>
+          <select id="d-subregion" name="Preferred Sub-Region" required>
+            <option value="">ज़ोन चुनें (Select Zone)</option>
+            <option value="Gurugram (गुड़गांव)">गुड़गांव (Gurugram - All Sectors / DLF)</option>
+            <option value="South Delhi (साउथ दिल्ली)">साउथ दिल्ली (South Delhi - Vasant Kunj, GK, Saket)</option>
+            <option value="Central & New Delhi (सेंट्रल/नई दिल्ली)">सेंट्रल व नई दिल्ली (Central &amp; New Delhi)</option>
+            <option value="West Delhi (वेस्ट दिल्ली)">वेस्ट दिल्ली (West Delhi - Janakpuri, Dwarka, Punjabi Bagh)</option>
+            <option value="North & North-West Delhi (नॉर्थ दिल्ली)">नॉर्थ दिल्ली (Rohini, Pitampura, Model Town)</option>
+            <option value="East Delhi & Noida (ईस्ट दिल्ली/नोएडा)">ईस्ट दिल्ली व नोएडा (East Delhi, Mayur Vihar, Noida, Gr. Noida)</option>
+            <option value="Faridabad & Ghaziabad (फरीदाबाद/गाजियाबाद)">फरीदाबाद व गाजियाबाद (Faridabad / Ghaziabad)</option>
+            <option value="All NCR (पूरे दिल्ली NCR में कहीं भी)">पूरे दिल्ली NCR में कहीं भी (Flexible for All NCR)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label for="d-age">आपकी उम्र (Age) <span class="req">*</span></label>
+          <select id="d-age" name="Driver Age" required>
+            <option value="">उम्र चुनें (Select Age)</option>
+            <option value="21 से 25 साल">21 से 25 साल</option>
+            <option value="26 से 30 साल">26 से 30 साल</option>
+            <option value="31 से 35 साल" selected>31 से 35 साल</option>
+            <option value="36 से 40 साल">36 से 40 साल</option>
+            <option value="41 से 45 साल">41 से 45 साल</option>
+            <option value="46 से 52 साल">46 से 52 साल</option>
+          </select>
+        </div>
+        <div>
           <label for="d-native">मूल निवासी राज्य (Native Home State) <span class="req">*</span></label>
           <select id="d-native" name="Native Home State" required>
             <option value="">राज्य चुनें (Select State)</option>
@@ -859,6 +891,11 @@
         </select>
       </div>
 
+      <div class="grid-full" style="margin-top:14px;">
+        <label for="d-notes">अतिरिक्त जानकारी या विशेष योग्यता (Additional Information / Special Skills) (Optional)</label>
+        <textarea id="d-notes" name="Special Skills & Notes" rows="2" placeholder="उदा. नॉन-स्मोकर, कभी शराब नहीं पीता, वर्दी में रहने का अनुभव, लग्जरी कार चलाई है, VIP फैमिली का अनुभव..."></textarea>
+      </div>
+
       <!-- Driver Code of Conduct & Honorarium Callout -->
       <div class="benefits-callout">
         <h4>ड्राइवर आचार संहिता व सुरक्षा नियम (Code of Conduct &amp; Honorarium)</h4>
@@ -880,14 +917,41 @@
 
     </form>
 
-    <!-- Success Message Box -->
+    <!-- Success Message Box with Auto PDF Resume Download & WhatsApp Dossier Share -->
     <div class="success-box" id="successBox">
       <div class="success-tick">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <h3>आवेदन स्वीकार कर लिया गया है!</h3>
-      <p>हमारी भर्ती टीम 24 घंटे के अंदर आपको कॉल करके आपके 1-दिन के ट्रायल का शेड्यूल और स्थान कन्फर्म करेगी।</p>
-      <a href="driver-apply.html" class="btn-hire" style="display:inline-block; margin-top:10px;">नया फॉर्म भरें (Submit Another)</a>
+      <h3 style="font-size:24px; font-weight:800; color:#07101E; margin-bottom:8px;">आवेदन स्वीकार कर लिया गया है!</h3>
+      <p style="color:#64748B; font-size:14px; margin-bottom:20px;">आपका फॉर्म सबमिट हो चुका है और आपका <strong>Drivers Saathi ऑफिशियल बायोडाटा (PDF)</strong> तैयार है।</p>
+
+      <!-- Resume Download & WhatsApp Share Card -->
+      <div style="background:#F0FDF4; border:1.5px solid #86EFAC; border-radius:14px; padding:20px; max-width:540px; margin:0 auto 24px; text-align:left;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <div style="width:44px; height:44px; background:#166534; color:#fff; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900;">
+            📄
+          </div>
+          <div>
+            <div style="font-size:15px; font-weight:800; color:#166534;" id="resume-applicant-name">ड्राइवर बायोडाटा (Chauffeur Profile)</div>
+            <div style="font-size:12px; color:#15803D;">Govt. MSME Registered Enterprise • Confidential Dossier</div>
+          </div>
+        </div>
+        <p style="font-size:12.5px; color:#166534; line-height:1.5; margin-bottom:16px;">
+          यह बायोडाटा आप सीधे डाउनलोड कर सकते हैं और क्लाइंट को शेयर करने के लिए Drivers Saathi व्हाट्सएप पर भी भेज सकते हैं।
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <button type="button" id="btnDownloadResume" onclick="downloadDriverResumePDF()" style="background:#166534; color:#fff; border:none; padding:12px 20px; border-radius:8px; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>📥 अपना Drivers Saathi बायोडाटा (PDF) डाउनलोड करें</span>
+          </button>
+          
+          <a id="btnShareWhatsAppDossier" href="#" target="_blank" style="background:#25D366; color:#fff; text-decoration:none; padding:12px 20px; border-radius:8px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>📲 व्हाट्सएप पर अपनी प्रोफाइल कन्फर्म करें &rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <a href="driver-apply.html" class="btn-hire" style="display:inline-block; margin-top:6px;">नया फॉर्म भरें (Submit Another Application)</a>
     </div>
   </div>
 
@@ -957,6 +1021,261 @@
       }
     });
   }
+
+  // Global cache of latest submitted driver profile data
+  window.lastSubmittedDriver = null;
+
+  function collectDriverFormData() {
+    const form = document.getElementById('applyForm');
+    if (!form) return null;
+    return {
+      fullName: (form.querySelector('[name="Full Name"]')?.value || 'Driver Candidate').trim(),
+      phone: (form.querySelector('[name="Phone"]')?.value || '').trim(),
+      currentArea: (form.querySelector('[name="Current Area in NCR"]')?.value || 'Delhi NCR').trim(),
+      subRegion: (form.querySelector('[name="Preferred Sub-Region"]')?.value || 'Delhi NCR').trim(),
+      age: (form.querySelector('[name="Driver Age"]')?.value || 'Not Specified').trim(),
+      nativeState: (form.querySelector('[name="Native Home State"]')?.value || 'North India').trim(),
+      transmission: (form.querySelector('[name="Car Transmission Skills"]')?.value || 'Manual & Automatic').trim(),
+      experience: (form.querySelector('[name="Driving Experience"]')?.value || '5+ Years').trim(),
+      dutyType: (form.querySelector('[name="Duty Type Preference"]')?.value || 'Permanent Monthly Job').trim(),
+      stayin: (form.querySelector('[name="Accommodation / Stay-in"]')?.value || 'Day Duty').trim(),
+      salary: (form.querySelector('[name="Expected Salary / Rate"]')?.value || 'Market Standard').trim(),
+      maps: (form.querySelector('[name="Smartphone & Google Maps Knowledge"]')?.value || 'Fluent').trim(),
+      dlNumber: (form.querySelector('[name="DL Number"]')?.value || '').trim(),
+      notes: (form.querySelector('[name="Special Skills & Notes"]')?.value || '').trim(),
+      model: (form.querySelector('[name="Job Model Category"]:checked')?.value || 'Private Family Chauffeur').trim()
+    };
+  }
+
+  function downloadDriverResumePDF() {
+    const d = window.lastSubmittedDriver || collectDriverFormData() || {
+      fullName: 'Professional Driver',
+      age: '32 Years',
+      subRegion: 'Gurugram / South Delhi',
+      currentArea: 'Palam Vihar / DLF',
+      nativeState: 'Uttar Pradesh',
+      experience: '7 Years',
+      transmission: 'Both Manual & Automatic + Luxury SUV',
+      dutyType: 'Permanent Monthly Job (10-12 Hours)',
+      salary: '₹22,000 - ₹25,000 / month',
+      maps: 'Fluent with Google Maps & Smartphone',
+      notes: 'Non-smoker, clean track record, well mannered'
+    };
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert('PDF generation library is loading. Please try again in 2 seconds.');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const pageW = 210;
+    const pageH = 297;
+    const margin = 16;
+    const contentW = pageW - (margin * 2);
+
+    // 1. Top Decorative Brand Bar
+    doc.setFillColor(7, 16, 30); // Navy #07101E
+    doc.rect(0, 0, pageW, 28, 'F');
+
+    doc.setFillColor(255, 183, 3); // Gold #FFB703
+    doc.rect(0, 28, pageW, 2.5, 'F');
+
+    // Brand Name & Enterprise Tag
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(19);
+    doc.text('DRIVERS SAATHI', margin, 14);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(255, 183, 3);
+    doc.text('GOVT. MSME REGISTERED ENTERPRISE  |  DELHI-NCR CHAUFFEUR PLACEMENT FIRM', margin, 21);
+
+    // Document Type Header (Right Side)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(255, 255, 255);
+    doc.text('VERIFIED CHAUFFEUR DOSSIER', pageW - margin, 14, { align: 'right' });
+
+    const refId = 'DS-' + Math.floor(100000 + Math.random() * 900000);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Candidate ID: ' + refId, pageW - margin, 21, { align: 'right' });
+
+    let y = 40;
+
+    // 2. Candidate Hero Title & Badges
+    doc.setTextColor(7, 16, 30);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text(d.fullName.toUpperCase(), margin, y);
+
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(16, 185, 129); // Emerald Green #10B981
+    doc.text('[ VERIFIED CANDIDATE  |  Aadhaar Checked  |  DL Cleared  |  Ready for 1-Day Trial ]', margin, y);
+
+    y += 10;
+
+    // 3. Information Table Builder Helper
+    function drawSectionHeader(title, yPos) {
+      doc.setFillColor(241, 245, 249);
+      doc.roundedRect(margin, yPos, contentW, 7.5, 1.5, 1.5, 'F');
+      doc.setTextColor(7, 16, 30);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text(title, margin + 4, yPos + 5.2);
+      return yPos + 11;
+    }
+
+    function drawInfoRow(label, value, yPos) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text(label, margin + 4, yPos);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(15, 23, 42);
+      doc.text(String(value || '-'), margin + 65, yPos);
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.2);
+      doc.line(margin + 4, yPos + 2.5, margin + contentW - 4, yPos + 2.5);
+      return yPos + 7.5;
+    }
+
+    // SECTION 1: Personal & Location Details
+    y = drawSectionHeader('1. PERSONAL & REGIONAL PROFILE', y);
+    y = drawInfoRow('Full Name:', d.fullName, y);
+    y = drawInfoRow('Age (Years):', d.age, y);
+    y = drawInfoRow('Native Home State:', d.nativeState, y);
+    y = drawInfoRow('Current Residential Area:', d.currentArea, y);
+    y = drawInfoRow('Preferred Delhi-NCR Zone:', d.subRegion, y);
+
+    y += 4;
+
+    // SECTION 2: Professional Driving Skills
+    y = drawSectionHeader('2. PROFESSIONAL DRIVING & VEHICLE SKILLS', y);
+    y = drawInfoRow('Total Driving Experience:', d.experience, y);
+    y = drawInfoRow('Transmission Capabilities:', d.transmission, y);
+    y = drawInfoRow('Preferred Duty Type:', d.dutyType, y);
+    y = drawInfoRow('Accommodation / Stay-in:', d.stayin, y);
+    y = drawInfoRow('Navigation / Smart Device:', d.maps, y);
+    y = drawInfoRow('Salary / Compensation Expectation:', d.salary, y);
+
+    y += 4;
+
+    // SECTION 3: Special Notes & Chauffeur Etiquette
+    y = drawSectionHeader('3. ADDITIONAL NOTES & SPECIAL QUALIFICATIONS', y);
+    const notesText = d.notes || 'Non-smoker, punctual, verified background. Fluent with Delhi-NCR routes & highways. Courteous demeanor suitable for family, executives & corporate deployment.';
+    const splitNotes = doc.splitTextToSize(notesText, contentW - 8);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(51, 65, 85);
+    doc.text(splitNotes, margin + 4, y);
+    y += (splitNotes.length * 5) + 6;
+
+    // 4. Confidentiality & Anti-Bypass Security Notice Box
+    doc.setFillColor(254, 242, 242); // Light Red #FEF2F2
+    doc.setDrawColor(252, 165, 165);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(margin, y, contentW, 28, 2, 2, 'FD');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(185, 28, 28); // Dark Red
+    doc.text('CONFIDENTIALITY NOTICE & CLIENT PROTOCOL (ANTI-BYPASS PROTECTED)', margin + 4, y + 6);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.8);
+    doc.setTextColor(127, 29, 29);
+    doc.text('1. Direct candidate phone numbers and original government IDs (Aadhaar & DL) are securely held by Drivers Saathi.', margin + 4, y + 12);
+    doc.text('2. Complete verified police dossier & contact are released only upon 1-Day Trial Booking confirmation.', margin + 4, y + 17);
+    doc.text('3. Direct off-platform hiring without Drivers Saathi registration is strictly prohibited and subject to legal action.', margin + 4, y + 22);
+
+    // 5. Official Agency Placement Footer
+    const footerY = 270;
+    doc.setFillColor(7, 16, 30);
+    doc.rect(0, footerY, pageW, 27, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(255, 183, 3);
+    doc.text('DRIVERS SAATHI - OFFICIAL CHAUFFEUR RECRUITMENT DESK', pageW / 2, footerY + 8, { align: 'center' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(241, 245, 249);
+    doc.text('To book a 1-Day Trial with this driver: Call / WhatsApp: +91 8175087004  |  Web: driverssaathi.com', pageW / 2, footerY + 14, { align: 'center' });
+    doc.text('Office: Palam Vihar, Gurugram, Haryana - 122017  |  Govt. MSME Regd. Enterprise', pageW / 2, footerY + 19, { align: 'center' });
+
+    // Download PDF
+    const cleanFileName = (d.fullName || 'Driver').replace(/[^a-zA-Z0-9]/g, '_') + '_Drivers_Saathi_BioData.pdf';
+    doc.save(cleanFileName);
+  }
+
+  // Hook into form submission for instant resume sync & WhatsApp share link
+  function prepareSuccessDossier(data) {
+    window.lastSubmittedDriver = data;
+    const nameLabel = document.getElementById('resume-applicant-name');
+    if (nameLabel) {
+      nameLabel.textContent = data.fullName + ' — बायोडाटा तैयार है';
+    }
+
+    // Build WhatsApp message for Drivers Saathi admin (+91 8175087004)
+    const waText = encodeURIComponent(
+      '🚗 *[NEW DRIVER DOSSIER / BIO-DATA]*\n' +
+      '-----------------------------------\n' +
+      '👤 *नाम:* ' + data.fullName + '\n' +
+      '📞 *मोबाइल:* ' + data.phone + '\n' +
+      '🎂 *उम्र:* ' + data.age + '\n' +
+      '📍 *वर्तमान इलाका:* ' + data.currentArea + ' (' + data.subRegion + ')\n' +
+      '🏠 *मूल राज्य:* ' + data.nativeState + '\n' +
+      '⭐ *अनुभव:* ' + data.experience + '\n' +
+      '🚗 *गाड़ियां:* ' + data.transmission + '\n' +
+      '💼 *काम का प्रकार:* ' + data.dutyType + '\n' +
+      '💰 *अपेक्षित वेतन:* ' + data.salary + '\n' +
+      '🆔 *DL नंबर:* ' + data.dlNumber + '\n' +
+      '📝 *विशेष नोट:* ' + (data.notes || 'None') + '\n' +
+      '-----------------------------------\n' +
+      '✅ *मैंने Drivers Saathi पर फॉर्म भर दिया है और अपना PDF बायोडाटा डाउनलोड कर लिया है। कृपया मेरा 1-दिन का ट्रायल शेड्यूल करें।*'
+    );
+
+    const waLink = document.getElementById('btnShareWhatsAppDossier');
+    if (waLink) {
+      waLink.href = 'https://wa.me/918175087004?text=' + waText;
+    }
+
+    // Auto-trigger PDF download for instant driver satisfaction
+    setTimeout(function() {
+      try {
+        downloadDriverResumePDF();
+      } catch (err) {
+        console.warn('Auto PDF trigger notice:', err);
+      }
+    }, 600);
+  }
+
+  // Listen to form submit to capture data before hiding
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('applyForm');
+    if (form) {
+      form.addEventListener('submit', function() {
+        const data = collectDriverFormData();
+        if (data && data.fullName) {
+          prepareSuccessDossier(data);
+        }
+      });
+    }
+  });
 
   if(window.location.search.includes('success=1')){
     document.getElementById('applyForm').style.display='none';
