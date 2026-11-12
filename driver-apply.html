@@ -269,6 +269,74 @@
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
   }
 
+  /* Work Model Category Cards */
+  .model-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .model-card-label {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 14px 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+  }
+  .model-card-label:hover {
+    border-color: #10B981;
+    background: #F0FDF4;
+  }
+  .model-card-label input[type="radio"] {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    accent-color: #10B981;
+    width: 18px;
+    height: 18px;
+  }
+  .model-card-label.selected {
+    border-color: #10B981;
+    background: #ECFDF5;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+  }
+  .model-tag {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 6px;
+    width: fit-content;
+  }
+  .tag-green { background: #DCFCE7; color: #166534; }
+  .tag-blue { background: #DBEAFE; color: #1E40AF; }
+  .tag-gold { background: #FEF3C7; color: #92400E; }
+  .model-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+  .model-payout {
+    font-size: 13px;
+    font-weight: 700;
+    color: #059669;
+    margin-bottom: 4px;
+  }
+  .model-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
   .benefits-callout {
     background: #F0FDF4;
     border: 1.5px solid #86EFAC;
@@ -422,6 +490,7 @@
 
   @media (max-width: 768px) {
     .benefits-grid { grid-template-columns: 1fr 1fr; }
+    .model-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 650px) {
     .grid-2 { grid-template-columns: 1fr; gap: 14px; }
@@ -431,6 +500,7 @@
     .btn-submit { width: 100%; text-align: center; }
     .whatsapp-direct { justify-content: center; }
     .benefits-grid { grid-template-columns: 1fr; }
+    .model-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -453,15 +523,15 @@
   <!-- Top Hero Banner Card -->
   <div class="banner-card">
     <div class="badge-trust">★ FORM B: DRIVER APPLICATION (ड्राइवर रजिस्ट्रेशन)</div>
-    <h1>( I am Driver ) / ड्राइवर नौकरी आवेदन</h1>
-    <p>दिल्ली NCR में अच्छी फैमिली व कॉर्पोरेट में प्राइवेट कार ड्राइवर नौकरी • महीने का <strong>₹20,000 से ₹28,000</strong> कमाएं • 0% कमीशन (कोई दलाली नहीं) • 1-दिन ट्रायल का <strong>₹800 मानदेय</strong> सीधा UPI पर।</p>
+    <h1>( I am Driver ) / ड्राइवर नौकरी व फ्लीट पार्टनर आवेदन</h1>
+    <p>दिल्ली NCR में अपनी पसंद के अनुसार काम चुनें: <strong>मासिक फैमिली ड्राइवर (₹20k - ₹28k/महीना)</strong>, <strong>वीकली सैलरी फ्लीट ड्राइवर (₹8k - ₹10k/हफ्ता)</strong>, या <strong>कार रेंटल मॉडल (₹50k+ कमाई)</strong> • 100% फ्री भर्ती • कोई कमीशन या दलाली नहीं।</p>
   </div>
 
   <!-- Trust / Rule Notice -->
   <div class="filter-notice">
     <span style="font-size:22px;">🛡️</span>
     <div>
-      <strong>100% फ्री रजिस्ट्रेशन • ₹0 कमीशन:</strong> आपसे नौकरी दिलाने का कोई पैसा या कमीशन नहीं लिया जाता। मालिक की गाड़ी, मालिक का पेट्रोल। 10–12 घंटे ड्यूटी (मालिक की जरूरत अनुसार) + ओवर-टाइम व वीकली ऑफ। ट्रायल के दिन का ₹800 शाम 7:00 बजे तुरंत मिलता है।
+      <strong>100% फ्री रजिस्ट्रेशन • 0% कमीशन:</strong> आपसे भर्ती का कोई चार्ज या कमीशन नहीं लिया जाता। पारदर्शी भुगतान, सुरक्षित कार्य और आपकी जरूरत के अनुसार कार्य विकल्प।
     </div>
   </div>
 
@@ -551,6 +621,40 @@
         <span>ड्यूटी प्राथमिकता व वेतन (Duty Preference &amp; Expected Salary)</span>
       </div>
 
+      <!-- Work Category Model Selection Cards -->
+      <label style="font-size:13.5px; font-weight:700; margin-bottom:8px;">आप किस प्रकार का काम ढूंढ रहे हैं? (Select Your Preferred Work Model) <span class="req">*</span></label>
+      <div class="model-grid">
+        <label class="model-card-label selected" id="card-family">
+          <input type="radio" name="Job Model Category" value="Private Family Chauffeur (मासिक फैमिली ड्राइवर)" checked onchange="updateModelSelection()">
+          <div>
+            <span class="model-tag tag-green">मासिक पक्की नौकरी</span>
+            <div class="model-title">मासिक फैमिली ड्राइवर</div>
+            <div class="model-payout">₹20,000 - ₹28,000 / महीना</div>
+          </div>
+          <div class="model-desc">फैमिली व कॉर्पोरेट कार • 10-12h ड्यूटी • मालिक की कार, मालिक का पेट्रोल</div>
+        </label>
+
+        <label class="model-card-label" id="card-fleet">
+          <input type="radio" name="Job Model Category" value="Weekly Salary Fleet Driver (वीकली सैलरी फ्लीट ड्राइवर)" onchange="updateModelSelection()">
+          <div>
+            <span class="model-tag tag-blue">वीकली सैलरी</span>
+            <div class="model-title">फ्लीट कैब ड्राइवर</div>
+            <div class="model-payout">₹8,000 - ₹10,000 / हफ्ता</div>
+          </div>
+          <div class="model-desc">हर मंगलवार बैंक में वेतन • ₹500-700 रोज़ का इंसेंटिव • चार्जिंग/सर्विसिंग कंपनी की</div>
+        </label>
+
+        <label class="model-card-label" id="card-rental">
+          <input type="radio" name="Job Model Category" value="Car Rental / Own Duty (गाड़ी घर ले जाने वाला रेंटल मॉडल)" onchange="updateModelSelection()">
+          <div>
+            <span class="model-tag tag-gold">गाड़ी घर ले जाएं</span>
+            <div class="model-title">रेंटल / DTO मॉडल</div>
+            <div class="model-payout">₹50,000 - ₹65,000+ / महीना</div>
+          </div>
+          <div class="model-desc">गाड़ी 24h अपने पास रखें • कोई ड्यूटी टाइम नहीं • Uber/Rapido/Airport राइड्स</div>
+        </label>
+      </div>
+
       <div class="grid-2">
         <div>
           <label for="d-stayin">क्या रहने की जगह (कमरा) चाहिए? (Accommodation / Stay-in) <span class="req">*</span></label>
@@ -565,6 +669,8 @@
           <label for="d-duty">काम का प्रकार (Duty Type Preference) <span class="req">*</span></label>
           <select id="d-duty" name="Duty Type Preference" required>
             <option value="Permanent Monthly Job (केवल पक्की मासिक नौकरी)">केवल पक्की मासिक नौकरी (Monthly Job - Family / Corporate)</option>
+            <option value="Weekly Salary Fleet (साप्ताहिक वेतन फ्लीट ड्राइवर - ₹8k-₹10k/हफ्ता)">साप्ताहिक वेतन फ्लीट ड्राइवर (Weekly Salary ₹8,000-₹10,000/हफ्ता)</option>
+            <option value="Rental / Keep Car at Home (गाड़ी घर ले जाने वाला रेंटल मॉडल)">रेंटल मॉडल - गाड़ी घर ले जाएं (Keep Car at Home - Earn ₹50,000+)</option>
             <option value="Outstation Trips (3-5 Days Outstation)">आउटस्टेशन हाईवे ट्रिप (3 से 5 दिन की यात्रा - Outstation Trips)</option>
             <option value="15-Days Reliever Duty (15 दिन की रिलेवर ड्यूटी)">15-दिन की रिलेवर ड्यूटी (15 Days Temporary Duty)</option>
             <option value="Event / Wedding Chauffeur (1-2 दिन शादी/इवेंट)">शादी व पार्टी ड्राइविंग (Event / Wedding 1-2 Days)</option>
@@ -591,6 +697,12 @@
               <option value="₹20,000 - ₹22,000 / महीना">₹20,000 से ₹22,000 / महीना (10 घंटे ड्यूटी)</option>
               <option value="₹22,000 - ₹25,000 / महीना" selected>₹22,000 से ₹25,000 / महीना (अनुभवी / ऑटोमैटिक / 12 घंटे)</option>
               <option value="₹25,000 - ₹28,000 / महीना">₹25,000 से ₹28,000 / महीना (लग्जरी कार / स्टे-इन)</option>
+            </optgroup>
+            <optgroup label="साप्ताहिक सैलरी फ्लीट (Weekly Salary Fleet)">
+              <option value="₹8,000 - ₹10,000 / हफ्ता (हर मंगलवार बैंक में वेतन)">₹8,000 से ₹10,000 / हफ्ता (हर मंगलवार बैंक में वेतन)</option>
+            </optgroup>
+            <optgroup label="रेंटल मॉडल अनुमानित कमाई (Car Rental Earnings)">
+              <option value="₹50,000 - ₹65,000+ / महीना (गाड़ी घर ले जाएं)">₹50,000 से ₹65,000+ / महीना (गाड़ी घर ले जाएं)</option>
             </optgroup>
             <optgroup label="15-दिन रिलेवर (15 Days Reliever)">
               <option value="₹10,000 - ₹12,000 for 15 Days">₹10,000 से ₹12,000 (15 दिन का मानदेय)</option>
@@ -708,6 +820,34 @@
 </div>
 
 <script>
+  function updateModelSelection() {
+    const cards = [
+      { id: 'card-family', dutyVal: 'Permanent Monthly Job (केवल पक्की मासिक नौकरी)', salVal: '₹22,000 - ₹25,000 / महीना' },
+      { id: 'card-fleet', dutyVal: 'Weekly Salary Fleet (साप्ताहिक वेतन फ्लीट ड्राइवर - ₹8k-₹10k/हफ्ता)', salVal: '₹8,000 - ₹10,000 / हफ्ता (हर मंगलवार बैंक में वेतन)' },
+      { id: 'card-rental', dutyVal: 'Rental / Keep Car at Home (गाड़ी घर ले जाने वाला रेंटल मॉडल)', salVal: '₹50,000 - ₹65,000+ / महीना (गाड़ी घर ले जाएं)' }
+    ];
+
+    cards.forEach(item => {
+      const cardEl = document.getElementById(item.id);
+      if (!cardEl) return;
+      const radio = cardEl.querySelector('input[type="radio"]');
+      if (radio && radio.checked) {
+        cardEl.classList.add('selected');
+        // Auto-select corresponding duty & salary if available
+        const dutySelect = document.getElementById('d-duty');
+        if (dutySelect && item.dutyVal) {
+          dutySelect.value = item.dutyVal;
+        }
+        const salSelect = document.getElementById('d-salary');
+        if (salSelect && item.salVal) {
+          salSelect.value = item.salVal;
+        }
+      } else {
+        cardEl.classList.remove('selected');
+      }
+    });
+  }
+
   if(window.location.search.includes('success=1')){
     document.getElementById('applyForm').style.display='none';
     document.getElementById('successBox').style.display='block';
