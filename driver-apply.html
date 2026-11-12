@@ -146,6 +146,49 @@
     padding: 0 16px;
   }
 
+  /* Running Marquee Strip */
+  .marquee-strip {
+    background: #07101E;
+    color: #F8FAFC;
+    border-bottom: 2px solid var(--gold);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding: 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .marquee-track {
+    display: inline-flex;
+    gap: 40px;
+    animation: marqueeScroll 28s linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+  .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .marquee-tag {
+    background: var(--gold);
+    color: #07101E;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .marquee-dot {
+    color: var(--gold);
+    font-size: 14px;
+  }
+  @keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   .banner-card {
     background: linear-gradient(135deg, #064E3B 0%, #0d2340 100%);
     color: #ffffff;
@@ -525,20 +568,86 @@
   </div>
 </header>
 
+<!-- Running Marquee Banner -->
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <div class="marquee-item">
+      <span class="marquee-tag">तत्काल भर्ती</span>
+      <span>दिल्ली NCR में ड्राइवर व फ्लीट पार्टनर भर्ती</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">100% फ्री</span>
+      <span>ड्राइवर से कोई कमीशन या दलाली नहीं</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">ऑप्शन 1</span>
+      <span>मासिक फैमिली ड्राइवर: ₹20,000 - ₹28,000 / महीना</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">ऑप्शन 2</span>
+      <span>वीकली सैलरी फ्लीट: ₹8,000 - ₹10,000 / हफ्ता (मंगलवार भुगतान)</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">ऑप्शन 3</span>
+      <span>कार रेंटल / DTO: गाड़ी घर ले जाएं • ₹50,000 - ₹65,000+ कमाई</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">1-दिन ट्रायल</span>
+      <span>₹800 मानदेय सीधा UPI पर उसी दिन शाम 7 बजे</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <!-- Repeat for seamless continuous scrolling -->
+    <div class="marquee-item">
+      <span class="marquee-tag">तत्काल भर्ती</span>
+      <span>दिल्ली NCR में ड्राइवर व फ्लीट पार्टनर भर्ती</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">100% फ्री</span>
+      <span>ड्राइवर से कोई कमीशन या दलाली नहीं</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">ऑप्शन 1</span>
+      <span>मासिक फैमिली ड्राइवर: ₹20,000 - ₹28,000 / महीना</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">ऑप्शन 2</span>
+      <span>वीकली सैलरी फ्लीट: ₹8,000 - ₹10,000 / हफ्ता (मंगलवार भुगतान)</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">ऑप्शन 3</span>
+      <span>कार रेंटल / DTO: गाड़ी घर ले जाएं • ₹50,000 - ₹65,000+ कमाई</span>
+    </div>
+    <span class="marquee-dot">&bull;</span>
+    <div class="marquee-item">
+      <span class="marquee-tag">1-दिन ट्रायल</span>
+      <span>₹800 मानदेय सीधा UPI पर उसी दिन शाम 7 बजे</span>
+    </div>
+  </div>
+</div>
+
 <div class="main-wrap">
 
   <!-- Top Hero Banner Card -->
   <div class="banner-card">
     <div class="badge-trust">★ FORM B: DRIVER APPLICATION (ड्राइवर रजिस्ट्रेशन)</div>
     <h1>( I am Driver ) / ड्राइवर नौकरी व फ्लीट पार्टनर आवेदन</h1>
-    <p>दिल्ली NCR में अपनी पसंद के अनुसार काम चुनें: <strong>मासिक फैमिली ड्राइवर (₹20k - ₹28k/महीना)</strong>, <strong>वीकली सैलरी फ्लीट ड्राइवर (₹8k - ₹10k/हफ्ता)</strong>, या <strong>कार रेंटल मॉडल (₹50k+ कमाई)</strong> • 100% फ्री भर्ती • कोई कमीशन या दलाली नहीं।</p>
+    <p>दिल्ली NCR में अपनी सुविधा अनुसार काम चुनें: <strong>मासिक फैमिली कार ड्राइवर</strong> (₹20,000 - ₹28,000/महीना), <strong>वीकली सैलरी फ्लीट कैब</strong> (₹8,000 - ₹10,000/हफ्ता), या <strong>कार रेंटल मॉडल</strong> (गाड़ी 24h अपने पास रखें • ₹50,000+ कमाई) • 100% फ्री भर्ती • कोई कमीशन या रजिस्ट्रेशन चार्ज नहीं।</p>
   </div>
 
   <!-- Trust / Rule Notice -->
   <div class="filter-notice">
     <span style="font-size:22px;">🛡️</span>
     <div>
-      <strong>100% फ्री रजिस्ट्रेशन • 0% कमीशन:</strong> आपसे भर्ती का कोई चार्ज या कमीशन नहीं लिया जाता। पारदर्शी भुगतान, सुरक्षित कार्य और आपकी जरूरत के अनुसार कार्य विकल्प।
+      <strong>100% फ्री भर्ती • ₹0 कमीशन:</strong> आपसे कोई दलाली नहीं ली जाती। मालिक की कार, मालिक का पेट्रोल या कंपनी फ्लीट। नीचे फॉर्म में अपनी पसंद का काम चुनें और आज ही जॉइन करें।
     </div>
   </div>
 
