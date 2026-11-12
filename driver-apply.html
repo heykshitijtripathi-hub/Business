@@ -1048,19 +1048,49 @@
     };
   }
 
+  function cleanPdfText(text) {
+    if (!text) return '-';
+    var s = String(text);
+    // Replace ₹ with Rs.
+    s = s.replace(/₹/g, 'Rs. ');
+    // If text contains brackets with English, prefer the English part: e.g. "दोनों — मैनुअल (Manual & Automatic)" -> "Manual & Automatic"
+    var matchParen = s.match(/\(([^)]+)\)/);
+    if (matchParen && /[a-zA-Z0-9]/.test(matchParen[1])) {
+      s = matchParen[1];
+    }
+    // Remove non-ASCII characters (Devanagari glyphs which corrupt standard PDF helvetica font)
+    s = s.replace(/[^\x00-\x7F]/g, ' ').replace(/\s+/g, ' ').trim();
+    return s || '-';
+  }
+
   function downloadDriverResumePDF() {
-    const d = window.lastSubmittedDriver || collectDriverFormData() || {
+    const raw = window.lastSubmittedDriver || collectDriverFormData() || {
       fullName: 'Professional Driver',
-      age: '32 Years',
+      age: '31 to 35 Years',
       subRegion: 'Gurugram / South Delhi',
       currentArea: 'Palam Vihar / DLF',
       nativeState: 'Uttar Pradesh',
-      experience: '7 Years',
-      transmission: 'Both Manual & Automatic + Luxury SUV',
+      experience: '5 to 8 Years',
+      transmission: 'Both Manual and Automatic',
       dutyType: 'Permanent Monthly Job (10-12 Hours)',
-      salary: '₹22,000 - ₹25,000 / month',
-      maps: 'Fluent with Google Maps & Smartphone',
+      salary: 'Rs. 22,000 - 25,000 / month',
+      maps: 'Fully Fluent with Google Maps',
       notes: 'Non-smoker, clean track record, well mannered'
+    };
+
+    const d = {
+      fullName: cleanPdfText(raw.fullName) || 'Driver Candidate',
+      age: cleanPdfText(raw.age) || '30 Years',
+      subRegion: cleanPdfText(raw.subRegion) || 'Delhi NCR',
+      currentArea: cleanPdfText(raw.currentArea) || 'Delhi NCR',
+      nativeState: cleanPdfText(raw.nativeState) || 'North India',
+      experience: cleanPdfText(raw.experience) || '5+ Years',
+      transmission: cleanPdfText(raw.transmission) || 'Manual and Automatic',
+      dutyType: cleanPdfText(raw.dutyType) || 'Permanent Monthly Job',
+      stayin: cleanPdfText(raw.stayin) || 'Day Duty Only',
+      salary: cleanPdfText(raw.salary) || 'Rs. 22,000 - 25,000 / month',
+      maps: cleanPdfText(raw.maps) || 'Fully Fluent with Google Maps',
+      notes: cleanPdfText(raw.notes) || 'Non-smoker, polite, verified background'
     };
 
     if (!window.jspdf || !window.jspdf.jsPDF) {
@@ -1076,25 +1106,25 @@
     });
 
     const pageW = 210;
-    const pageH = 297;
     const margin = 16;
     const contentW = pageW - (margin * 2);
 
     // 1. Top Decorative Brand Bar
     doc.setFillColor(7, 16, 30); // Navy #07101E
-    doc.rect(0, 0, pageW, 30, 'F');
+    doc.rect(0, 0, pageW, 36, 'F');
 
     doc.setFillColor(255, 183, 3); // Gold #FFB703
-    doc.rect(0, 30, pageW, 2.5, 'F');
+    doc.rect(0, 36, pageW, 2.5, 'F');
 
-    // Add Original Drivers Saathi Logo if available
+    // Add Logo inside crisp White Rounded Badge
     let textLeftMargin = margin;
     if (window.DRIVERS_SAATHI_LOGO_BASE64) {
       try {
-        // Logo natural aspect ratio ~ 1.15 : 1 (width : height)
-        // Draw 24mm wide, 21mm tall logo on dark bar
-        doc.addImage(window.DRIVERS_SAATHI_LOGO_BASE64, 'PNG', margin, 4.5, 24, 21);
-        textLeftMargin = margin + 28;
+        // Draw white rounded container for logo
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(margin, 4, 32, 28, 2, 2, 'F');
+        doc.addImage(window.DRIVERS_SAATHI_LOGO_BASE64, 'PNG', margin + 2, 5.5, 28, 25);
+        textLeftMargin = margin + 37;
       } catch (err) {
         console.warn('PDF Logo render notice:', err);
       }
@@ -1104,26 +1134,26 @@
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text('DRIVERS SAATHI', textLeftMargin, 15);
+    doc.text('DRIVERS SAATHI', textLeftMargin, 16);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(8.5);
     doc.setTextColor(255, 183, 3);
-    doc.text('GOVT. MSME REGISTERED ENTERPRISE  |  DELHI-NCR CHAUFFEUR PLACEMENT', textLeftMargin, 22);
+    doc.text('GOVT. MSME REGISTERED ENTERPRISE  |  DELHI-NCR CHAUFFEUR PLACEMENT', textLeftMargin, 23);
 
     // Document Type Header (Right Side)
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
+    doc.setFontSize(10.5);
     doc.setTextColor(255, 255, 255);
-    doc.text('VERIFIED CHAUFFEUR DOSSIER', pageW - margin, 14, { align: 'right' });
+    doc.text('VERIFIED CHAUFFEUR DOSSIER', pageW - margin, 16, { align: 'right' });
 
     const refId = 'DS-' + Math.floor(100000 + Math.random() * 900000);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(8.5);
     doc.setTextColor(203, 213, 225);
-    doc.text('Candidate ID: ' + refId, pageW - margin, 21, { align: 'right' });
+    doc.text('Candidate ID: ' + refId, pageW - margin, 23, { align: 'right' });
 
-    let y = 42;
+    let y = 47;
 
     // 2. Candidate Hero Title & Badges
     doc.setTextColor(7, 16, 30);
@@ -1189,7 +1219,7 @@
 
     // SECTION 3: Special Notes & Chauffeur Etiquette
     y = drawSectionHeader('3. ADDITIONAL NOTES & SPECIAL QUALIFICATIONS', y);
-    const notesText = d.notes || 'Non-smoker, punctual, verified background. Fluent with Delhi-NCR routes & highways. Courteous demeanor suitable for family, executives & corporate deployment.';
+    const notesText = d.notes || 'Non-smoker, punctual, verified background. Fluent with Delhi-NCR routes and highways. Courteous demeanor suitable for family, executives and corporate deployment.';
     const splitNotes = doc.splitTextToSize(notesText, contentW - 8);
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(9);
@@ -1201,19 +1231,19 @@
     doc.setFillColor(254, 242, 242); // Light Red #FEF2F2
     doc.setDrawColor(252, 165, 165);
     doc.setLineWidth(0.4);
-    doc.roundedRect(margin, y, contentW, 28, 2, 2, 'FD');
+    doc.roundedRect(margin, y, contentW, 26, 2, 2, 'FD');
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(185, 28, 28); // Dark Red
-    doc.text('CONFIDENTIALITY NOTICE & CLIENT PROTOCOL (ANTI-BYPASS PROTECTED)', margin + 4, y + 6);
+    doc.text('CONFIDENTIALITY NOTICE & CLIENT PROTOCOL (ANTI-BYPASS PROTECTED)', margin + 4, y + 5.5);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.8);
     doc.setTextColor(127, 29, 29);
-    doc.text('1. Direct candidate phone numbers and original government IDs (Aadhaar & DL) are securely held by Drivers Saathi.', margin + 4, y + 12);
-    doc.text('2. Complete verified police dossier & contact are released only upon 1-Day Trial Booking confirmation.', margin + 4, y + 17);
-    doc.text('3. Direct off-platform hiring without Drivers Saathi registration is strictly prohibited and subject to legal action.', margin + 4, y + 22);
+    doc.text('1. Direct candidate phone numbers and original government IDs (Aadhaar & DL) are securely held by Drivers Saathi.', margin + 4, y + 11);
+    doc.text('2. Complete verified police dossier & contact are released only upon 1-Day Trial Booking confirmation.', margin + 4, y + 15.5);
+    doc.text('3. Direct off-platform hiring without Drivers Saathi registration is strictly prohibited and subject to legal action.', margin + 4, y + 20);
 
     // 5. Official Agency Placement Footer
     const footerY = 268;
@@ -1251,34 +1281,38 @@
     const waText = encodeURIComponent(
       '🚗 *[NEW DRIVER DOSSIER / BIO-DATA]*\n' +
       '-----------------------------------\n' +
-      '👤 *नाम:* ' + data.fullName + '\n' +
-      '📞 *मोबाइल:* ' + data.phone + '\n' +
-      '🎂 *उम्र:* ' + data.age + '\n' +
-      '📍 *वर्तमान इलाका:* ' + data.currentArea + ' (' + data.subRegion + ')\n' +
-      '🏠 *मूल राज्य:* ' + data.nativeState + '\n' +
-      '⭐ *अनुभव:* ' + data.experience + '\n' +
-      '🚗 *गाड़ियां:* ' + data.transmission + '\n' +
-      '💼 *काम का प्रकार:* ' + data.dutyType + '\n' +
-      '💰 *अपेक्षित वेतन:* ' + data.salary + '\n' +
-      '🆔 *DL नंबर:* ' + data.dlNumber + '\n' +
+      '👤 *नाम:* ' + (data.fullName || '') + '\n' +
+      '📞 *मोबाइल:* ' + (data.phone || '') + '\n' +
+      '🎂 *उम्र:* ' + (data.age || '') + '\n' +
+      '📍 *वर्तमान इलाका:* ' + (data.currentArea || '') + ' (' + (data.subRegion || '') + ')\n' +
+      '🏠 *मूल राज्य:* ' + (data.nativeState || '') + '\n' +
+      '⭐ *अनुभव:* ' + (data.experience || '') + '\n' +
+      '🚗 *गाड़ियां:* ' + (data.transmission || '') + '\n' +
+      '💼 *काम का प्रकार:* ' + (data.dutyType || '') + '\n' +
+      '💰 *अपेक्षित वेतन:* ' + (data.salary || '') + '\n' +
+      '🆔 *DL नंबर:* ' + (data.dlNumber || '') + '\n' +
       '📝 *विशेष नोट:* ' + (data.notes || 'None') + '\n' +
       '-----------------------------------\n' +
       '✅ *मैंने Drivers Saathi पर फॉर्म भर दिया है और अपना PDF बायोडाटा डाउनलोड कर लिया है। कृपया मेरा 1-दिन का ट्रायल शेड्यूल करें।*'
     );
 
-    const waLink = document.getElementById('btnShareWhatsAppDossier');
-    if (waLink) {
-      waLink.href = 'https://wa.me/918175087004?text=' + waText;
+    const waLinkUrl = 'https://wa.me/918175087004?text=' + waText;
+    const waBtn = document.getElementById('btnShareWhatsAppDossier');
+    if (waBtn) {
+      waBtn.href = waLinkUrl;
     }
 
-    // Auto-trigger PDF download for instant driver satisfaction
+    // 1. Instant Auto-download PDF
+    try {
+      downloadDriverResumePDF();
+    } catch (err) {
+      console.warn('PDF download err:', err);
+    }
+
+    // 2. Automatically open WhatsApp after brief pause so PDF finishes downloading
     setTimeout(function() {
-      try {
-        downloadDriverResumePDF();
-      } catch (err) {
-        console.warn('Auto PDF trigger notice:', err);
-      }
-    }, 600);
+      window.location.href = waLinkUrl;
+    }, 1400);
   }
 
   // Listen to form submit to capture data before hiding
